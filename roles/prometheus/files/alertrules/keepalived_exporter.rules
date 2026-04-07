@@ -1,0 +1,23 @@
+groups:
+- name: keepalived_exporter
+  rules:
+  - alert: Keepalived Cluster Zustand 
+    expr: count by(environment, hostname, iname, instance, job, os, os_version, port, product, severity,state) (keepalived_become_master_total{alerting_required!='false',state='MASTER'}) != 1
+    annotations:
+      metric_name: count by(environment, hostname, iname, instance, job, os, os_version, port, product, severity,state) (keepalived_become_master_total%7Binstance='{{  $labels.instance  }}',state='MASTER'%7D)
+      description: 'Keepalived auf Cluster {{ $labels.iname }} kein Member im Master Status.'
+      value: '{{ $labels.iname }}'
+    for: 3m
+    labels:
+      severity: critical
+      alert_scc: true
+  - alert: Keepalived Dienst abgestürzt
+    expr: keepalived_up{alerting_required!='false'} != 1
+    annotations:
+      metric_name: keepalived_up%7Binstance='{{  $labels.instance  }}'%7D 
+      description: 'Keepalived auf Host {{ $labels.hostname }} abgestürzt. Bitte überprüfen: ssh {{ $labels.hostname }} \n systemctl status keepalived'
+      value: '{{ $labels.iname }}'
+    for: 3m
+    labels:
+      severity: critical
+      alert_scc: true

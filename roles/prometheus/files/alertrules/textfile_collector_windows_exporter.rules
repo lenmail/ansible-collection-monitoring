@@ -1,0 +1,79 @@
+groups:
+- name: textfile_collector_rica_problem
+  rules:
+  - alert: 'CA Problem'
+    expr: dvag_ca_problem{alerting_required!='false'} == 1
+    labels:
+      treaton_severity: critical
+      alert_scc: true
+      severity: critical
+    annotations:
+      metric_name: dvag_ca_problem%7Binstance='{{  $labels.instance  }}'%7D
+      description: 'Das CA System hat ein Problem.'
+      value: '{{ $labels.event }}'
+      scc_info: 'Treaton managed System Bereitschaft ist zwischen 17:00-08:00 Mo-Fr & 00:00-23:59 an Sa-So & Feiertagen zu informieren unter: \n Windows Rufbereitschaft: 069-34871947'
+
+  - alert: ESX Cluster CPU Utilization
+    for: 10m
+    expr: dvag_esx_utilization{utilization="cpu_used_percent", managedby='Treaton'} > 80
+    annotations:
+      metric_name: dvag_esx_utilization%7Binstance='{{  $labels.instance  }}'%7D
+      value: '{{ $value }}'
+      summary: 'ESX Cluster CPU Utilization on Host (instance {{ $labels.instance }}) is over {{ $value }}'
+      scc_info: 'Treaton managed System Bereitschaft ist zwischen 17:00-08:00 Mo-Fr & 00:00-23:59 an Sa-So & Feiertagen zu informieren unter: \n Virtualisierung Rufbereitschaft: 069-34871946'
+      description: 'ESX Cluster CPU Utilization is more than 80%'
+
+  - alert: ESX Cluster Memory Utilization
+    for: 10m
+    expr: dvag_esx_utilization{utilization="memory_used_percent", managedby='Treaton'} > 80
+    annotations:
+      metric_name: dvag_esx_utilization%7Binstance='{{  $labels.instance  }}'%7D
+      value: '{{ $value }}'
+      summary: 'ESX Cluster Memory Utilization on Host (instance {{ $labels.instance }}) is over {{ $value }}'
+      scc_info: 'Treaton managed System Bereitschaft ist zwischen 17:00-08:00 Mo-Fr & 00:00-23:59 an Sa-So & Feiertagen zu informieren unter: \n Virtualisierung Rufbereitschaft: 069-34871946'
+      description: 'ESX Cluster Memory Utilization is more than 80%'
+
+  - alert: ESX Datastore Freespace GB
+    expr: dvag_datastore_freespace_gb{instance=~"SVMD.+", managedby='Treaton'}  < 600
+    annotations:
+      metric_name: dvag_datastore_freespace_gb%7Binstance='{{  $labels.instance  }}'%7D
+      value: '{{ $value }}'
+      summary: 'ESX Datastore Freespace on Host (instance {{ $labels.instance }}) is over {{ $value }} GB'
+      scc_info: 'Treaton managed System Bereitschaft ist zwischen 17:00-08:00 Mo-Fr & 00:00-23:59 an Sa-So & Feiertagen zu informieren unter: \n Virtualisierung Rufbereitschaft: 069-34871946'
+      description: 'ESX Datastore Freespace is less than 600 GB'
+
+  - alert: ESX Datastore Freespace Percent
+    expr: dvag_datastore_full_percent{instance!~"SVMD.+", managedby='Treaton'}  > 90
+    annotations:
+      metric_name: dvag_datastore_full_percent%7Binstance='{{  $labels.instance  }}'%7D
+      value: '{{ $value }}'
+      summary: 'ESX Datastore Freespace on Host (instance {{ $labels.instance }}) is over {{ $value }} %'
+      scc_info: 'Treaton managed System Bereitschaft ist zwischen 17:00-08:00 Mo-Fr & 00:00-23:59 an Sa-So & Feiertagen zu informieren unter: \n Virtualisierung Rufbereitschaft: 069-34871946'
+      description: 'ESX Datastore Freespace is over 90 %'
+
+  - alert: ESX Snapshot Size
+    expr: dvag_vm_snaphot_size{managedby='Treaton'}  > 150
+    annotations:
+      metric_name: dvag_vm_snaphot_size%7Binstance='{{  $labels.instance  }}'%7D
+      value: '{{ $value }}'
+      summary: 'ESX Snapshot Size on Host (instance {{ $labels.instance }}) is over {{ $value }} GB'
+      scc_info: 'Treaton managed System Bereitschaft ist zwischen 17:00-08:00 Mo-Fr & 00:00-23:59 an Sa-So & Feiertagen zu informieren unter: \n Virtualisierung Rufbereitschaft: 069-34871946'
+      description: 'ESX Snapshot Size is over 150 GB'
+
+  - alert: ESX SCSI down
+    expr: dvag_esx_scsi_down > 0
+    annotations:
+      metric_name: dvag_esx_scsi_down%7Binstance='{{  $labels.instance  }}'%7D
+      value: '{{ $labels.SCSIPath }}'
+      summary: 'ESX Snapshot SCSI down on Host (instance {{ $labels.instance }}) path {{ $labels.SCSIPath }} '
+      scc_info: 'Treaton managed System Bereitschaft ist zwischen 17:00-08:00 Mo-Fr & 00:00-23:59 an Sa-So & Feiertagen zu informieren unter: \n Virtualisierung Rufbereitschaft: 069-34871946'
+      description: 'ESX SCSI down'
+
+  - alert: ESX vmnic down
+    expr: dvag_esx_vmnic_down == 1
+    annotations:
+      metric_name: dvag_esx_vmnic_down%7Binstance='{{  $labels.instance  }}'%7D
+      value: '{{ $labels.VMNic }}'
+      summary: 'ESX Snapshot vmnic down on Host (instance {{ $labels.instance }}) adapter {{ $labels.VMNic }}'
+      scc_info: 'Treaton managed System Bereitschaft ist zwischen 17:00-08:00 Mo-Fr & 00:00-23:59 an Sa-So & Feiertagen zu informieren unter: \n Virtualisierung Rufbereitschaft: 069-34871946'
+      description: 'ESX vmnic down'

@@ -1,0 +1,5 @@
+---
+proxy_env: {}
+ilo5_exporter_config_flags_extra:
+  api.username: "{{ ilo5_user }}"
+  api.password: "{{ ilo5_pass }}"

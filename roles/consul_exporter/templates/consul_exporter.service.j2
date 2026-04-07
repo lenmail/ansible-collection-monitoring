@@ -1,0 +1,35 @@
+{{ ansible_managed | comment }}
+[Unit]
+Description=Prometheus Consul Exporter
+Documentation=https://github.com/prometheus/consul_exporter
+After=network-online.target
+StartLimitInterval=0
+
+[Service]
+{% if consul_exporter_consul_token is defined and consul_exporter_consul_token | length > 0 %}
+Environment="CONSUL_HTTP_TOKEN={{ consul_exporter_consul_token }}"
+{% endif %}
+Type=simple
+User={{ consul_exporter_system_user }}
+Group={{ consul_exporter_system_group }}
+ExecReload=/bin/kill -HUP $MAINPID
+ExecStart={{ consul_exporter_binary_install_dir }}/consul_exporter \
+{% if consul_exporter_params | length > 0 %}
+{% for item in consul_exporter_params %}
+  --{{ item }} \
+{% endfor %}
+{% endif %}
+  --web.listen-address '{{ consul_exporter_web_listen_address }}:{{ consul_exporter_web_listen_port }}' \
+  --log.level '{{ consul_exporter_log_level }}' \
+  --log.format '{{ consul_exporter_log_format }}'
+
+KillMode=process
+SyslogIdentifier=consul_exporter
+Restart=always
+RestartSec=30
+PrivateTmp=yes
+ProtectHome=yes
+NoNewPrivileges=yes
+
+[Install]
+WantedBy=multi-user.target

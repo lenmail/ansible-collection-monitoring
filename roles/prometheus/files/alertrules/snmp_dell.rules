@@ -1,0 +1,40 @@
+  - alert: Bios Version
+    annotations:
+      description: "Bios Version ungleich 2.9.0 und 2.11.0"
+      summary: SystemBiosVersion
+    expr: systemBIOSVersionName{systemBIOSIndex="1",systemBIOSVersionName!~"2.9.0|2.11.0",systemBIOSchassisIndex="1"} 
+    for: 3m
+    labels:
+      severity: warning
+      scc: no
+  - alert: Dell IDRAC kritisches Temperatur Problem
+    annotations:      
+      summary: "IDRAC Temperature Problem"
+      scc_info: "https://projektportal.dvag.com/confluence/pages/viewpage.action?pageId=241208731"
+      value: "{{ $labels.fqdn}} value {{ $value }}"
+    expr: temperatureProbeReading{hostname!~"(.+-test)"} > temperatureProbeUpperCriticalThreshold
+    for: 3m
+    labels:
+      severity: critical
+      alert_scc: true
+  - alert: Dell IDRAC Temperatur Problem Warnung
+    annotations:      
+      summary: "IDRAC Temperature Problem"
+      scc_info: "https://projektportal.dvag.com/confluence/pages/viewpage.action?pageId=241208731"
+      value: "{{ $labels.fqdn}} value {{ $value }}"
+    expr: temperatureProbeReading{hostname!~"(.+-test)"} > temperatureProbeUpperNonCriticalThreshold
+    for: 3m
+    labels:
+      severity: standard
+      alert_scc: false
+  - alert: Dell IDRAC PERC Batterie Problem
+    annotations:
+      description: "Current state of battery. Possible values: \n 1: The current state could not be determined. \n 2: The battery is operating normally. \n 3: The battery has failed and needs to be replaced. \n 4: The battery temperature is high or charge level is depleting. \n 5: The battery is missing or not detected. \n 6: The battery is undergoing the re-charge phase. \n 7: The battery voltage or charge level is below the threshold."
+      summary: Dell IDRAC PERC Batterie Problem
+      scc_info: "https://projektportal.dvag.com/confluence/pages/viewpage.action?pageId=241208731"
+      value: "{{ $labels.fqdn}} value {{ $value }}"
+    expr: batteryState{hostname!~"(.+-test)"}  != 2
+    for: 3m
+    labels:
+      severity: critical
+      alert_scc: true

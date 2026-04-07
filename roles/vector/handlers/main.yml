@@ -1,0 +1,12 @@
+---
+- name: restart vector
+  systemd:
+    name: vector
+    state: reloaded
+  tags: vector
+
+- name: reload vector
+  systemd:
+    name: vector
+    state: restarted
+  tags: vector

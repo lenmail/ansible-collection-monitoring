@@ -1,0 +1,33 @@
+groups:
+- name: apache_exporter
+  rules:
+  - alert: ApacheDown
+    expr: apache_up{alerting_required!='false'} == 0
+    for: 3m
+    labels:
+      severity: critical
+    annotations:
+      metric_name: apache_up%7Binstance='{{  $labels.instance  }}'%7D
+      value: '{{ $value }}'
+      summary: 'Apache down (instance {{ $labels.instance }})'
+      description: 'Apache down\n  VALUE = {{ $value }}'
+  - alert: ApacheWorkersLoad
+    expr: (sum by (instance) (apache_workers{alerting_required!='false',state='busy'}) / sum by (instance) (apache_scoreboard) ) * 100 > 80
+    for: 3m
+    labels:
+      severity: critical
+    annotations:
+      metric_name: (sum by (instance) (apache_workers{state='busy'}) / sum by (instance) (apache_scoreboard) ) * 100
+      value: '{{ $value }}'
+      summary: 'Apache workers load (instance {{ $labels.instance }})'
+      description: 'Apache workers in busy state approach the max workers count 80% workers busy on {{ $labels.instance }}\n  VALUE = {{ $value }}'
+  - alert: ApacheRestart
+    expr: apache_uptime_seconds_total{alerting_required!='false'} / 60 < 1
+    for: 3m
+    labels:
+      severity: standard
+    annotations:
+      metric_name: apache_uptime_seconds_total%7Binstance='{{  $labels.instance  }}'%7D / 60
+      value: '{{ $value }}'
+      summary: 'Apache restart (instance {{ $labels.instance }})'
+      description: 'Apache has just been restarted, less than one minute ago.\n  VALUE = {{ $value }}'

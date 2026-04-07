@@ -1,0 +1,150 @@
+---
+groups:
+- name: windows_exporter
+  rules:
+#  - alert: WindowsServerCollectorError
+#    expr: windows_exporter_collector_success == 0
+#    for: 3m
+#    labels:
+#      metric_name: windows_exporter_collector_success
+#      severity: critical
+#      alert_scc: true
+#    annotations:
+#      metric_name: windows_exporter_collector_success
+#      value: '{{ $value }}'
+#      summary: 'Windows Server collector Error (instance {{ $labels.instance }})'
+#      description: 'Collector {{ $labels.collector }} was not successful'
+
+  - alert: Windows Server Disk Space Usage
+    expr: 100 - 100 * ((windows_logical_disk_free_bytes{alerting_required!='false',volume!~'V:|X:|Y:|HarddiskVolume.+|P:|Z:'} / 1024 / 1024 ) / (windows_logical_disk_size_bytes{managedby!='Treaton',volume!~'V:|X:|Y:|HarddiskVolume.+|P:|Z:'} / 1024 / 1024)) > 95
+    for: 3m
+    labels:
+      alert_scc: true
+      severity: critical
+    annotations:
+      metric_name: 100 - 100 * ((windows_logical_disk_free_bytes%7Binstance='{{  $labels.instance  }}',volume!%7E'V:%7CX:%7CY:%7CHarddiskVolume.%2B%7CP:%7CZ:'%7D / 1024 / 1024 ) / (windows_logical_disk_size_bytes%7Bmanagedby!='Treaton',volume!%7E'V:%7CX:%7CY:%7CHarddiskVolume.%2B%7CP:%7CZ:'%7D / 1024 / 1024))
+      value: '{{ $value }}'
+      summary: 'Windows Server disk Space Usage (instance {{ $labels.instance }})'
+      description: 'Disk usage is more than 95%'
+
+  - alert: Windows Server Disk Space Usage
+    expr: 100 - 100 * ((windows_logical_disk_free_bytes{alerting_required!='false',volume!~'V:|X:|Y:|HarddiskVolume.+|P:|Z:'} / 1024 / 1024 ) / (windows_logical_disk_size_bytes{managedby!='Treaton',volume!~'V:|X:|Y:|HarddiskVolume.+|P:|Z:'} / 1024 / 1024)) > 95
+    for: 3m
+    labels:
+      alert_scc: false
+      severity: standard
+    annotations:
+      metric_name: 100 - 100 * ((windows_logical_disk_free_bytes%7Binstance='{{  $labels.instance  }}',volume!%7E'V:%7CX:%7CY:%7CHarddiskVolume.%2B%7CP:%7CZ:'%7D / 1024 / 1024 ) / (windows_logical_disk_size_bytes%7Bmanagedby!='Treaton',volume!%7E'V:%7CX:%7CY:%7CHarddiskVolume.%2B%7CP:%7CZ:'%7D / 1024 / 1024))
+      value: '{{ $value }}'
+      summary: 'Windows Server disk Space Usage (instance {{ $labels.instance }})'
+      description: 'Disk usage is more than 95%'
+
+  - alert: Windows Server Reboot
+    expr: changes(windows_system_system_up_time{alerting_required!='false'}[1h])  >  1
+    for: 3m
+    labels:
+      alert_scc: false
+      severity: standard
+    annotations:
+      metric_name: changes(windows_system_system_up_time%7Binstance='{{  $labels.instance  }}'%7D%5b1h%5d)
+      value: '{{ $value }}'
+      summary: 'Windows Server (instance {{ $labels.instance }}) wurde neugestartet'
+
+
+  - alert: Windows Server mssql_agent job_failed
+    expr: dvag_mssql_agentjob_failed{alerting_required!='false'} == 1
+    for: 3m
+    labels:
+      alert_scc: false
+      severity: standard
+    annotations:
+      metric_name: dvag_mssql_agentjob_failed%7Binstance='{{  $labels.instance  }}'%7D
+      value: '{{ $value }}'
+      summary: 'Wndows Server mssql_agent job failed (Text File Collector) (instance {{ $labels.instance }})'
+  - alert: Windows_app_mbamstatus
+    expr: dvag_app_mbamstatus{alerting_required!='false'} == 0
+    for: 3m
+    labels:
+      alert_scc: true
+      severity: standard
+    annotations:
+      metric_name: dvag_app_mbamstatus%7Binstance='{{  $labels.instance  }}'%7D
+      value: '{{ $value }}'
+      summary: 'Windows App Mbamstatus down (instance {{ $labels.instance }})'
+
+  - alert: Service MSIKerneldienst gecrasht
+    expr: windows_service_status{name="msikernel",status="ok"} != 1
+    labels:
+      alert_it: true
+    annotations:
+      metric_name: windows_service_status%7Binstance='{{  $labels.instance  }}',name%3D%3D'msikernel'
+      value: '{{ $labels.name }}'
+      summary: 'Dienst {{ $labels.name }} auf dem Windows Server {{ $labels.instance }} down'
+
+
+#  - alert: Prometheus Target Missing Windows
+#    expr:  up{alerting_required!='false',job=~'windows.+',hostname!~'lupagenta[2][0-9].dvaglup.com|lupagenta30.dvaglup.com|lupagta3[1-4].dvaglup.com|lupmasterfp0[1-2].dvaglup.com|dvaglupdcfp03', product!="iDOS"} == 0
+#    for: 15m
+#    labels:
+#      alert_scc: true
+#      severity: critical
+#    annotations:
+#      metric_name: up%7Binstance='{{  $labels.instance  }}'%7D
+#      value: '{{ $value }}'
+#      summary: 'Service Windows Exporter down (instance {{ $labels.instance }})'
+#      scc_info: 'Bitte bei SB ein Ticket eröffnen'
+  - alert: Prometheus Target Missing Windows iDOS
+    expr:  up{alerting_required!='false',job=~'windows.+', product="iDOS"} == 0
+    for: 15m
+    labels:
+      alert_scc: true
+      severity: critical
+    annotations:
+      metric_name: up%7Binstance='{{  $labels.instance  }}'%7D
+      value: '{{ $value }}'
+      summary: 'Service Windows Exporter down (instance {{ $labels.instance }})'
+      scc_info: 'Bitte bei BP ein Ticket eröffnen'
+  - alert: Domain Controller Service crashed
+    expr: windows_service_state{alerting_required!='false',state='running',name=~'(netlogon|dhcp|frs|dfsr|dnscache|dns|kdc|w32tm|ntds|adws)',hostname=~'(^rd.+|audc.+|iddc.+)'} != 1
+    for: 15m
+    labels:
+      alert_scc: true
+      severity: critical
+    annotations:
+      metric_name: windows_service_state%7Binstance='{{  $labels.instance  }}',state='running',name=%7E'(netlogon%7Cdhcp%7Cfrs%7Cdfsr%7Cdnscache%7Cdns%7Ckdc%7Cw32tm%7Cntds%7Cadws)',hostname=%7E'(^rd.%2B%7Caudc.%2B%7Ciddc.%2B)'%7D
+      value: '{{ $value }}'
+      summary: 'Dienst {{ $labels.name }} auf dem Windows Server {{ $labels.instance }} down'
+  - alert: Windows Server Service State Standard
+    expr: windows_service_state{alerting_required!='false',state='running',name=~'consul|windows_exporter'} != 1
+    for: 30m
+    labels:
+      alert_scc: true
+      severity: standard
+    annotations:
+      metric_name: windows_service_state%7Binstance='{{  $labels.instance  }}',state='running',name=%7E'consul%7Cwindows_exporter'%7D
+      value: '{{ $value }}'
+      summary: 'Dienst {{ $labels.name }} auf dem Windows Server {{ $labels.instance }} down'
+
+  - alert: Windows Server Cpu Usage
+    expr: (100 - avg without(core)(rate(windows_cpu_time_total{alerting_required!='false',mode='idle',managedby!='Treaton'}[2m])) * 100 > 94)
+    for: 30m
+    labels:
+      treaton_severity: standard
+      alert_it: true
+    annotations:
+      metric_name: 100 - (rate(windows_cpu_time_total%7Binstance='{{  $labels.instance  }}',mode='idle',managedby='Treaton'%7D%5b2m%5d)) * 100
+      value: '{{ $value }}'
+      summary: 'Windows Server CPU Usage on host (instance {{ $labels.instance }}) is {{ $value }}'
+      description: 'CPU Usage is more than 94%'
+
+  - alert: Windows Server Memory Usage
+    expr: windows_os_physical_memory_free_bytes{alerting_required!='false'} / windows_cs_physical_memory_bytes{managedby!='Treaton'} * 100 < 5
+    for: 60m
+    labels:
+      alert_scc: false
+      severity: standard
+    annotations:
+      metric_name: windows_os_physical_memory_free_bytes%7Binstance='{{  $labels.instance  }}'%7D / windows_cs_physical_memory_bytes%7Bmanagedby!='Treaton'%7D * 100
+      value: '{{ $value }}'
+      summary: 'Windows Server memory Usage on Host (instance {{ $labels.instance }}) is over {{ $value }}'
+      description: 'Memory usage is more than 95%'

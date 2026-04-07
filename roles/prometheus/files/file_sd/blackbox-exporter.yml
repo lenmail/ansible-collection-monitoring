@@ -1,0 +1,32 @@
+---
+- targets:
+  - lb01.wolf.local:22
+  - lb01.wolf.local:22
+  - lb02.wolf.local:22
+  - ns01.wolf.local:22
+  - ns02.wolf.local:22
+  - ntp01.wolf.local:22
+  - ntp02.wolf.local:22
+  - prometheus01.wolf.local:22
+  - pve01.wolf.local:22
+  - pve02.wolf.local:22
+  - pve03.wolf.local:22
+  - zabbix01.wolf.local:22
+  labels:
+    __param_module: ssh_banner
+    alerting_required: 'true'
+    environment: Develop
+    product: Infra
+    severity: critical
+    grafana_id: xtkCtBkiz
+    job: blackbox-exporter
+- targets:
+  - zabbix01.wolf.local:10051
+  labels:
+    __param_module: tcp_connect_ipv4
+    alerting_required: 'true'
+    environment: Develop
+    product: Infra
+    severity: critical
+    grafana_id: xtkCtBkiz
+    job: blackbox-exporter

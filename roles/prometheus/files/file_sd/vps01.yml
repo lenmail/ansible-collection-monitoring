@@ -1,0 +1,18 @@
+---
+# vps01.wolf.local
+- targets: ["localhost:9090"]
+  labels: {__scheme__: http, job: prometheus, environment: prod, product: Monitoring, hostname: vps01.wolf.local, ip: 5.189.177.25, os: 'Ubuntu 22.04'}
+- targets: ["localhost:9091"]
+  labels: {__scheme__: http, job: pushgateway, environment: prod, product: Monitoring, hostname: vps01.wolf.local, ip: 5.189.177.25, os: 'Ubuntu 22.04'}
+- targets: ["localhost:9093"]
+  labels: {__scheme__: http, job: alertmanager, environment: prod, product: Monitoring, hostname: vps01.wolf.local, ip: 5.189.177.25, os: 'Ubuntu 22.04'}
+- targets: ["localhost:3002"]
+  labels: {__scheme__: http, job: grafana, environment: prod, product: Monitoring, hostname: vps01.wolf.local, ip: 5.189.177.25, os: 'Ubuntu 22.04'}
+- targets: ["localhost:9187"]
+  labels: {__scheme__: http, job: postgres-exporter, environment: prod, product: Monitoring, hostname: vps01.wolf.local, ip: 5.189.177.25, os: 'Ubuntu 22.04'}
+- targets: ["localhost:9121"]
+  labels: {__scheme__: http, job: redis-exporter, environment: prod, product: Monitoring, hostname: vps01.wolf.local, ip: 5.189.177.25, os: 'Ubuntu 22.04'}
+- targets: ["localhost:9115"]
+  labels: {__scheme__: http, job: blackbox-exporter, environment: prod, product: Monitoring, hostname: vps01.wolf.local, ip: 5.189.177.25, os: 'Ubuntu 22.04'}
+- targets: ["localhost:6062"]
+  labels: {__scheme__: http, job: traefik-exporter, environment: prod, product: Loadbalancer, hostname: vps01.wolf.local, ip: 5.189.177.25, os: 'Ubuntu 22.04'}

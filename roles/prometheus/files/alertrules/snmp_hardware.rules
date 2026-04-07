@@ -1,0 +1,113 @@
+groups:
+- name: snmp_exporter_dell
+  rules:
+  - alert: Dell IDRAC Global System Status
+    expr: systemStateGlobalSystemStatus{hostname!~'(.+-test)'}  != 3
+    annotations:
+      metric_name: systemStateGlobalSystemStatus%7Binstance='{{  $labels.instance  }}'%7D
+      description: 'This attribute defines the global system status of all system chassis being monitored by the systems management software. 1: other 2: unknown 3: ok 4: nonCritical 5: critical 6: nonRecoverable'
+      summary: 'Global System Status'
+      scc_info: 'https://projektportal.dvag.com/confluence/pages/viewpage.action?pageId=241208731'
+      value: '{{ $labels.fqdn}} value {{ $value }}'
+    for: 3m
+    labels:
+      severity: critical
+      alert_scc: true
+  - alert: Dell IDRAC nicht erreichbar
+    expr: up{product='Dell Idracs'} == 0
+    for: 15m
+    labels:
+      severity: critical
+      alert_scc: true
+    annotations:
+      metric_name: up%7Binstance='{{  $labels.instance  }}'%7D 
+      summary: 'Dell IDRAC Module nicht mehr erreichbar (instance {{ $labels.instance }})'
+      scc_info: 'Versuchen das IDRAC Module über die Web GUI zu erreichen {{ $labels.fqdn}}
+      https://projektportal.dvag.com/confluence/pages/viewpage.action?pageId=241208731'
+      value: '{{ $labels.fqdn}}'
+- name: snmp_exporter_overall
+  rules:
+  - alert: Prometheus Target Missing Hardware Gerät
+    expr: up{alerting_required!='false', job='(snmp-exporter-hardware)'} == 0
+    annotations:
+      metric_name: up%7Binstance='{{  $labels.instance  }}'%7D 
+      description: '{{ $labels.fqdn }} kann keine SNMP Daten mehr liefern. \n Testen der Funktionalität: ping {{ $labels.fqdn}} oder \n snmpwalk -v2c -c {{ $labels.snmpCommunity }} {{ $labels.fqdn}}'
+      scc_info: 'Bitte passenden Dienstleister anhand des Info Textes oben im Ticket informieren'
+      value: '{{ $labels.fqdn}}'
+    for: 30m
+    labels:
+      severity: critical
+      alert_scc: true
+- name: snmp_exporter_compellent
+  rules:
+  - alert: Genereller Hardware Fehler
+    expr: scScStatus{alerting_required!='false'} != 1
+    annotations:
+      metric_name: scScStatus%7Binstance='{{  $labels.instance  }}'%7D 
+      description: 'Genereller Hardware Fehler auf {{ $labels.fqdn }} '
+      scc_info: 'Bitte Storage Team informieren'
+      value: '{{ $labels.fqdn }}'
+    labels:
+      severity: critical
+      alert_scc: true
+- name: snmp_exporter_netscaler
+  rules:
+  - alert: Netscaler Memory Usage too high
+    expr: resMemUsage > 80
+    annotations:
+      metric_name: resMemUsage%7Binstance='{{  $labels.instance  }}'%7D 
+      description: 'Memory Usage auf {{ $labels.hostname }} bei {{ $value }}.'
+      scc_info: 'Bitte iDos Team informieren'
+      value: '{{ $value }}'
+    for: 5m
+    labels:
+      severity: critical
+      alert_scc: true
+  - alert: Netscaler CPU Usage too high
+    expr: nsCPUusage > 90
+    annotations:
+      metric_name: nsCPUusage%7Binstance='{{  $labels.instance  }}'%7D 
+      description: 'CPU Usage auf {{ $labels.hostname }} bei {{ $value }} Prozent über 1,5 Stunden auf CPU {{ $labels.nsCPUname }}'
+      scc_info: 'Bitte iDos Team informieren'
+      value: '{{ $value }}'
+    for: 60m
+    labels:
+      severity: critical
+      alert_scc: true
+  - alert: Netscaler Disk Usage too high
+    expr: sysHealthDiskPerusage > 90
+    annotations:
+      metric_name: sysHealthDiskPerusage%7Binstance='{{  $labels.instance  }}'%7D 
+      description: 'Disk Usage auf {{ $labels.hostname }} bei {{ $value }} Prozent auf Festplatte {{ $labels.sysHealthDiskName }}.'
+      scc_info: 'Bitte iDos Team informieren'
+      value: '{{ $value }}'
+    for: 60m
+    labels:
+      severity: critical
+      alert_scc: true
+- name: snmp_exporter_hsm_crypto
+  rules:
+  - alert: HSM Crypto State not operational
+    expr: csMode != 1 or up{fqdn=~'dvrcs.+'} != 1
+    annotations:
+      metric_name: csMode%7Binstance='{{  $labels.instance  }}'} or up{instance='{{  $labels.instance  }}', fqdn=%7E'dvrcslanap.%2B'%7D 
+      description: 'HSM Crypto Server {{ $labels.fqdn }} Fehler.'
+      scc_info: 'Bitte Ticket bei SB erstellen'
+      value: '{{ $value }}'
+    for: 5m
+    labels:
+      severity: critical
+      alert_scc: true
+      mail: zertifikatsmanagement
+  - alert: HSM Crypto clock drift
+    expr: abs(csDateTime - cslDateTime) > 500
+    annotations:
+      metric_name: abs(csDateTime - cslDateTime)
+      description: 'HSM Crypto Server {{ $labels.fqdn }} clock drift.'
+      scc_info: 'Bitte Ticket bei SB erstellen'
+      value: '{{ $value }}'
+    for: 5m
+    labels:
+      severity: critical
+      alert_scc: true
+      mail: zertifikatsmanagement

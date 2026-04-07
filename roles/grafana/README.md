@@ -1,0 +1,87 @@
+# grafana
+
+Install and configure Grafana dashboards, datasources, and settings.
+
+## Supported platforms
+
+- Ubuntu 22.04+
+- Debian 12+
+- RHEL 9+
+
+## Role Variables
+
+The role interface is validated through `meta/argument_specs.yml`. Defaults are defined in `defaults/main.yml`.
+
+```yaml
+---
+grafana_version: latest
+grafana_yum_repo_template: grafana.repo.j2
+grafana_manage_repo: true
+grafana_use_provisioning: true
+grafana_provisioning_synced: false
+grafana_instance: '{{ ansible_fqdn | default(ansible_host) | default(inventory_hostname) }}'
+grafana_logs_dir: /var/log/grafana
+grafana_data_dir: /var/lib/grafana
+grafana_address: 0.0.0.0
+grafana_port: 3000
+grafana_cap_net_bind_service: false
+grafana_url: http://{{ grafana_address }}:{{ grafana_port }}
+grafana_api_url: '{{ grafana_url }}'
+grafana_domain: "{{ ansible_fqdn | default(ansible_host) | default('localhost') }}"
+grafana_server:
+  protocol: http
+  enforce_domain: false
+  socket: ''
+  cert_key: ''
+  cert_file: ''
+  enable_gzip: false
+  static_root_path: public
+  router_logging: false
+  serve_from_sub_path: false
+grafana_security:
+  admin_user: admin
+  admin_password: ''
+grafana_database:
+  type: sqlite3
+grafana_remote_cache: {}
+grafana_welcome_email_on_sign_up: false
+grafana_users:
+  allow_sign_up: false
+  auto_assign_org_role: Viewer
+  default_theme: dark
+grafana_auth: {}
+grafana_ldap: {}
+grafana_session: {}
+grafana_analytics: {}
+grafana_smtp: {}
+grafana_alerting:
+  execute_alerts: true
+grafana_log:
+grafana_metrics: {}
+grafana_tracing: {}
+grafana_snapshots: {}
+grafana_image_storage: {}
+grafana_plugins: []
+grafana_dashboards: []
+grafana_dashboards_dir: dashboards
+grafana_alert_notifications: []
+grafana_datasources: []
+grafana_api_keys: []
+grafana_api_keys_dir: "{{ lookup('env', 'HOME') }}/grafana/keys"
+grafana_environment: {}
+grafana_panels: {}
+```
+
+## Example Playbook
+
+```yaml
+- name: Apply grafana
+  hosts: all
+  become: true
+  roles:
+    - role: lenmail.monitoring.grafana
+```
+
+## Testing
+
+The collection CI runs `ansible-lint`, `ansible-test sanity`, repository consistency tests, and per-role syntax checks using `roles/grafana/tests/test.yml`.

@@ -1,0 +1,16 @@
+groups:
+- name: citrix_adc_exporter
+  rules:
+  - alert: Prometheus Target Missing Citrix
+    expr: up{alerting_required!='false',managedby!='Treaton',job='citrix-adc-exporter'} == 0
+    for: 3m
+    labels:
+      severity: critical
+      alert_scc: true
+      product: iDOS
+    annotations:
+      metric_name: up%7Binstance='{{  $labels.instance  }}'%7D 
+      value: '{{ $value }}'
+      summary: 'Prometheus target missing (instance {{ $labels.instance }})'
+      description: 'A Prometheus target has disappeared. An exporter might be crashed.'
+      scc_info: 'Citrix ADC Exporter nicht mehr erreichbar (iDOS). Bitte Ticket bei BP erstellen.'

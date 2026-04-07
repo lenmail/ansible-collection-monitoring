@@ -1,0 +1,537 @@
+groups:
+- name: textfile_collector_absent
+  rules:
+  - alert: Prometheus zu wenig Targets
+    expr: delta(prometheus_sd_discovered_targets[30m]) < -150
+    for: 90m
+    labels:
+      severity: critical
+      absent_trigger: 'yes'
+      alert_scc: false
+      environment: Produktion
+    annotations:
+      metric_name: delta(prometheus_sd_discovered_targets%7Binstance='{{  $labels.instance  }}'%7D%5b30m%5d)
+      value: '{{ $value }}'
+      summary: 'Mehr als 150 Prometheus Targets fehlen'
+      scc_info: 'Bitte unter folgendem Link nachschauen: https://prometheus.mon.dvag.net/graph?g0.expr=prometheus_sd_discovered_targets&g0.tab=0&g0.stacked=0&g0.show_exemplars=0&g0.range_input=2h, ob die Targets wieder hergestellt sind.'
+  - alert: Zertifikats Sperrliste Check keine Daten
+    expr: absent(dvag_certificate_expiration{cert_name_sperrlisten='DVAGIssuingCA01.crl'}) == 1
+    for: 1h
+    labels:
+      severity: critical
+      absent_trigger: 'yes'
+      alert_scc: true
+      environment: Produktion
+    annotations:
+      metric_name: absent(dvag_certificate_expiration%7Bcert_name_sperrlisten='DVAGIssuingCA01.crl'%7D) 
+      value: '{{ $value }}'
+      summary: 'Sperrlisten Zertifikat Skript liefert keine Daten mehr ein. Bitte Ticket beim MON Team erstellen'
+  - alert: Zertifikats Sperrliste Gültigkeit läuft ab
+    expr: dvag_certificate_expiration{cert_name_sperrlisten=~'DVAGIssuingCA01[+]?.crl'} - time() < 39600
+    labels:
+      severity: critical
+      environment: Produktion
+    annotations:
+      metric_name: dvag_certificate_expiration%7Binstance='{{  $labels.instance  }}'%7D - time()
+      value: '{{ $value }}'
+      summary: 'Sperrlisten Zertifikat Gültigkeit unter 11 Stunden'
+  - alert: FNT2Prometheus Problem
+    expr: delta(dvag_fnt2prometheus_overall_devices[30m]) < -100
+    for: 1h
+    labels:
+      severity: warning
+      absent_trigger: 'yes'
+      environment: Produktion
+    annotations:
+      metric_name: dvag_fnt2prometheus_overall_devices
+      value: '{{ $value }}'
+      scc_info: 'Bitte Ticket im MON Bereich eröffnen.' 
+      description: 'Zu wenige SNMP Geräte registriert. Bitte auf script01.1.mon.dvag.net überprüfen /usr/local/dvag_scripts überprüfen.'
+  - alert: FNT2Prometheus Problem
+    expr: dvag_fnt2prometheus_success == 0 
+    labels:
+      severity: warning
+      absent_trigger: 'yes'
+      environment: Produktion
+    annotations:
+      metric_name: dvag_fnt2prometheus_success 
+      value: '{{ $value }}'
+      scc_info: 'Bitte Ticket im MON Bereich eröffnen.' 
+      description: 'Skript ist nicht sauber durchgelaufen. Bitte auf script01.1.mon.dvag.net überprüfen /usr/local/dvag_scripts überprüfen.'
+- name: textfile_collector
+  rules:
+  - alert: VN Syncjob Signature Process Time over 60 seconds
+    expr: dvag_vn_syncjob_signature_process_time_seconds_max{product='vianova'} > 60
+    labels:
+      severity: critical
+      alerting: 'vianova_betrieb'
+      environment: Produktion
+    annotations:
+      metric_name: dvag_vn_syncjob_signature_process_time_seconds_max%7Binstance='{{  $labels.instance  }}', product='vianova'%7D 
+      value: '{{ $value }}'
+      description: 'In der Umgebung {{ $labels.environment }} ist die Singature Process Time über 60 Sekunden'
+  - alert: VN Syncjob Signature count is not between 140.000-180.000
+    expr: dvag_vn_syncjob_signature_count{product='vianova'} < 140000 > 180000
+    labels:
+      severity: critical
+      alerting: 'vianova_betrieb'
+      environment: Produktion
+    annotations:
+      metric_name: dvag_vn_syncjob_signature_count%7Binstance='{{  $labels.instance  }}', product='vianova'%7D
+      value: '{{ $value }}'
+      description: 'In der Umgebung {{ $labels.environment }} ist der Singature Count nicht zwischen 140.000 und 180.000'
+  - alert: MailboxSizeNotNullBytes 
+    expr: dvag_size_mailqueue_bytes{hostname!~"relayout0[1,2].4.mail.dvag.net"}  > 1
+    for: 3m
+    labels:
+      severity: critical
+    annotations:
+      metric_name: dvag_size_mailqueue_bytes%7Binstance='{{  $labels.instance  }}', hostname!%7E'relayout0%5b1,2%5d.4.mail.dvag.net'%7D
+      value: '{{ $value }}'
+      description: 'Check /var/spool/mail for non zero-size files'
+      summary: 'LocalMailQueue (instance {{ $labels.instance }})'
+  - alert: ProxyEthernetConnectivity
+    expr: dvag_connectivity_check{product='proxy'} == 000
+    for: 3m
+    labels:
+      severity: critical
+    annotations:
+      metric_name: dvag_connectivity_check%7Binstance='{{  $labels.instance  }}', product!='proxy'%7D
+      value: '{{ $value }}'
+      summary: 'ProxyEthernetConnectivity (instance {{ $labels.instance }}) failed'
+      description: 'ProxyEthernetConnectivity'
+  - alert: External URLs not reachable
+    expr: dvag_connectivity_check{product!='proxy'} == 000
+    for: 3m
+    labels:
+      severity: critical
+    annotations:
+      metric_name: dvag_connectivity_check%7Binstance='{{  $labels.instance  }}', product='proxy'%7D
+      value: '{{ $value }}'
+      summary: 'External URLs not reachable (instance {{ $labels.instance }}) failed'
+      description: 'External URLs not reachable'
+  - alert: Mulipath_path_failure
+    expr: dvag_dmpath_info{dm_path_state='failed',hostname!='mailarcbackup03.4.mail.dvag.net'}
+    for: 3m
+    labels:
+      severity: critical
+      alert_scc: true
+    annotations:
+      metric_name: dvag_dmpath_info%7Binstance='{{  $labels.instance  }}', dm_path_state='failed',hostname!='mailarcbackup03.4.mail.dvag.net'%7D
+      value: '{{ $value }}'
+      summary: 'Multipath Failure on (instance {{ $labels.instance }}'      
+  - alert: FilesystemMount
+    expr: dvag_filesystem_mounts{hostname!~'app0.+14.dos.dvag.net|mailarcbackup03.4.mail.dvag.net'} == 1
+    for: 3m
+    labels:
+      severity: critical
+      alert_scc: true
+    annotations:
+      metric_name: dvag_filesystem_mounts%7Binstance='{{  $labels.instance  }}', hostname!%7E'app0.%2B14.dos.dvag.net%7Cmailarcbackup03.4.mail.dvag.net'%7D 
+      value: '{{ $value }}'
+      summary: 'FilesystemMount (instance {{ $labels.instance }} down'
+      description: 'FilesystemMount'
+  - alert: Time Check with NTP
+    expr: dvag_time == 10001
+    for: 20m
+    labels:
+      severity: critical
+      alert_scc: true
+    annotations:
+      metric_name: dvag_time%7Binstance='{{  $labels.instance  }}'%7D
+      value: '{{ $value }}'
+      summary: 'Time synchronization failure with NTP Server on host (instance {{ $labels.instance }} ). Chronyc not present on system (Code {{$value}} )'
+  - alert: Time Check with NTP
+    expr: dvag_time == 10002
+    for: 20m
+    labels:
+      severity: critical
+      alert_scc: true
+    annotations:
+      metric_name: dvag_time%7Binstance='{{  $labels.instance  }}'%7D
+      value: '{{ $value }}'
+      summary: 'Time synchronization failure with NTP Server on host (instance {{ $labels.instance }} ). Server either uses a wrong NTP Service or none at all (Code {{$value}} )'
+  - alert: Time Check with NTP
+    expr: dvag_time == 10003
+    for: 20m
+    labels:
+      severity: critical
+      alert_scc: true
+    annotations:
+      metric_name: dvag_time%7Binstance='{{  $labels.instance  }}'%7D
+      value: '{{ $value }}'
+      summary: 'Time synchronization failure with NTP Server on host (instance {{ $labels.instance }}. Server is not synchronised with the NTP Service (Code {{$value}} )'
+  - alert: Time Check with NTP
+    expr: dvag_time > 1 < 1000
+    labels:
+      severity: critical
+      alert_scc: true
+    annotations:
+      metric_name: dvag_time%7Binstance='{{  $labels.instance  }}'%7D
+      value: '{{ $value }}'
+      summary: 'Time synchronization failure with NTP Server on host (instance {{ $labels.instance }}) lacks behind more than one second'
+  - alert: Office 365 Status Check
+    expr: dvag_o365_status > 9 < 20
+    for: 10m
+    labels:
+      severity: critical
+      grafana_id: 'https://grafana.mon.dvag.net/d/O3XTQC9Wz/o365-service-health-state?orgId=1&refresh=5m'
+    annotations:
+      metric_name: dvag_o365_status%7Binstance='{{  $labels.instance  }}'%7D
+      summary: 'Office o365  on Service {{ $labels.service }} Check.'
+      value: '{{ $value }}'
+      error_codes: 'Error Codes: \n 10 = ServiceDegraded \n 11 = ServiceDegradation \n 12 = Investigating \n 13 = ServiceInterruption \n 14 = RestoringService \n 15 = ExtendedRecovery'
+  - alert: Insight Export to Helpline
+    expr: dvag_insight_to_helpline_export{hostname='jiraautomation02.1.mgmt.dvag.net'} == 0
+    for: 3m
+    labels:
+      severity: critical
+      alert_scc: false
+      atl_ticket: yes
+    annotations:
+      metric_name: dvag_insight_to_helpline_export%7Binstance='{{  $labels.instance  }}', hostname='jiraautomation02.1.mgmt.dvag.net'%7D 
+      summary: 'Insight export to Helpline failed - File {{ $labels.filename }} is older than 1 day'
+      value: '{{ $value }}'
+  - alert: Insight Import
+    expr: dvag_jira_insight_imports{hostname!='jira02.5.pportal.dvag.net'} > 172800
+    for: 3m
+    labels:
+      severity: critical
+      alert_scc: false
+      atl_ticket: yes
+    annotations:
+      metric_name: dvag_jira_insight_imports%7Binstance='{{  $labels.instance  }}', hostname!='jira02.5.pportal.dvag.net'%7D > 17
+      summary: 'Insight import - {{ $labels.import }} is over 48 days'
+      value: '{{ $value }}'
+      description: 'Insight import - {{ $labels.import }} is over 48 days'
+  - alert: Verbindungen ADZ ist über 700
+    expr: dvag_adz_zentrale > 700
+    for: 3m
+    labels:
+      severity: critical
+      alert_scc: true
+    annotations:
+      metric_name: dvag_adz_zentrale%7Binstance='{{  $labels.instance  }}'%7D
+      summary: 'Verbindungen ADZ {{ $labels.hostname }} über 700. \n (Lizenz Limit 780 User insgesamt)'
+      value: '{{ $value }}'
+  - alert: Squid Available Filedescriptors less then 1000
+    expr: dvag_squid_fd_available < 1000
+    for: 3m
+    labels:
+      severity: critical
+      alert_scc: true
+    annotations:
+      metric_name: dvag_squid_fd_available%7Binstance='{{  $labels.instance  }}'%7D
+      summary: "Squid Available Filedescriptors less then 1000 (instance {{ $labels.hostname }})"
+      command: "ssh {{ $labels.hostname }} sudo squidclient4 mgr:info | grep 'Available number of file descriptors' | awk '{print $NF}'"
+      value: '{{ $value }}'
+  - alert: jira mailqueue too high
+    expr: dvag_jira_mailqueue > 20
+    for: 3m
+    labels: 
+      severity: critical
+      alert_scc: false
+      atl_ticket: yes
+    annotations:
+      metric_name: dvag_jira_mailqueue%7Binstance='{{  $labels.instance  }}'%7D
+      summary: 'Mail Queue Size on {{ $labels.hostname }} is over 20'
+      value: '{{ $value }}'
+  - alert: jira error mailqueue too high
+    expr: dvag_jira_mailerrorqueue > 20
+    for: 3m
+    labels: 
+      severity: critical
+      alert_scc: false
+      atl_ticket: yes
+    annotations:
+      metric_name: dvag_jira_mailerrorqueue%7Binstance='{{  $labels.instance  }}'%7D
+      summary: 'Error Mail Queue Size on {{ $labels.hostname }} is over 20'
+      value: '{{ $value }}'
+  - alert: Jira Mailimportqueue
+    expr: dvag_jira_mailimportqueue > 10
+    for: 3m
+    labels:
+      severity: critical
+      alert_scc: false
+      atl_ticket: yes
+    annotations:
+      metric_name: dvag_jira_mailimportqueue%7Binstance='{{  $labels.instance  }}'%7D
+      summary: 'Jira Mailimportqueue on {{ $labels.hostname }} is over 10'
+      value: '{{ $value }}'
+- name: textfile_collector_postfix
+  rules:
+  - alert: Postfix Deferred mails from internal delivery
+    expr: dvag_postfix_deferred_count{alerting_required!='false',mail='internal'} > 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      metric_name: dvag_postfix_deferred_count%7Binstance='{{  $labels.instance  }}',mail='internal'%7D
+      description: 'Deferred mails from internal delivery on {{ $labels.hostname }}.'
+      value: '{{ $value }}'
+  - alert: Postfix Delayed delivery
+    expr: dvag_postfix_incoming_maxage{alerting_required!='false',mail='internal'} > 600
+    for: 10m
+    labels:
+      severity: warning
+    annotations:
+      metric_name: dvag_postfix_incoming_maxage%7Binstance='{{  $labels.instance  }}', mail='internal'%7D
+      description: 'Delayed delivery on {{ $labels.hostname }}.'
+      value: '{{ $value }}'
+  - alert: Postfix Mail queue size is unusually large
+    expr: (dvag_postfix_incoming_count{alerting_required!='false',mail='internal'} - dvag_postfix_incoming_bulk_count)  > 2000
+    for: 10m
+    labels:
+      severity: warning
+    annotations:
+      metric_name: (dvag_postfix_incoming_count{instance='{{  $labels.instance  }}', mail='internal'} - dvag_postfix_incoming_bulk_count)
+      description: 'Mail queue size is unusually large on {{ $labels.hostname }}.'
+      value: '{{ $value }}'
+  - alert: Postfix Deferred mails from external delivery
+    expr: dvag_postfix_deferred_count{alerting_required!='false',mail='external'} > 0 
+    for: 10m
+    labels:
+      severity: warning
+    annotations:
+      metric_name: dvag_postfix_deferred_count%7Binstance='{{  $labels.instance  }}', mail='external'%7D
+      description: 'Mail queue size is unusually large on {{ $labels.hostname }}.'
+      value: '{{ $value }}'
+  - alert: Postfix Delayed delivery
+    expr: dvag_postfix_incoming_maxage{alerting_required!='false',mail='external'} > 600 
+    for: 10m
+    labels:
+      severity: warning
+    annotations:
+      metric_name: dvag_postfix_incoming_maxage%7Binstance='{{  $labels.instance  }}', mail='external'%7D
+      description: 'Mail queue size is unusually large on {{ $labels.hostname }}.'
+      value: '{{ $value }}'
+  - alert: Mail DB misconfiguration
+    expr: dvag_maildb_misconfig{alerting_required!='false'} > 0
+    labels:
+      severity: warning
+      alert_scc: false
+    annotations:
+      metric_name: dvag_maildb_misconfig%7Binstance='{{  $labels.instance  }}'%7D
+      description: 'Mail DB misconfiguration on {{ $labels.topic }}.'
+      value: '{{ $labels.topic }}'
+- name: textfile_collector_pinkontigent_produktion
+  rules:
+  - alert: 'Verfügbare Pins zu hoch'
+    expr: dvag_pinkontingent{alerting_required!='false', pin='SEQ_ANTRAG_PIN_48', environment='Produktion'} > 9900000
+    labels:
+      severity: critical
+      alert_scc: true
+    annotations:
+      metric_name: dvag_pinkontingent%7Binstance='{{  $labels.instance  }}', pin=%7E'SEQ_ANTRAG_PIN_48'%7D
+      description: 'Anzahl der verfügbaren Pins zu hoch für {{ $labels.name }}'
+      value: '{{ $value }}'
+      scc_info: 'Anzahl der verfügbaren Pins zu hoch. Es müssen neue Pins in die Datenbank eingespielt werden.\nBitte bei Unterschreiten der Grenzwerte immer eine Mail an PIN-Kontingente@dvag.com senden.'
+  - alert: 'Verfügbare Pins zu hoch'
+    expr: dvag_pinkontingent{alerting_required!='false', pin='SEQ_ANTRAG_PIN_10', environment='Produktion'} > 85000000
+    labels:
+      severity: critical
+      alert_scc: true
+    annotations:
+      metric_name: dvag_pinkontingent%7Binstance='{{  $labels.instance  }}', pin=%7E'SEQ_ANTRAG_PIN_10'%7D
+      description: 'Anzahl der verfügbaren Pins zu hoch für {{ $labels.name }}'
+      value: '{{ $value }}'
+      scc_info: 'Anzahl der verfügbaren Pins zu hoch. Es müssen neue Pins in die Datenbank eingespielt werden.\nBitte bei Unterschreiten der Grenzwerte immer eine Mail an PIN-Kontingente@dvag.com senden.'
+  - alert: 'Verfügbare Pins für zu niedrig (unter 25000)'
+    expr: dvag_pinkontingent{alerting_required!='false', pin=~'(SEQ_ELEKTRA_20_KAL|SEQ_ELEKTRA_20_KLN)', environment='Produktion'} < 25000
+    labels:
+      severity: critical
+      alert_scc: true
+    annotations:
+      metric_name: dvag_pinkontingent%7Binstance='{{  $labels.instance  }}', pin=%7E'(SEQ_ELEKTRA_20_KAL%7CSEQ_ELEKTRA_20_KLN)', environment='Produktion'%7D
+      description: 'Anzahl der verfügbaren Pins ist zu niedrig für {{ $labels.name }}'
+      value: '{{ $value }}'
+      scc_info: 'Anzahl der verfügbaren Pins ist zu niedrig. Es müssen neue Pins in die Datenbank eingespielt werden.\nBitte bei Unterschreiten der Grenzwerte immer eine Mail an PIN-Kontingente@dvag.com senden.'
+  - alert: 'Verfügbare Pins für zu niedrig (unter 20000)'
+    expr: dvag_pinkontingent{alerting_required!='false', pin=~'(SEQ_ELEKTRA_70|SEQ_ELEKTRA_10|SEQ_ELEKTRA_16|SEQ_ELEKTRA_26|SEQ_ELEKTRA_48)', environment='Produktion'} < 20000
+    labels:
+      alert_scc: true
+      severity: critical
+    annotations:
+      metric_name: dvag_pinkontingent%7Binstance='{{  $labels.instance  }}', pin=%7E'(SEQ_ELEKTRA_70%7CSEQ_ELEKTRA_10%7CSEQ_ELEKTRA_16%7CSEQ_ELEKTRA_26%7CSEQ_ELEKTRA_48)', environment='Produktion'%7D
+      description: 'Anzahl der verfügbaren Pins ist zu niedrig für {{ $labels.name }}'
+      value: '{{ $value }}'
+      scc_info: 'Anzahl der verfügbaren Pins ist zu niedrig. Es müssen neue Pins in die Datenbank eingespielt werden.\nBitte bei Unterschreiten der Grenzwerte immer eine Mail an PIN-Kontingente@dvag.com senden.'
+  - alert: 'Verfügbare Pins für zu niedrig (unter 10000)'
+    expr: dvag_pinkontingent{alerting_required!='false', pin=~'(SEQ_ELEKTRA_5[1,2]|SEQ_ELEKTRA_79|SEQ_ELEKTRA_81)', environment='Produktion'} < 10000
+    labels:
+      severity: critical
+      alert_scc: true
+    annotations:
+      metric_name: dvag_pinkontingent%7Binstance='{{  $labels.instance  }}', pin=%7E'(SEQ_ELEKTRA_5%5b1,2%5d%7CSEQ_ELEKTRA_79%7CSEQ_ELEKTRA_81)', environment='Produktion'%7D
+      description: 'Anzahl der verfügbaren Pins ist zu niedrig für {{ $labels.name }}'
+      value: '{{ $value }}'
+      scc_info: 'Anzahl der verfügbaren Pins ist zu niedrig. Es müssen neue Pins in die Datenbank eingespielt werden.\nBitte bei Unterschreiten der Grenzwerte immer eine Mail an PIN-Kontingente@dvag.com senden.'
+  - alert: 'Verfügbare Pins für zu niedrig (unter 7000)'
+    expr: dvag_pinkontingent{alerting_required!='false', pin=~'(SEQ_ELEKTRA_20_22)', environment='Produktion'} < 7000
+    labels:
+      alert_scc: true
+      severity: critical
+    annotations:
+      metric_name: dvag_pinkontingent%7Binstance='{{  $labels.instance  }}', pin=%7E'(SEQ_ELEKTRA_20_22)', environment='Produktion'%7D
+      description: 'Anzahl der verfügbaren Pins ist zu niedrig für {{ $labels.name }}'
+      value: '{{ $value }}'
+      scc_info: 'Anzahl der verfügbaren Pins ist zu niedrig. Es müssen neue Pins in die Datenbank eingespielt werden.\nBitte bei Unterschreiten der Grenzwerte immer eine Mail an PIN-Kontingente@dvag.com senden.'
+  - alert: 'Verfügbare Pins für zu niedrig (unter 2000)'
+    expr: dvag_pinkontingent{alerting_required!='false', pin=~'(SEQ_ELEKTRA_20|SEQ_ELEKTRA_20_25)', environment='Produktion'} < 2000
+    labels:
+      alert_scc: true
+      severity: critical
+    annotations:
+      metric_name: dvag_pinkontingent%7Binstance='{{  $labels.instance  }}', pin=%7E'(SEQ_ELEKTRA_20%7CSEQ_ELEKTRA_20_25)', environment='Produktion'%7D
+      description: 'Anzahl der verfügbaren Pins ist zu niedrig für {{ $labels.name }}'
+      value: '{{ $value }}'
+      scc_info: 'Anzahl der verfügbaren Pins ist zu niedrig. Es müssen neue Pins in die Datenbank eingespielt werden.\nBitte bei Unterschreiten der Grenzwerte immer eine Mail an PIN-Kontingente@dvag.com senden.'
+  - alert: 'Verfügbare Pins für zu niedrig (unter 500)'
+    expr: dvag_pinkontingent{alerting_required!='false', pin=~'(SEQ_ELEKTRA_40)', environment!='Produktion'} < 500
+    labels:
+      alert_scc: true
+      severity: critical
+    annotations:
+      metric_name: dvag_pinkontingent%7Binstance='{{  $labels.instance  }}', pin=%7E'(SEQ_ELEKTRA_40)'%7D
+      description: 'Anzahl der verfügbaren Pins ist zu niedrig für {{ $labels.name }}'
+      value: '{{ $value }}'
+      scc_info: 'Anzahl der verfügbaren Pins ist zu niedrig. Es müssen neue Pins in die Datenbank eingespielt werden.\nBitte bei Unterschreiten der Grenzwerte immer eine Mail an PIN-Kontingente@dvag.com senden.'
+- name: textfile_collector_pinkontigent_no_production
+  rules:
+  - alert: 'Verfügbare Pins zu hoch'
+    expr: dvag_pinkontingent{alerting_required!='false', pin='SEQ_ANTRAG_PIN_48', environment!='Produktion'} > 9990000
+    labels:
+      severity: critical
+      alert_scc: true
+    annotations:
+      metric_name: dvag_pinkontingent%7Binstance='{{  $labels.instance  }}', pin=%7E'SEQ_ANTRAG_PIN_48'%7D
+      description: 'Anzahl der verfügbaren git git aPins zu hoch für {{ $labels.name }}'
+      value: '{{ $value }}'
+      scc_info: 'Anzahl der verfügbaren Pins zu hoch. Es müssen neue Pins in die Datenbank eingespielt werden.\nBitte bei Unterschreiten der Grenzwerte immer eine Mail an PIN-Kontingente@dvag.com senden.'
+  - alert: 'Verfügbare Pins zu hoch'
+    expr: dvag_pinkontingent{alerting_required!='false', pin='SEQ_ANTRAG_PIN_10', environment!='Produktion'} > 89000000
+    labels:
+      severity: critical
+      alert_scc: true
+    annotations:
+      metric_name: dvag_pinkontingent%7Binstance='{{  $labels.instance  }}', pin=%7E'SEQ_ANTRAG_PIN_10'%7D
+      description: 'Anzahl der verfügbaren git git aPins zu hoch für {{ $labels.name }}'
+      value: '{{ $value }}'
+      scc_info: 'Anzahl der verfügbaren Pins zu hoch. Es müssen neue Pins in die Datenbank eingespielt werden.\nBitte bei Unterschreiten der Grenzwerte immer eine Mail an PIN-Kontingente@dvag.com senden.'
+  - alert: 'Verfügbare Pins für zu niedrig (unter 500)'
+    expr: dvag_pinkontingent{alerting_required!='false', pin=~'(SEQ_ELEKTRA_20|SEQ_ELEKTRA_20_22|SEQ_ELEKTRA_20_25|SEQ_ELEKTRA_40|SEQ_ELEKTRA_20_KLN)', environment!='Produktion'} < 500
+    labels:
+      alert_scc: true
+      severity: critical
+    annotations:
+      metric_name: dvag_pinkontingent%7Binstance='{{  $labels.instance  }}', pin=%7E'(SEQ_ELEKTRA_20%7CSEQ_ELEKTRA_20_22%7CSEQ_ELEKTRA_20_25%7CSEQ_ELEKTRA_40%7CSEQ_ELEKTRA_20_KLN)', environment!='Produktion'%7D
+      description: 'Anzahl der verfügbaren Pins ist zu niedrig für {{ $labels.name }}'
+      value: '{{ $value }}'
+      scc_info: 'Anzahl der verfügbaren Pins ist zu niedrig. Es müssen neue Pins in die Datenbank eingespielt werden.\nBitte bei Unterschreiten der Grenzwerte immer eine Mail an PIN-Kontingente@dvag.com senden.'
+  - alert: 'Verfügbare Pins für zu niedrig (unter 500)'
+    expr: dvag_pinkontingent{alerting_required!='false', pin=~'(SEQ_ELEKTRA_10|SEQ_ELEKTRA_16|SEQ_ELEKTRA_26|SEQ_ELEKTRA_48|SEQ_ELEKTRA_5[1,2]|SEQ_ELEKTRA_60|SEQ_ELEKTRA_70|SEQ_ELEKTRA_79|SEQ_ELEKTRA_81)', environment!='Produktion'} < 500
+    labels:
+      severity: critical
+      alert_scc: true
+    annotations:
+      metric_name: dvag_pinkontingent%7Binstance='{{  $labels.instance  }}', pin=%7E'(SEQ_ELEKTRA_10%7CSEQ_ELEKTRA_16%7CSEQ_ELEKTRA_26%7CSEQ_ELEKTRA_48%7CSEQ_ELEKTRA_5%5b1,2%5d%7CSEQ_ELEKTRA_60%7CSEQ_ELEKTRA_70%7CSEQ_ELEKTRA_79%7CSEQ_ELEKTRA_81)', environment!='Produktion'%7D
+      description: 'Anzahl der verfügbaren Pins ist zu niedrig für {{ $labels.name }}'
+      value: '{{ $value }}'
+      scc_info: 'Anzahl der verfügbaren Pins ist zu niedrig. Es müssen neue Pins in die Datenbank eingespielt werden.\nBitte bei Unterschreiten der Grenzwerte immer eine Mail an PIN-Kontingente@dvag.com senden.'
+- name: textfile_collector_mdatp
+  rules:
+  - alert: 'MDATP not healthy'
+    expr: dvag_mdatp_healthy == 0
+    labels:
+      severity: critical
+      alert_scc: false
+    annotations:
+      metric_name: dvag_mdatp_healthy%7Binstance='{{  $labels.instance  }}'%7D
+      description: 'mdatp health shows that mdatp is not in a healthy state.'
+      scc_info: 'Bitte auf dem System {{  $labels.hostname  }} MDATP Dienst neustarten und mit mdatp health überprüfen, ob der healthy Status wieder auf true steht.'
+  - alert: 'MDATP not licensed'
+    expr: dvag_mdatp_licensed == 0
+    labels:
+      severity: critical
+      alert_scc: false
+    annotations:
+      metric_name: dvag_mdatp_licensed%7Binstance='{{  $labels.instance  }}'%7D
+      description: 'mdatp health shows that mdatp is not licensed'
+      scc_info: 'Bitte auf dem System {{  $labels.hostname  }} MDATP Dienst neustarten und mit mdatp health überprüfen, ob der licensed wieder auf true steht.'
+  - alert: 'MDATP automatic definition update disabled'
+    expr: dvag_mdatp_automatic_definition_update_enabled == 0
+    labels:
+      severity: critical
+      alert_scc: false
+    annotations:
+      metric_name: dvag_mdatp_automatic_definition_update_enabled%7Binstance='{{  $labels.instance  }}'%7D
+      description: 'mdatp health shows that automatic antivirus definition updates are disabled'
+      scc_info: 'Bitte auf dem System {{  $labels.hostname  }} MDATP Dienst neustarten und mit mdatp health überprüfen, ob der automatic_definition_update_enabled Status wieder auf true steht.'
+  - alert: 'MDATP wrong or missing org id'
+    expr: dvag_mdatp_org_id == 0
+    labels:
+      severity: critical
+      alert_scc: false
+    annotations:
+      metric_name: dvag_mdatp_org_id%7Binstance='{{  $labels.instance  }}'%7D
+      description: 'mdatp health shows that the org id is not matching with DVAG org id'
+      scc_info: 'Bitte auf dem System {{  $labels.hostname  }} MDATP Dienst neustarten und mit mdatp health überprüfen, ob die org id auf 367f5662-f642-4f2e-9ae1-8f50952cf1dc steht'
+  - alert: 'MDATP passive mode disabled'
+    expr: dvag_mdatp_passiv_mode == 0
+    labels:
+      severity: critical
+      alert_scc: false
+    annotations:
+      metric_name: dvag_mdatp_passiv_mode%7Binstance='{{  $labels.instance  }}'%7D
+      description: 'mdatp health shows that the passive mode is not enabled'
+      scc_info: 'Bitte auf dem System {{  $labels.hostname  }} MDATP Dienst neustarten und mit mdatp health überprüfen, ob passive mode auf true steht'
+  - alert: 'MDATP definitions status not up to date'
+    expr: dvag_mdatp_definitions_status_up_to_date == 0
+    for: 24h
+    labels:
+      severity: critical
+      alert_scc: false
+    annotations:
+      metric_name: dvag_mdatp_definitions_status_up_to_date%7Binstance='{{  $labels.instance  }}'%7D
+      description: 'mdatp health shows that the definition status is not up to date'
+      scc_info: 'Bitte auf dem System {{  $labels.hostname  }} MDATP Dienst neustarten und mit mdatp health überprüfen, ob definition status auf up to date steht'
+  - alert: 'MDATP definition update older than 24 hours'
+    expr: dvag_mdatp_updated_minutes_ago < 1440
+    labels:
+      severity: critical
+      alert_scc: false
+    annotations:
+      metric_name: dvag_mdatp_updated_minutes_ago%7Binstance='{{  $labels.instance  }}'%7D
+      description: 'mdatp health shows that the definition were not updated since 24 hours'
+      scc_info: 'Bitte auf dem System {{  $labels.hostname  }} MDATP Dienst neustarten und mit mdatp health überprüfen, ob sich die definitions updaten'
+  - alert: 'MDATP definition update older than 24 hours'
+    expr: dvag_mdatp_updated_minutes_ago < 1440
+    labels:
+      severity: critical
+      alert_scc: false
+    annotations:
+      metric_name: dvag_mdatp_updated_minutes_ago%7Binstance='{{  $labels.instance  }}'%7D
+      description: 'mdatp health shows that the definition were not updated since 24 hours'
+      scc_info: 'Bitte auf dem System {{  $labels.hostname  }} MDATP Dienst neustarten und mit mdatp health überprüfen, ob sich die definitions updaten'
+  - alert: 'MDATP conflicting applications present'
+    expr: dvag_mdatp_conflicting_applications == 0
+    for: 30m
+    labels:
+      severity: critical
+      alert_scc: false
+    annotations:
+      metric_name: dvag_mdatp_conflicting_applications%7Binstance='{{  $labels.instance  }}'%7D
+      description: 'mdatp health shows that conflicting applications are present'
+      scc_info: 'Bitte auf dem System {{  $labels.hostname  }} MDATP Dienst neustarten und mit mdatp health überprüfen, ob weiterhin conflicting applications angezeigt werden'
+- name: textfile_collector_onlinesystem_proxy
+  rules:
+  - alert: Abruf des BKK Linde Dokumentenarchives
+    expr: dvag_connectivity_check_bkk_linde != 200
+    for: 60m
+    labels:
+      severity: critical
+      alert_scc: true
+    annotations:
+      metric_name: dvag_connectivity_check_bkk_linde%7Binstance='{{  $labels.instance  }}'%7D
+      description: 'Abruf des BKK Linde Dokumentenarchives auf {{ $labels.hostname }} meldet keinen HTTP/200.'
+      value: '{{ $value }}'

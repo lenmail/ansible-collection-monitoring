@@ -1,0 +1,497 @@
+---
+- targets:
+  - diamant01.wolf.local:9182
+  labels:
+    hostname: diamant01.wolf.local
+    __metrics_path__: "/metrics"
+    __scheme__: http
+    application_owner_name: "Dominik Lenhardt"
+    environment: Prod
+    groupname: treaton_server_p
+    managedby: Treaton
+    os: "Windows Server 2022 Datacenter"
+    product: Diamant
+    severity: critical
+    monitoring: true
+    technical_owner_name: Treaton
+    job: windows-exporter
+- targets:
+  - dvr01.wolf.local:9182
+  labels:
+    hostname: dvr01.wolf.local
+    __metrics_path__: "/metrics"
+    __scheme__: http
+    application_owner_name: "Dominik Lenhardt"
+    environment: Prod
+    groupname: server
+    managedby: Treaton
+    os: "Windows Server 2022"
+    product: Kameraserver
+    severity: standard
+    monitoring: true
+    technical_owner_name: Treaton
+    job: windows-exporter
+- targets:
+  - rcwapp001.wolf.local:9182
+  labels:
+    hostname: rcwapp001.wolf.local
+    __metrics_path__: "/metrics"
+    __scheme__: http
+    application_owner_name: "Simon Ebert"
+    environment: Prod
+    groupname: server
+    managedby: Treaton
+    os: Windows Server 2012 R2
+    product: MSI Applicationsserver
+    severity: critical
+    monitoring: true
+    technical_owner_name: Treaton
+    job: windows-exporter
+- targets:
+  - rcwbss001.wolf.local:9182
+  labels:
+    hostname: rcwbss001.wolf.local
+    __metrics_path__: "/metrics"
+    __scheme__: http
+    application_owner_name: "Dominik Lenhardt"
+    environment: Prod
+    groupname: server
+    managedby: Treaton
+    os: "Windows Server 2012 R2"
+    product: Trendmicro
+    severity: standard
+    monitoring: true
+    technical_owner_name: Treaton
+    job: windows-exporter
+- targets:
+  - rcwdbs002.wolf.local:9182
+  labels:
+    hostname: rcwdbs002.wolf.local
+    __metrics_path__: "/metrics"
+    __scheme__: http
+    application_owner_name: "Simon Ebert"
+    environment: Prod
+    groupname: server
+    managedby: Treaton
+    os: "Windows Server 2019"
+    product: "MSI Datenbankserver"
+    severity: critical
+    monitoring: true
+    technical_owner_name: Treaton
+    job: windows-exporter
+- targets:
+  - rcwdbs005.wolf.local:9182
+  labels:
+    hostname: rcwdbs005.wolf.local
+    __metrics_path__: "/metrics"
+    __scheme__: http
+    application_owner_name: "Simon Ebert"
+    environment: Abna
+    groupname: server
+    managedby: Treaton
+    os: "Windows Server 2019"
+    product: "MSI Datenbankserver"
+    severity: standard
+    monitoring: true
+    technical_owner_name: Treaton
+    job: windows-exporter
+- targets:
+  - rcwdia001.wolf.local:9182
+  labels:
+    hostname: rcwdia001.wolf.local
+    __metrics_path__: "/metrics"
+    __scheme__: http
+    application_owner_name: "Christine Koffler"
+    environment: Prod
+    groupname: server
+    managedby: Treaton
+    os: "Windows Server 2019"
+    product: Diamant
+    severity: critical
+    monitoring: true
+    technical_owner_name: Treaton
+    job: windows-exporter
+- targets:
+  - rcwdpd001.wolf.local:9182
+  labels:
+    hostname: rcwdpd001.wolf.local
+    __metrics_path__: "/metrics"
+    __scheme__: http
+    application_owner_name: "Florian Framke"
+    environment: Prod
+    groupname: server
+    managedby: Treaton
+    os: "Windows Server 2012 R2"
+    product: "DPD Versand"
+    severity: standard
+    monitoring: true
+    technical_owner_name: Treaton
+    job: windows-exporter
+- targets:
+  - rcwelo001.wolf.local:9182
+  labels:
+    hostname: rcwelo001.wolf.local
+    __metrics_path__: "/metrics"
+    __scheme__: http
+    application_owner_name: "Christine Koffler"
+    environment: Prod
+    groupname: server
+    managedby: Treaton
+    os: "Windows Server 2019"
+    product: "ELO Archiv"
+    severity: critical
+    monitoring: true
+    technical_owner_name: Treaton
+    job: windows-exporter
+- targets:
+  - rcwexs001.wolf.local:9182
+  labels:
+    hostname: rcwexs001.wolf.local
+    __metrics_path__: "/metrics"
+    __scheme__: http
+    application_owner_name: "Dominik Lenhardt"
+    environment: Prod
+    groupname: server
+    managedby: Treaton
+    os: "Windows Server 2012 R2"
+    product: Exchange
+    severity: critical
+    monitoring: true
+    technical_owner_name: Treaton
+    job: windows-exporter
+- targets:
+  - rcwftp001.wolf.local:9182
+  labels:
+    hostname: rcwftp001.wolf.local
+    __metrics_path__: "/metrics"
+    __scheme__: http
+    application_owner_name: "Dominik Lenhardt"
+    environment: Prod
+    groupname: server
+    managedby: Treaton
+    os: "Windows Server 2012 R2"
+    product: "FileZilla FTP"
+    severity: critical
+    monitoring: true
+    technical_owner_name: Treaton
+    job: windows-exporter
+- targets:
+  - rcwnetphone001.wolf.local:9182
+  labels:
+    hostname: rcwnetphone001.wolf.local
+    __metrics_path__: "/metrics"
+    __scheme__: http
+    application_owner_name: "Dominik Lenhardt"
+    environment: Prod
+    groupname: server
+    managedby: Treaton
+    os: "Windows Server 2016"
+    product: "NetPhone Telefonie"
+    severity: critical
+    monitoring: true
+    technical_owner_name: Treaton
+    job: windows-exporter
+- targets:
+  - rcwsafe001.wolf.local:9182
+  labels:
+    hostname: rcwsafe001.wolf.local
+    __metrics_path__: "/metrics"
+    __scheme__: http
+    application_owner_name: "Florian Framke"
+    environment: Prod
+    groupname: server
+    managedby: Treaton
+    os: "Windows Server 2012 R2"
+    product: Pagersystem
+    severity: standard
+    monitoring: true
+    technical_owner_name: Treaton
+    job: windows-exporter
+- targets:
+  - rcwsql002.wolf.local:9182
+  labels:
+    hostname: rcwsql002.wolf.local
+    __metrics_path__: "/metrics"
+    __scheme__: http
+    application_owner_name: Dominik Lenhardt
+    environment: Prod
+    groupname: server
+    managedby: Treaton
+    os: "Windows Server 2019"
+    product: "MSSQL Server (Cluster)"
+    severity: critical
+    monitoring: true
+    technical_owner_name: Treaton
+    job: windows-exporter
+- targets:
+  - rcwwfs001.wolf.local:9182
+  labels:
+    hostname: rcwwfs001.wolf.local
+    __metrics_path__: "/metrics"
+    __scheme__: http
+    application_owner_name: "Dominik Lenhardt"
+    environment: Prod
+    groupname: server
+    managedby: Treaton
+    os: "Windows Server 2012 R2"
+    product: "Windows Fileserver, WSUS"
+    severity: standard
+    monitoring: true
+    technical_owner_name: Treaton
+    job: windows-exporter
+- targets:
+  - rcwwts001.wolf.local:9182
+  labels:
+    hostname: rcwwts001.wolf.local
+    __metrics_path__: "/metrics"
+    __scheme__: http
+    application_owner_name: "Dominik Lenhardt"
+    environment: Prod
+    groupname: server
+    managedby: Treaton
+    os: "Windows Server 2012 R2"
+    product: "Terminalserver Au\xDFendienst"
+    severity: standard
+    monitoring: true
+    technical_owner_name: Treaton
+    job: windows-exporter
+- targets:
+  - rcwdbsiltis007.wolf.local:9182
+  labels:
+    hostname: rcwdbsiltis007.wolf.local
+    __metrics_path__: "/metrics"
+    __scheme__: http
+    application_owner_name: "Simon Ebert"
+    environment: Abna
+    groupname: server
+    managedby: Treaton
+    os: "Windows Server 2022 Datacenter"
+    product: "MSI ProLogistik Testsystem"
+    severity: standard
+    monitoring: true
+    technical_owner_name: Treaton
+    job: windows-exporter
+- targets:
+  - rcwads001.wolf.local:9182
+  labels:
+    hostname: rcwads001.wolf.local
+    __metrics_path__: "/metrics"
+    __scheme__: http
+    application_owner_name: "Dominik Lenhardt"
+    environment: Prod
+    groupname: server
+    managedby: Treaton
+    os: "Windows Server 2012 R2"
+    product: "Domain Controller"
+    severity: critical
+    monitoring: true
+    technical_owner_name: Treaton
+    job: windows-exporter
+- targets:
+  - mssql01.wolf.local:9182
+  labels:
+    hostname: mssql01.wolf.local
+    __metrics_path__: "/metrics"
+    __scheme__: http
+    application_owner_name: "Dominik Lenhardt"
+    environment: Prod
+    groupname: treaton_server_p
+    managedby: Treaton
+    os: "Windows Server 2022 Datacenter"
+    product: SQL
+    severity: critical
+    monitoring: true
+    technical_owner_name: Treaton
+    job: windows-exporter
+- targets:
+  - dc02.wolf.local:9182
+  labels:
+    hostname: dc02.wolf.local
+    __metrics_path__: "/metrics"
+    __scheme__: http
+    application_owner_name: "Dominik Lenhardt"
+    environment: Prod
+    groupname: treaton_server_a
+    managedby: Treaton
+    os: "Windows Server 2022 Datacenter"
+    product: DomainController
+    severity: critical
+    monitoring: true
+    technical_owner_name: Treaton
+    job: windows-exporter
+- targets:
+  - fs01.wolf.local:9182
+  labels:
+    hostname: fs01.wolf.local
+    __metrics_path__: "/metrics"
+    __scheme__: http
+    application_owner_name: "Dominik Lenhardt"
+    environment: Prod
+    groupname: treaton_server_p
+    managedby: Treaton
+    os: "Windows Server 2022 Datacenter"
+    product: FileServer
+    severity: critical
+    monitoring: true
+    technical_owner_name: Treaton
+    job: windows-exporter
+- targets:
+  - ca01.wolf.local:9182
+  labels:
+    hostname: ca01.wolf.local
+    __metrics_path__: "/metrics"
+    __scheme__: http
+    application_owner_name: "Dominik Lenhardt"
+    environment: Prod
+    groupname: treaton_server_p
+    managedby: Treaton
+    os: "Windows Server 2022 Datacenter"
+    product: CA
+    severity: critical
+    monitoring: true
+    technical_owner_name: Treaton
+    job: windows-exporter
+- targets:
+  - dc01.wolf.local:9182
+  labels:
+    hostname: dc01.wolf.local
+    __metrics_path__: "/metrics"
+    __scheme__: http
+    application_owner_name: "Dominik Lenhardt"
+    environment: Prod
+    groupname: treaton_server_p
+    managedby: Treaton
+    os: "Windows Server 2022 Datacenter"
+    product: DomainController
+    severity: critical
+    monitoring: true
+    technical_owner_name: Treaton
+    job: windows-exporter
+- targets:
+  - aadsync01.wolf.local:9182
+  labels:
+    hostname: aadsync01.wolf.local
+    __metrics_path__: "/metrics"
+    __scheme__: http
+    application_owner_name: "Dominik Lenhardt"
+    environment: Prod
+    groupname: treaton_server_a
+    managedby: Treaton
+    os: "Windows Server 2022 Datacenter"
+    product: AADSync
+    severity: critical
+    monitoring: true
+    technical_owner_name: Treaton
+    job: windows-exporter
+- targets:
+  - exs01.wolf.local:9182
+  labels:
+    hostname: exs01.wolf.local
+    __metrics_path__: "/metrics"
+    __scheme__: http
+    application_owner_name: Dominik Lenhardt
+    environment: Prod
+    groupname: "treaton_server_p"
+    managedby: Treaton
+    os: "Windows Server 2022 Datacenter"
+    product: Exchange
+    severity: critical
+    monitoring: true
+    technical_owner_name: Treaton
+    job: windows-exporter
+- targets:
+  - sftp01.wolf.local:9182
+  labels:
+    hostname: sftp01.wolf.local
+    __metrics_path__: "/metrics"
+    __scheme__: http
+    application_owner_name: "Dominik Lenhardt"
+    environment: Prod
+    groupname: treaton_server_p
+    managedby: Treaton
+    os: "Windows Server 2022 Datacenter"
+    product: SFTP
+    severity: critical
+    monitoring: true
+    technical_owner_name: Treaton
+    job: windows-exporter
+- targets:
+  - rcwwts002.wolf.local:9182
+  labels:
+    hostname: rcwwts002.wolf.local
+    __metrics_path__: "/metrics"
+    __scheme__: http
+    application_owner_name: "Dominik Lenhardt"
+    environment: Prod
+    groupname: server
+    managedby: Treaton
+    os: "Windows Server 2012 R2"
+    product: Terminalserver Innendienst
+    severity: critical
+    monitoring: true
+    technical_owner_name: Treaton
+    job: windows-exporter
+- targets:
+  - rcwzes001.wolf.local:9182
+  labels:
+    hostname: rcwzes001.wolf.local
+    __metrics_path__: "/metrics"
+    __scheme__: http
+    application_owner_name: "Martina Neuhalfen"
+    environment: Prod
+    groupname: server
+    managedby: Treaton
+    os: "Windows Server 2012 R2"
+    product: Zeiterfassung
+    severity: standard
+    monitoring: true
+    technical_owner_name: Treaton
+    job: windows-exporter
+- targets:
+  - iltistestapp01.wolf.local:9182
+  labels:
+    hostname: iltistestapp01.wolf.local
+    __metrics_path__: "/metrics"
+    __scheme__: http
+    application_owner_name: "Florian Framke"
+    environment: Abna
+    groupname: server
+    managedby: Treaton
+    os: "Windows Server 2022"
+    product: ProLogistik
+    severity: standard
+    monitoring: true
+    technical_owner_name: Treaton
+    job: windows-exporter
+- targets:
+  - iltisapp01.wolf.local:9182
+  labels:
+    hostname: iltisapp01.wolf.local
+    __metrics_path__: "/metrics"
+    __scheme__: http
+    application_owner_name: "Florian Framke"
+    environment: Prod
+    groupname: server
+    managedby: Treaton
+    os: "Windows Server 2022"
+    product: ProLogistik
+    severity: critical
+    monitoring: true
+    technical_owner_name: Treaton
+    job: windows-exporter
+- targets:
+  - wsus01.wolf.local:9182
+  labels:
+    hostname: wsus01.wolf.local
+    __metrics_path__: "/metrics"
+    __scheme__: http
+    application_owner_name: Treaton
+    environment: Prod
+    groupname:
+    managedby: Treaton
+    os: "Windows Server 2022 Datacenter"
+    product: "WSUS & Automation"
+    severity: standard
+    monitoring: true
+    technical_owner_name: Treaton
+    job: windows-exporter

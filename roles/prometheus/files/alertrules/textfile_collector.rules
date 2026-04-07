@@ -1,0 +1,39 @@
+groups:
+- name: textfile_collector
+  rules:
+  - alert: Local Mailqueue
+    expr: node_size_mailqueue_bytes > 1
+    for: 3m
+    annotations:
+      summary: LocalMailQueue (instance {{ $labels.instance }})
+      description: "Local MailQueue is stuck\n  VALUE = {{ $value }}"
+  - alert: Filesystem Mount
+    expr: node_filesystem_mount == 1
+    for: 3m
+    annotations:
+      summary: "FilesystemMount (instance {{ $labels.instance }} down"
+      description: "Filesystem Mount\n  VALUE = {{ $value }}"
+  - alert: Node reboot required
+    expr: node_reboot_required == 1
+    for: 3m
+    annotations:
+      summary: "System reboot required for {{ $labels.instance }}"
+      description: "The node {{ $labels.instance }} must be restarted after apt-get updates"
+  - alert: VN Syncjob absent
+    expr: absent(dvag_vn_syncjob_signature_process_time_seconds_max{environment="dev",product="vianova"}) == 1
+    for: 6h
+    labels:
+      severity: informational
+      absent_trigger: "yes"
+      alerting: "vianova_betrieb"
+    annotations:
+      description: "Es konnten keine Daten von dem Text File Collector Skript eingesammelt werden. Auf script01.1.mon.dvag.net überprüfen."
+  - alert: o365 Status absent
+    expr: absent(dvag_o365_status) == 1
+    for: 48h
+    labels:
+      severity: informational
+      absent_trigger: "yes"
+    annotations:
+      description: "Es konnten keine Daten von dem Text File Collector Skript eingesammelt werden. Auf script01.1.mon.dvag.net überprüfen."
+      scc_info: "Bitte Ticket im MON Bereich eröffnen." 

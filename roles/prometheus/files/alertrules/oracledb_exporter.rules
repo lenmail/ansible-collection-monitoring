@@ -1,0 +1,341 @@
+groups:
+- name: oracledb_exporter
+  rules:
+  - alert: Prometheus Target Missing
+    expr: up{alerting_required!='false',job='oracledb-exporter'} == 0 or oracledb_up{alerting_required!='false'} == 0
+    for: 3m
+    labels:
+      severity: critical
+      alert_scc: true
+    annotations:
+      metric_name: up%7Binstance='{{  $labels.instance  }}',job='oracledb-exporter'%7D or oracledb_up%7Binstance='{{  $labels.instance  }}'%7D 
+      value: '{{ $value }}'
+      summary: 'Prometheus target missing (instance {{ $labels.instance }})'
+      description: 'A Prometheus target has disappeared. An exporter might be crashed.'
+      scc_info: 'OracleDB Exporter oder kompletter Host nicht mehr erreichbar. Bitte Ticket bei DBAs erstellen'
+  - alert: OracleDB Recovery Usage Warning
+    expr: (oracledb_recovery{hostname='ora1oncla01.3.oracle.dvag.net',exported_type='percent_space_used'} - ignoring(exported_type) oracledb_recovery{hostname='ora1oncla01.3.oracle.dvag.net',exported_type='percent_space_reclaimable'}) > 80
+    labels:
+      severity: warning
+      alert_scc: false
+    annotations:
+      metric_name: (oracledb_recovery%7Binstance='{{  $labels.instance  }}', hostname='ora1oncla01.3.oracle.dvag.net',exported_type='percent_space_used'%7D - ignoring(exported_type) oracledb_recovery%7Bhostname='ora1oncla01.3.oracle.dvag.net',exported_type='percent_space_reclaimable'%7D) 
+      value: '{{ $value }}'
+      summary: 'Recovery Usage Problem auf Host {{ $labels.instance }} Datenbank {{ $labels.database }}'
+      description: 'Recovery Usage Kontrolle https://projektportal.dvag.com/jira/browse/MON-2224'
+      scc_info: 'Bitte Ticket bei DBAs erstellen.'
+  - alert: OracleDB Recovery Usage Critical
+    expr: (oracledb_recovery{exported_type='percent_space_used'} - ignoring(exported_type) oracledb_recovery{exported_type='percent_space_reclaimable'}) > 90
+    labels:
+      severity: critical
+      alert_scc: true
+    annotations:
+      metric_name: (oracledb_recovery%7Binstance='{{  $labels.instance  }}', exported_type='percent_space_used'%7D - ignoring(exported_type) oracledb_recovery%7Bexported_type='percent_space_reclaimable'%7D) 
+      value: '{{ $value }}'
+      summary: 'Recovery Usage Problem auf Host {{ $labels.instance }} Datenbank {{ $labels.database }}'
+      description: 'Recovery Usage Kontrolle https://projektportal.dvag.com/jira/browse/MON-2224'
+      scc_info: 'Anruf ausserhalb der Betriebszeit nur bei Produktion notwendig'
+  ### Tablespace vom Exporter nur für autoextend no, da viele tablespaces eine dynamische Erweiterung haben
+  - alert: OracleDB Tablespace Usage Warning
+    expr: oracledb_tablespace{exported_type='used',autoextend='NO',contents='PERMANENT'} / ignoring(exported_type) oracledb_tablespace{exported_type='total',autoextend='NO',contents='PERMANENT'} * 100 > 80
+    labels:
+      severity: warning
+      alert_scc: false
+    annotations:
+      metric_name: oracledb_tablespace%7Binstance='{{  $labels.instance  }}', exported_type='used',autoextend='NO',contents='PERMANENT'%7D / ignoring(exported_type) oracledb_tablespace%7Bexported_type='total',autoextend='NO',contents='PERMANENT'%7D * 100 
+      value: '{{ $value }}'
+      summary: 'Tablespace Usage Problem auf Host {{ $labels.instance }} Datenbank {{ $labels.database }}'
+      description: 'Tablespace muss erweitert werden'
+      scc_info: 'Bitte Ticket bei DBAs erstellen.'
+  - alert: OracleDB Tablespace Usage Critical
+    expr: oracledb_tablespace{exported_type='used',autoextend='NO',contents='PERMANENT'} / ignoring(exported_type) oracledb_tablespace{exported_type='total',autoextend='NO',contents='PERMANENT'} * 100 > 90
+    labels:
+      severity: critical
+      alert_scc: true
+    annotations:
+      metric_name: oracledb_tablespace%7Binstance='{{  $labels.instance  }}', exported_type='used',autoextend='NO',contents='PERMANENT'%7D / ignoring(exported_type) oracledb_tablespace%7Bexported_type='total',autoextend='NO',contents='PERMANENT'%7D * 100 
+      value: '{{ $value }}'
+      summary: 'Tablespace Usage Problem auf Host {{ $labels.instance }} Datenbank {{ $labels.database }}'
+      description: 'Tablespace muss erweitert werden'
+      scc_info: 'Anruf ausserhalb der Betriebszeit nur bei Produktion notwendig'
+- name: oracledb_exporter_textfile
+  rules:
+  - alert: OracleDB Low ASM Space Warning
+    expr: dvag_oracle_asm_usage_percent > dvag_oracle_asm_warning_treshhold
+    labels:
+      severity: warning
+      alert_scc: false
+    annotations:
+      metric_name: dvag_oracle_asm_usage_percent%7Binstance='{{  $labels.instance  }}'%7D 
+      value: '{{ $value }}'
+      summary: 'Low ASM Space auf Host {{ $labels.instance }} Datenbank {{ $labels.database }}'
+      description: 'ASM Disk ist für die Diskgruppe warning. Anfragen können (demnächst) nicht mehr bearbeitet werden.'
+      scc_info: 'Bitte Ticket bei DBAs erstellen.'
+  - alert: OracleDB Low ASM Space Critical
+    expr: dvag_oracle_asm_usage_percent > dvag_oracle_asm_critical_treshhold
+    labels:
+      severity: critical
+      alert_scc: true
+    annotations:
+      metric_name: dvag_oracle_asm_usage_percent%7Binstance='{{  $labels.instance  }}'%7D
+      value: '{{ $value }}'
+      summary: 'Low ASM Space auf Host {{ $labels.instance }} Datenbank {{ $labels.database }}'
+      description: 'ASM Disk ist für die Diskgruppe äuserst kritische. Anfragen können (demnächst) nicht mehr bearbeitet werden.'
+      scc_info: 'Anruf ausserhalb der Betriebszeit nur bei Produktion notwendig'
+  - alert: OracleDB Tablespace Usage Warning
+    expr: dvag_oracle_tablespace_usage_percent > dvag_oracle_tablespace_warning_treshhold
+    labels:
+      severity: warning
+      alert_scc: false
+    annotations:
+      metric_name: dvag_oracle_tablespace_usage_percent%7Binstance='{{  $labels.instance  }}'%7D
+      value: '{{ $value }}'
+      summary: 'Tablespace Usage Problem auf Host {{ $labels.instance }} Datenbank {{ $labels.database }}'
+      description: 'Tablespace muss erweitert werden'
+      scc_info: 'Bitte Ticket bei DBAs erstellen.'
+  - alert: OracleDB Tablespace Usage Critical
+    expr: dvag_oracle_tablespace_usage_percent > dvag_oracle_tablespace_critical_treshhold
+    labels:
+      severity: critical
+      alert_scc: true
+    annotations:
+      metric_name: dvag_oracle_tablespace_usage_percent%7Binstance='{{  $labels.instance  }}'%7D
+      value: '{{ $value }}'
+      summary: 'Tablespace Usage kritisch auf Host {{ $labels.instance }} Datenbank {{ $labels.database }}'
+      description: 'Tablespace muss erweitert werden'
+      scc_info: 'Anruf ausserhalb der Betriebszeit nur bei Produktion notwendig'
+  - alert: OracleDB Recovery Usage Warning
+    expr: dvag_oracle_tablespace_usage_percent > dvag_oracle_tablespace_warning_treshhold
+    labels:
+      severity: warning
+      alert_scc: false
+    annotations:
+      metric_name: dvag_oracle_tablespace_usage_percent%7Binstance='{{  $labels.instance  }}'%7D
+      value: '{{ $value }}'
+      summary: 'Tablespace Usage Problem auf Host {{ $labels.instance }} Datenbank {{ $labels.database }}'
+      description: 'Tablespace muss erweitert werden'
+      scc_info: 'Ticket an DBAs / Anruf ausserhalb der Betriebszeit nicht notwendig'
+  - alert: OracleDB Recovery Usage Critical
+    expr: dvag_oracle_recovery_usage_percent > dvag_oracle_recovery_critical_treshhold
+    labels:
+      severity: critical
+      alert_scc: true
+    annotations:
+      metric_name: dvag_oracle_recovery_usage_percent%7Binstance='{{  $labels.instance  }}'%7D
+      value: '{{ $value }}'
+      summary: 'Tablespace Usage Problem auf Host {{ $labels.instance }} Datenbank {{ $labels.database }}'
+      scc_info: 'Anruf ausserhalb der Betriebszeit nur bei Produktion notwendig'
+  - alert: OracleDB Shared Server Usage Count Warning
+    expr: dvag_oracle_shared_server_count >= dvag_oracle_shared_server_count_warning_treshhold
+    labels:
+      severity: warning
+      alert_scc: false
+    annotations:
+      metric_name: dvag_oracle_shared_server_count%7Binstance='{{  $labels.instance  }}'%7D
+      value: '{{ $value }}'
+      summary: 'Shared Server Problem auf Host {{ $labels.instance }} Datenbank {{ $labels.database }}'
+      scc_info: 'Ticket an DBAs / Anruf ausserhalb der Betriebszeit nicht notwendig'
+  - alert: OracleDB Shared Server Usage Count Critical
+    expr: dvag_oracle_shared_server_count >= dvag_oracle_shared_server_count_critical_treshhold
+    labels:
+      severity: critical
+      alert_scc: true
+    annotations:
+      metric_name: dvag_oracle_shared_server_count%7Binstance='{{  $labels.instance  }}'%7D
+      value: '{{ $value }}'
+      summary: 'Shared Server Problem auf Host {{ $labels.instance }} Datenbank {{ $labels.database }}'
+      scc_info: 'Anruf ausserhalb der Betriebszeit nur bei Produktion notwendig'
+  - alert: OracleDB Shared Server Usage Percent Warning
+    expr: dvag_oracle_shared_server_percent >= dvag_oracle_shared_server_percent_warning_treshhold
+    labels:
+      severity: warning
+      alert_scc: false
+    annotations:
+      metric_name: dvag_oracle_shared_server_percent%7Binstance='{{  $labels.instance  }}'%7D
+      value: '{{ $value }}'
+      summary: 'Shared Server Problem auf Host {{ $labels.instance }} Datenbank {{ $labels.database }}'
+      scc_info: 'Ticket an DBAs / Anruf ausserhalb der Betriebszeit nicht notwendig'
+  - alert: OracleDB Shared Server Usage Percent Critical
+    expr: dvag_oracle_shared_server_percent >= dvag_oracle_shared_server_percent_critical_treshhold
+    labels:
+      severity: critical
+      alert_scc: true
+    annotations:
+      metric_name: dvag_oracle_shared_server_percent%7Binstance='{{  $labels.instance  }}'%7D
+      value: '{{ $value }}'
+      summary: 'Shared Server Problem auf Host {{ $labels.instance }} Datenbank {{ $labels.database }}'
+      scc_info: 'Anruf ausserhalb der Betriebszeit nur bei Produktion notwendig'
+  - alert: OracleDB Dispatcher Usage Count Warning
+    expr: dvag_oracle_dispatcher_count >= dvag_oracle_dispatcher_count_warning_treshhold
+    labels:
+      severity: warning
+      alert_scc: false
+    annotations:
+      metric_name: dvag_oracle_dispatcher_count%7Binstance='{{  $labels.instance  }}'%7D
+      value: '{{ $value }}'
+      summary: 'Dispatcher Problem auf Host {{ $labels.instance }} Datenbank {{ $labels.database }}'
+      scc_info: 'Ticket an DBAs / Anruf ausserhalb der Betriebszeit nicht notwendig'
+  - alert: OracleDB Dispatcher Usage Count Critical
+    expr: dvag_oracle_dispatcher_count >= dvag_oracle_dispatcher_count_critical_treshhold
+    labels:
+      severity: critical
+      alert_scc: true
+    annotations:
+      metric_name: dvag_oracle_dispatcher_count%7Binstance='{{  $labels.instance  }}'%7D
+      value: '{{ $value }}'
+      summary: 'Dispatcher Problem auf Host {{ $labels.instance }} Datenbank {{ $labels.database }}'
+      scc_info: 'Anruf ausserhalb der Betriebszeit nur bei Produktion notwendig'
+  - alert: OracleDB Dispatcher Usage Percent Warning
+    expr: dvag_oracle_dispatcher_percent >= dvag_oracle_dispatcher_percent_warning_treshhold
+    labels:
+      severity: warning
+      alert_scc: false
+    annotations:
+      metric_name: dvag_oracle_dispatcher_percent%7Binstance='{{  $labels.instance  }}'%7D
+      value: '{{ $value }}'
+      summary: 'Dispatcher Problem auf Host {{ $labels.instance }} Datenbank {{ $labels.database }}'
+      scc_info: 'Ticket an DBAs / Anruf ausserhalb der Betriebszeit nicht notwendig'
+  - alert: OracleDB Dispatcher Usage Percent Critical
+    expr: dvag_oracle_dispatcher_percent >= dvag_oracle_dispatcher_percent_critical_treshhold
+    labels:
+      severity: critical
+      alert_scc: true
+    annotations:
+      metric_name: dvag_oracle_dispatcher_percent%7Binstance='{{  $labels.instance  }}'%7D
+      value: '{{ $value }}'
+      summary: 'Dispatcher Problem auf Host {{ $labels.instance }} Datenbank {{ $labels.database }}'
+      scc_info: 'Anruf ausserhalb der Betriebszeit nur bei Produktion notwendig'
+  - alert: OracleDB Common Queue Average Warning
+    expr: dvag_oracle_common_queue_waits_avg_msec >= dvag_oracle_common_queue_waits_avg_warning_treshhold
+    labels:
+      severity: warning
+      alert_scc: false
+    annotations:
+      metric_name: dvag_oracle_common_queue_waits_avg_msec%7Binstance='{{  $labels.instance  }}'%7D
+      value: '{{ $value }}'
+      summary: 'Common Queue Problem auf Host {{ $labels.instance }} Datenbank {{ $labels.database }}'
+      scc_info: 'Ticket an DBAs / Anruf ausserhalb der Betriebszeit nicht notwendig'
+  - alert: OracleDB Common Queue Average Critical
+    expr: dvag_oracle_common_queue_waits_avg_msec >= dvag_oracle_common_queue_waits_avg_critical_treshhold
+    labels:
+      severity: critical
+      alert_scc: true
+    annotations:
+      metric_name: dvag_oracle_common_queue_waits_avg_msec%7Binstance='{{  $labels.instance  }}'%7D
+      value: '{{ $value }}'
+      summary: 'Common Queue Problem auf Host {{ $labels.instance }} Datenbank {{ $labels.database }}'
+      scc_info: 'Anruf ausserhalb der Betriebszeit nur bei Produktion notwendig'
+  - alert: OracleDB Common Queue Max Warning
+    expr: dvag_oracle_common_queue_waits_max_msec >= dvag_oracle_common_queue_waits_max_warning_treshhold
+    labels:
+      severity: warning
+      alert_scc: false
+    annotations:
+      metric_name: dvag_oracle_common_queue_waits_max_msec%7Binstance='{{  $labels.instance  }}'%7D
+      value: '{{ $value }}'
+      summary: 'Common Queue Problem auf Host {{ $labels.instance }} Datenbank {{ $labels.database }}'
+      scc_info: 'Ticket an DBAs / Anruf ausserhalb der Betriebszeit nicht notwendig'
+  - alert: OracleDB Common Queue Max Critical
+    expr: dvag_oracle_common_queue_waits_max_msec >= dvag_oracle_common_queue_waits_max_critical_treshhold
+    labels:
+      severity: critical
+      alert_scc: true
+    annotations:
+      metric_name: dvag_oracle_common_queue_waits_max_msec%7Binstance='{{  $labels.instance  }}'%7D
+      value: '{{ $value }}'
+      summary: 'Common Queue Problem auf Host {{ $labels.instance }} Datenbank {{ $labels.database }}'
+      scc_info: 'Anruf ausserhalb der Betriebszeit nur bei Produktion notwendig'
+  - alert: OracleDB Response Queue Average Warning
+    expr: dvag_oracle_response_queue_waits_avg_msec >= dvag_oracle_response_queue_waits_avg_warning_treshhold 
+    labels:
+      severity: warning
+      alert_scc: false
+    annotations:
+      metric_name: dvag_oracle_response_queue_waits_avg_msec%7Binstance='{{  $labels.instance  }}'%7D
+      value: '{{ $value }}'
+      summary: 'Response Queue Problem auf Host {{ $labels.instance }} Datenbank {{ $labels.database }}'
+      scc_info: 'Ticket an DBAs / Anruf ausserhalb der Betriebszeit nicht notwendig'
+  - alert: OracleDB Response Queue Average Critical
+    expr: dvag_oracle_response_queue_waits_avg_msec >= dvag_oracle_response_queue_waits_avg_critical_treshhold
+    labels:
+      severity: critical
+      alert_scc: true
+    annotations:
+      metric_name: dvag_oracle_response_queue_waits_avg_msec%7Binstance='{{  $labels.instance  }}'%7D
+      value: '{{ $value }}'
+      summary: 'Response Queue Problem auf Host {{ $labels.instance }} Datenbank {{ $labels.database }}'
+      scc_info: 'Anruf ausserhalb der Betriebszeit nur bei Produktion notwendig'
+  - alert: OracleDB Response Queue Max Warning
+    expr: dvag_oracle_response_queue_waits_max_msec >= dvag_oracle_response_queue_waits_max_warning_treshhold
+    labels:
+      severity: warning
+      alert_scc: false
+    annotations:
+      metric_name: dvag_oracle_response_queue_waits_max_msec%7Binstance='{{  $labels.instance  }}'%7D
+      value: '{{ $value }}'
+      summary: 'Response Queue Problem auf Host {{ $labels.instance }} Datenbank {{ $labels.database }}'
+      scc_info: 'Ticket an DBAs / Anruf ausserhalb der Betriebszeit nicht notwendig'
+  - alert: OracleDB Response Queue Max Critical
+    expr: dvag_oracle_response_queue_waits_max_msec >= dvag_oracle_response_queue_waits_max_critical_treshhold
+    labels:
+      severity: critical
+      alert_scc: true
+    annotations:
+      metric_name: dvag_oracle_response_queue_waits_max_msec%7Binstance='{{  $labels.instance  }}'%7D
+      value: '{{ $value }}'
+      summary: 'Response Queue Problem auf Host {{ $labels.instance }} Datenbank {{ $labels.database }}'
+      scc_info: 'Anruf ausserhalb der Betriebszeit nur bei Produktion notwendig'
+  - alert: 'OracleDB Count Sessions - Warning'
+    expr: dvag_oracle_active_session_count >= dvag_oracle_active_session_warning_treshhold
+    labels:
+      severity: warning
+      alert_scc: false
+    annotations:
+      metric_name: dvag_oracle_active_session_count%7Binstance='{{  $labels.instance  }}'%7D 
+      description: 'Number of Oracle Server Connections too high'
+      scc_info: 'Ticket bei TS oder DBA erstellen. Falls Produktion -> Zusätzlich TS oder DBA informieren.'
+  - alert: 'OracleDB Count Sessions - Critical'
+    expr: dvag_oracle_active_session_count >= dvag_oracle_active_session_critical_treshhold
+    labels:
+      severity: critical
+      alert_scc: true
+    annotations:
+      metric_name: dvag_oracle_active_session_count%7Binstance='{{  $labels.instance  }}'%7D 
+      description: 'Number of Oracle Server Connections too high'
+      scc_info: 'Ticket bei TS oder DBA erstellen. Falls Produktion -> Zusätzlich TS oder DBA informieren.'
+  - alert: 'OracleDB Check Standby Gap - Warning'
+    expr: dvag_oracle_standby_applylag_value >= dvag_oracle_standby_applylag_warning_treshhold
+    labels:
+      severity: warning
+      alert_scc: true
+    annotations:
+      metric_name: dvag_oracle_standby_applylag_value%7Binstance='{{  $labels.instance  }}'%7D 
+      description: 'Das Gap zwischen Primary DB und Standby DB ist zu hoch'
+      scc_info: 'Ticket bei DBA erstellen. Falls Produktion -> Zusätzlich sofort DBA informieren. Außerhalb der Kernzeit bitte DBA Bereitschaft anrufen.'
+  - alert: 'OracleDB Check Standby Gap - Critical'
+    expr: dvag_oracle_standby_applylag_value >= dvag_oracle_standby_applylag_critical_treshhold
+    labels:
+      severity: critical
+      alert_scc: true
+    annotations:
+      metric_name: dvag_oracle_standby_applylag_value%7Binstance='{{  $labels.instance  }}'%7D 
+      description: 'Das Gap zwischen Primary DB und Standby DB ist zu hoch'
+      scc_info: 'Ticket bei DBA erstellen. Falls Produktion -> Zusätzlich sofort DBA informieren. Außerhalb der Kernzeit bitte DBA Bereitschaft anrufen.'
+  - alert: 'OracleDB Standby Transportlag too high - Warning'
+    expr: dvag_oracle_standby_transportlag_value >= dvag_oracle_standby_transportlag_warning_treshhold
+    labels:
+      severity: warning
+      alert_scc: true
+    annotations:
+      metric_name: dvag_oracle_standby_transportlag_value%7Binstance='{{  $labels.instance  }}'%7D 
+      description: 'Das Gap zwischen Primary DB und Standby DB ist zu hoch'
+      scc_info: 'Ticket bei DBA erstellen. Falls Produktion -> Zusätzlich sofort DBA informieren. Außerhalb der Kernzeit bitte DBA Bereitschaft anrufen.'
+  - alert: 'OracleDB Standby Transportlag too high - Critical'
+    expr: dvag_oracle_standby_transportlag_value >= dvag_oracle_standby_transportlag_critical_treshhold
+    labels:
+      severity: critical
+      alert_scc: true
+    annotations:
+      metric_name: dvag_oracle_standby_transportlag_value%7Binstance='{{  $labels.instance  }}'%7D 
+      description: 'Das Gap zwischen Primary DB und Standby DB ist zu hoch'
+      scc_info: 'Ticket bei DBA erstellen. Falls Produktion -> Zusätzlich sofort DBA informieren. Außerhalb der Kernzeit bitte DBA Bereitschaft anrufen.'

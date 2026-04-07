@@ -1,0 +1,97 @@
+groups:
+- name: textfile_collector_dos
+  rules:
+  - alert: JMX Exporter nicht erreichbar
+    expr:  (up{alerting_required!='false',job='jmx-exporter'} == 0)
+    for: 3m
+    labels:
+      severity: critical
+      alert_scc: true
+    annotations:
+      metric_name: up%7Binstance='{{  $labels.instance  }}'%7D 
+      value: '{{ $value }}'
+      summary: 'JMX Exporter nicht erreichbar (instance {{ $labels.instance }})'
+      scc_info: 'Bitte auf dem Host die entsprechende Tomcat Instanz überprüfen'
+  - alert: Tomcat nicht erreichbar
+    expr:  jmx_scrape_error{type!="azure"} != 0
+    for: 3m
+    labels:
+      severity: critical
+      alert_scc: true
+    annotations:
+      metric_name: jmx_scrape_error%7Binstance='{{  $labels.instance  }}'%7D 
+      value: '{{ $value }}'
+      summary: 'JMX Exporter kann seine Tomcat Instanz nicht mehr scrapen. Welche Instanz genau kann in der Config Datei unter /etc/jmx_exporter/ herausgefunden werden'
+      scc_info: 'Bitte auf dem Host die entsprechende Tomcat Instanz überprüfen'
+  - alert: Tomcat nicht erreichbar
+    expr: jmx_scrape_error{type="azure"} != 0
+    for: 33m
+    labels:
+      severity: critical
+      alert_scc: true
+    annotations:
+      metric_name: jmx_scrape_error%7Binstance='{{  $labels.instance  }}'%7D 
+      value: '{{ $value }}'
+      summary: 'JMX Exporter kann seine Tomcat Instanz nicht mehr scrapen. Welche Instanz genau kann in der Config Datei unter /etc/jmx_exporter/ herausgefunden werden'
+      scc_info: 'Bitte auf dem Host die entsprechende Tomcat Instanz überprüfen'
+  - alert: Tomcat Thread Count zu hoch
+    expr: dvag_java_tomcat_thread_count > 1000
+    labels:
+      severity: critical
+      alert_scc: true
+    annotations:
+      metric_name: dvag_java_tomcat_thread_count%7Binstance='{{  $labels.instance  }}'%7D
+      summary: 'Tomcat Thread Count zu hoch auf Host {{ $labels.hostname }} Instanz {{ $labels.metric_port }}'
+      scc_info: 'Bitte Ticket bei TS erstellen'
+      value: '{{ $value }}'
+  - alert: Tomcat Active DB Connections zu hoch
+    expr: dvag_java_db_active_connections{db_name!='gesamt'} > 30
+    labels:
+      severity: critical
+      alert_scc: true
+    annotations:
+      metric_name: dvag_java_db_active_connections%7Binstance='{{  $labels.instance  }}', db_name!='gesamt'%7D 
+      summary: 'Tomcat Active DB Connections zu hoch auf Host {{ $labels.hostname }} Instanz {{ $labels.metric_port }}'
+      scc_info: 'Bitte Ticket bei TS erstellen'
+      value: '{{ $value }}'
+  - alert: Tomcat Active Gesamt DB Connections zu hoch
+    expr: dvag_java_db_active_connections{db_name='gesamt'} > 50
+    labels:
+      severity: critical
+      alert_scc: true
+    annotations:
+      metric_name: dvag_java_db_active_connections%7Binstance='{{  $labels.instance  }}', db_name='gesamt'%7D 
+      summary: 'Tomcat Active DB Connections zu hoch auf Host {{ $labels.hostname }} Instanz {{ $labels.metric_port }}'
+      scc_info: 'Bitte Ticket bei TS erstellen'
+      value: '{{ $value }}'
+  - alert: Java Garbage Collector zuviele Instanzen
+    expr: dvag_java_gc_old_count > 2
+    labels:
+      severity: critical
+      alert_scc: true
+    annotations:
+      metric_name: dvag_java_gc_old_count%7Binstance='{{  $labels.instance  }}'%7D 
+      summary: 'Es laufen zuviele Java GC auf {{ $labels.hostname }} Instanz {{ $labels.metric_port }}'
+      scc_info: 'Es laufen zu viele GC, dies deutet auf eine Speicher Problem hin. \n https://itb-confluence.id.dvag.com/confluence/display/ITBsaadscc/Full+GC+Meldungen \n Es muss zudem VOR dem Neustart des Tomcat ein Heapdump gezogen und das TS per Ticket darüber informiert werden!'
+      value: '{{ $value }}'
+  - alert: Java MSC Garbage Collector zuviele Instanzen
+    expr: changes(dvag_java_gc_msc_count[2m]) > 1
+    labels:
+      severity: critical
+      alert_scc: true
+    annotations:
+      metric_name: dvag_java_gc_msc_count%7Binstance='{{  $labels.instance  }}'%7D 
+      summary: 'Es laufen zuviele Java MSC GC auf {{ $labels.hostname }} Instanz {{ $labels.metric_port }}'
+      scc_info: 'Es laufen zu viele GC, dies deutet auf eine Speicher Problem hin. \n https://itb-confluence.id.dvag.com/confluence/display/ITBsaadscc/Full+GC+Meldungen \n Es muss zudem VOR dem Neustart des Tomcat ein Heapdump gezogen und das TS per Ticket darüber informiert werden!'
+      value: '{{ $value }}'
+  - alert: Java Tomcat Thread busy
+    expr: sum by (hostname)(dvag_java_tomcat_thread_busy{alerting_required!='false'}) > 10
+    for: 2m
+    labels:
+      severity: critical
+      alert_scc: true
+    annotations:
+      metric_name: sum by (hostname)(dvag_java_tomcat_thread_busy%7Binstance='{{  $labels.instance  }}'%7D) 
+      summary: 'Es laufen zu viele Einzel Threads voll auf {{ $labels.hostname }} Instanz {{ $labels.metric_port }}'
+      scc_info: 'Troubleshooter informieren'
+      value: '{{ $value }}'

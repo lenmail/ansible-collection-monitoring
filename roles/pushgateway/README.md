@@ -1,0 +1,46 @@
+# pushgateway
+
+Install and configure the Prometheus Pushgateway.
+
+## Supported platforms
+
+- Ubuntu 22.04+
+- Debian 12+
+- RHEL 9+
+
+## Role Variables
+
+The role interface is validated through `meta/argument_specs.yml`. Defaults are defined in `defaults/main.yml`.
+
+```yaml
+---
+proxy_env: {}
+pushgateway_version: 1.4.3
+pushgateway_web_listen_address: 0.0.0.0
+pushgateway_web_listen_port: 9091
+pushgateway_web_external_url: http://{{ ansible_domain }}.{{ ansible_hostname }}:{{ pushgateway_web_listen_port }}
+pushgateway_system_user: "{{ prometheus_user | default('pushgateway') }}"
+pushgateway_system_group: "{{ prometheus_group | default('pushgateway') }}"
+pushgateway_log_level: warn
+pushgateway_log_format: json
+pushgateway_persistence: true
+pushgateway_binary_local_dir: /usr/local/bin
+pushgateway_persistence_dir: /var/lib/pushgateway
+pushgateway_limit_nofile: 8192
+pushgateway_http_proxy: ''
+pushgateway_config_flags_extra: {}
+```
+
+## Example Playbook
+
+```yaml
+- name: Apply pushgateway
+  hosts: all
+  become: true
+  roles:
+    - role: lenmail.monitoring.pushgateway
+```
+
+## Testing
+
+The collection CI runs `ansible-lint`, `ansible-test sanity`, repository consistency tests, and per-role syntax checks using `roles/pushgateway/tests/test.yml`.

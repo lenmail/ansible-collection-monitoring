@@ -1,0 +1,923 @@
+# blackbox_exporter
+
+Install and configure the Prometheus blackbox_exporter.
+
+## Supported platforms
+
+- Ubuntu 22.04+
+- Debian 12+
+- RHEL 9+
+
+## Role Variables
+
+The role interface is validated through `meta/argument_specs.yml`. Defaults are defined in `defaults/main.yml`.
+
+```yaml
+---
+proxy_env: {}
+blackbox_exporter_version: 0.25.0
+blackbox_exporter_log_level: warn
+blackbox_exporter_webconfig: {}
+blackbox_exporter_config_flags_extra: {}
+blackbox_exporter_config: "{{ all_blackbox_exporter_config|default({}) | combine(group_vars_blackbox_exporter_config|default({}),recursive=True,list_merge='append') | combine(host_vars_blackbox_exporter_config|default({}),recursive=True,list_merge='append') | combine(defaults_blackbox_exporter_config|default({}),recursive=True,list_merge='append') }}"
+defaults_blackbox_exporter_config:
+  modules:
+    ssh_banner:
+      prober: tcp
+      tcp:
+        query_response:
+        - expect: ^SSH-2.0-
+        - send: SSH-2.0-blackbox-ssh-check
+    dns_tcp_ipv4:
+      prober: dns
+      timeout: 10s
+      dns:
+        transport_protocol: tcp
+        preferred_ip_protocol: ip4
+        query_name: '{{ ansible_external_domain }}'
+        query_type: A
+        valid_rcodes:
+        - NOERROR
+    dns_udp_ipv4:
+      prober: dns
+      timeout: 10s
+      dns:
+        transport_protocol: udp
+        preferred_ip_protocol: ip4
+        query_name: '{{ ansible_external_domain }}'
+        query_type: A
+        valid_rcodes:
+        - NOERROR
+    dns_tcp_ipv6:
+      prober: dns
+      timeout: 10s
+      dns:
+        transport_protocol: tcp
+        preferred_ip_protocol: ip6
+        query_name: '{{ ansible_external_domain }}'
+        query_type: A
+        valid_rcodes:
+        - NOERROR
+    dns_udp_ipv6:
+      prober: dns
+      timeout: 10s
+      dns:
+        transport_protocol: udp
+        preferred_ip_protocol: ip6
+        query_name: '{{ ansible_external_domain }}'
+        query_type: A
+        valid_rcodes:
+        - NOERROR
+    https_200:
+      http:
+        preferred_ip_protocol: ip4
+        method: GET
+        valid_http_versions:
+        - HTTP/1.0
+        - HTTP/1.1
+        - HTTP/2.0
+        valid_status_codes:
+        - 200
+        ip_protocol_fallback: true
+      prober: http
+      timeout: 10s
+    icmp_ipv4:
+      prober: icmp
+      timeout: 5s
+      icmp:
+        preferred_ip_protocol: ip4
+        ip_protocol_fallback: false
+    icmp_ipv6:
+      prober: icmp
+      timeout: 5s
+      icmp:
+        preferred_ip_protocol: ip6
+        ip_protocol_fallback: false
+    tcp_connect_ipv4:
+      prober: tcp
+      timeout: 5s
+      tcp:
+        preferred_ip_protocol: ip4
+        ip_protocol_fallback: false
+    tcp_connect_ipv6:
+      prober: tcp
+      timeout: 5s
+      tcp:
+        preferred_ip_protocol: ip6
+        ip_protocol_fallback: false
+    smtp_ipv4:
+      prober: tcp
+      timeout: 10s
+      tcp:
+        preferred_ip_protocol: ip4
+        ip_protocol_fallback: false
+        query_response:
+        - expect: '^220 '
+        - send: "EHLO {{ ansible_fqdn }}\r"
+        - expect: ^250
+        - send: "QUIT\r"
+    smtp_ipv6:
+      prober: tcp
+      timeout: 10s
+      tcp:
+        preferred_ip_protocol: ip6
+        ip_protocol_fallback: false
+        query_response:
+        - expect: '^220 '
+        - send: "EHLO {{ ansible_fqdn }}\r"
+        - expect: ^250
+        - send: "QUIT\r"
+    http_post_2xx_alertmanager_token:
+      http:
+        preferred_ip_protocol: ip4
+        headers:
+          Content-Type: application/json
+          Auth-User: '{{ traefik_alertmanager_auth_user }}'
+          Auth-Token: '{{ traefik_alertmanager_auth_token }}'
+          Host: alertmanager.reifen-wolf.de
+        method: POST
+        body: "[{\n  \"status\": \"firing\",\n  \"labels\": {\n    \"alertname\": \"Test Blackox-Exporter Post\",\n    \"test\": \"yes\"\n  },\n  \"annotations\": {\n  \"summary\": \"Test Blackox-Exporter Post\"\n}, \"generatorURL\": \"https://alertmanager.reifen-wolf.de\" }]\n"
+        valid_status_codes:
+        - 200
+      prober: http
+      timeout: 5s
+    pushgw_test_post:
+      http:
+        preferred_ip_protocol: ip4
+        headers:
+          Content-Type: data-binary
+          Auth-User: '{{ traefik_pushgateway_auth_user }}'
+          Auth-Token: '{{ traefik_pushgateway_auth_token }}'
+          Host: pushgateway.reifen-wolf.de
+        method: POST
+        body: "test_metric 1\n  "
+        valid_http_versions:
+        - HTTP/1.0
+        - HTTP/1.1
+        - HTTP/2.0
+        valid_status_codes:
+        - 200
+      prober: http
+      timeout: 5s
+additional_blackbox_exporter_config:
+  bkklinde_via_proxy01.4:
+    http:
+      method: GET
+      preferred_ip_protocol: ip4
+      proxy_url: http://proxy01.4.infra.dvag.net:3128
+      valid_http_versions:
+      - HTTP/1.0
+      - HTTP/1.1
+      - HTTP/2.0
+      valid_status_codes:
+      - 200
+    prober: http
+    timeout: 10s
+  bulk_web_check:
+    http:
+      fail_if_body_not_matches_regexp:
+      - UP
+      method: GET
+      preferred_ip_protocol: ip4
+      valid_http_versions:
+      - HTTP/1.0
+      - HTTP/1.1
+      - HTTP/2.0
+      valid_status_codes:
+      - 200
+    prober: http
+    timeout: 10s
+  dns_tcp_ipv4_ad:
+    dns:
+      preferred_ip_protocol: ip4
+      query_name: help.mon.dvag.net
+      query_type: A
+      transport_protocol: tcp
+      valid_rcodes:
+      - NOERROR
+    prober: dns
+    timeout: 10s
+  dns_tcp_ipv4_ext:
+    dns:
+      preferred_ip_protocol: ip4
+      query_name: www.google.com
+      query_type: A
+      transport_protocol: tcp
+      valid_rcodes:
+      - NOERROR
+    prober: dns
+    timeout: 10s
+  dns_tcp_ipv4_k8s:
+    dns:
+      preferred_ip_protocol: ip4
+      query_name: zob.produktion.k8s.dvag.net
+      query_type: A
+      transport_protocol: tcp
+      valid_rcodes:
+      - NOERROR
+    prober: dns
+    timeout: 10s
+  dns_udp_ipv4_ad:
+    dns:
+      preferred_ip_protocol: ip4
+      query_name: help.mon.dvag.net
+      query_type: A
+      transport_protocol: udp
+      valid_rcodes:
+      - NOERROR
+    prober: dns
+    timeout: 10s
+  dns_udp_ipv4_ext:
+    dns:
+      preferred_ip_protocol: ip4
+      query_name: www.google.com
+      query_type: A
+      transport_protocol: udp
+      valid_rcodes:
+      - NOERROR
+    prober: dns
+    timeout: 10s
+  dns_udp_ipv4_k8s:
+    dns:
+      preferred_ip_protocol: ip4
+      query_name: zob.produktion.k8s.dvag.net
+      query_type: A
+      transport_protocol: udp
+      valid_rcodes:
+      - NOERROR
+    prober: dns
+    timeout: 10s
+  health_web_check:
+    http:
+      fail_if_body_not_matches_regexp:
+      - UP
+      method: GET
+      preferred_ip_protocol: ip4
+      valid_http_versions:
+      - HTTP/1.0
+      - HTTP/1.1
+      - HTTP/2.0
+      valid_status_codes:
+      - 200
+    prober: http
+    timeout: 10s
+  http_basic:
+    http:
+      method: GET
+      preferred_ip_protocol: ip4
+      valid_http_versions:
+      - HTTP/1.0
+      - HTTP/1.1
+      - HTTP/2.0
+      valid_status_codes:
+      - 200
+      - 401
+    prober: http
+    timeout: 10s
+  http_basic_proxy:
+    http:
+      method: GET
+      preferred_ip_protocol: ip4
+      proxy_url: http://proxy-client.infra.dvag.net:3128
+      valid_http_versions:
+      - HTTP/1.0
+      - HTTP/1.1
+      - HTTP/2.0
+      valid_status_codes:
+      - 200
+      - 401
+    prober: http
+    timeout: 10s
+  http_basic_webcms_backend:
+    http:
+      fail_if_body_not_matches_regexp:
+      - '{"mountedFs":true,"mongoDB_OK":true,"bestenlistenStatus":{"mongoDB_OK":true}}'
+      method: GET
+      preferred_ip_protocol: ip4
+      valid_http_versions:
+      - HTTP/1.0
+      - HTTP/1.1
+      - HTTP/2.0
+      valid_status_codes:
+      - 200
+      - 401
+    prober: http
+    timeout: 10s
+  http_basic_webcms_bestenliste:
+    http:
+      fail_if_body_not_matches_regexp:
+      - '{"mongoDB_OK":true}'
+      method: GET
+      preferred_ip_protocol: ip4
+      valid_http_versions:
+      - HTTP/1.0
+      - HTTP/1.1
+      - HTTP/2.0
+      valid_status_codes:
+      - 200
+      - 401
+    prober: http
+    timeout: 10s
+  http_basic_webcms_frontend:
+    http:
+      fail_if_body_not_matches_regexp:
+      - '{"OK":true}'
+      method: GET
+      preferred_ip_protocol: ip4
+      valid_http_versions:
+      - HTTP/1.0
+      - HTTP/1.1
+      - HTTP/2.0
+      valid_status_codes:
+      - 200
+      - 401
+    prober: http
+    timeout: 10s
+  http_post_2xx:
+    http:
+      body: '{}'
+      headers:
+        Content-Type: application/json
+      method: POST
+      preferred_ip_protocol: ip4
+      tls_config:
+        insecure_skip_verify: false
+      valid_http_versions:
+      - HTTP/1.1
+      - HTTP/2.0
+      valid_status_codes:
+      - 200
+      - 405
+    prober: http
+    timeout: 10s
+  http_post_2xx_proxy:
+    http:
+      body: '{}'
+      headers:
+        Content-Type: application/json
+      method: POST
+      preferred_ip_protocol: ip4
+      proxy_url: http://proxy-client.infra.dvag.net:3128
+      tls_config:
+        insecure_skip_verify: false
+      valid_http_versions:
+      - HTTP/1.1
+      - HTTP/2.0
+      valid_status_codes:
+      - 200
+      - 405
+    prober: http
+    timeout: 10s
+  http_post_2xx_proxy_alertmanager_token:
+    http:
+      body: "[{ \"status\": \"firing\", \"labels\": { \"alertname\": \"extern-test-alert-from-blackbox-exporter\", \"test\": \"yes\", \"owner\": \"Holger Waschke\" }, \"annotations\": { \"summary\": \"TestAlertFromBlackbox\" }, \"generatorURL\": \"http://alertmanager.dvag.com\" }]      \n"
+      headers:
+        Auth-Token: 2CmlQJO8sqG6fYee0fvblqINGKrsmNSLBkePRrmzYX63Rz4A90Kvb7rr9IdViiu
+        Auth-User: azure2alert-prod
+        Content-Type: application/json
+        Host: alertmanager.dvag.com
+      method: POST
+      proxy_url: http://proxy-client.infra.dvag.net:3128
+      tls_config:
+        insecure_skip_verify: true
+      valid_http_versions:
+      - HTTP/1.0
+      - HTTP/1.1
+      - HTTP/2.0
+      valid_status_codes:
+      - 200
+    prober: http
+    timeout: 10s
+  http_post_2xx_proxy_pushgw_token:
+    http:
+      body: "test_metric 1\n  "
+      headers:
+        Auth-Token: K9Vk8uaDhXc8HWvY5tTiSdV9hrhAU0oHWT6ml4OohJl4nJKZ4GQwaUtpW2zPMrxa
+        Auth-User: pushgw-prod
+        Content-Type: data-binary
+        Host: pushgw.dvag.com
+      method: POST
+      proxy_url: http://proxy-client.infra.dvag.net:3128
+      tls_config:
+        insecure_skip_verify: true
+      valid_http_versions:
+      - HTTP/1.0
+      - HTTP/1.1
+      - HTTP/2.0
+      valid_status_codes:
+      - 200
+    prober: http
+    timeout: 10s
+  https_basic:
+    http:
+      method: GET
+      preferred_ip_protocol: ip4
+      valid_http_versions:
+      - HTTP/1.0
+      - HTTP/1.1
+      - HTTP/2.0
+      valid_status_codes:
+      - 200
+      - 401
+      - 400
+    prober: http
+    timeout: 10s
+  https_basic_403:
+    http:
+      method: GET
+      preferred_ip_protocol: ip4
+      valid_http_versions:
+      - HTTP/1.0
+      - HTTP/1.1
+      - HTTP/2.0
+      valid_status_codes:
+      - 200
+      - 401
+      - 403
+    prober: http
+    timeout: 10s
+  https_basic_403_skipssl:
+    http:
+      method: GET
+      preferred_ip_protocol: ip4
+      tls_config:
+        insecure_skip_verify: true
+      valid_http_versions:
+      - HTTP/1.0
+      - HTTP/1.1
+      - HTTP/2.0
+      valid_status_codes:
+      - 200
+      - 401
+      - 403
+    prober: http
+    timeout: 10s
+  https_basic_403_skipssl_ipv4:
+    http:
+      ip_protocol_fallback: false
+      method: GET
+      preferred_ip_protocol: ip4
+      tls_config:
+        insecure_skip_verify: true
+      valid_http_versions:
+      - HTTP/1.0
+      - HTTP/1.1
+      - HTTP/2.0
+      valid_status_codes:
+      - 200
+      - 401
+      - 403
+    prober: http
+    timeout: 10s
+  https_basic_403_skipssl_ipv6:
+    http:
+      ip_protocol_fallback: false
+      method: GET
+      tls_config:
+        insecure_skip_verify: true
+      valid_http_versions:
+      - HTTP/1.0
+      - HTTP/1.1
+      - HTTP/2.0
+      valid_status_codes:
+      - 200
+      - 401
+      - 403
+    prober: http
+    timeout: 10s
+  https_basic_404:
+    http:
+      method: GET
+      preferred_ip_protocol: ip4
+      valid_http_versions:
+      - HTTP/1.0
+      - HTTP/1.1
+      - HTTP/2.0
+      valid_status_codes:
+      - 200
+      - 401
+      - 400
+      - 404
+    prober: http
+    timeout: 10s
+  https_basic_404_ipv4:
+    http:
+      ip_protocol_fallback: false
+      method: GET
+      preferred_ip_protocol: ip4
+      valid_http_versions:
+      - HTTP/1.0
+      - HTTP/1.1
+      - HTTP/2.0
+      valid_status_codes:
+      - 200
+      - 401
+      - 400
+      - 404
+  https_basic_404_ipv6:
+    http:
+      ip_protocol_fallback: false
+      method: GET
+      preferred_ip_protocol: ip6
+      valid_http_versions:
+      - HTTP/1.0
+      - HTTP/1.1
+      - HTTP/2.0
+      valid_status_codes:
+      - 200
+      - 401
+      - 400
+      - 404
+    prober: http
+    timeout: 10s
+  https_basic_404_skipssl:
+    http:
+      method: GET
+      preferred_ip_protocol: ip4
+      tls_config:
+        insecure_skip_verify: true
+      valid_http_versions:
+      - HTTP/1.0
+      - HTTP/1.1
+      - HTTP/2.0
+      valid_status_codes:
+      - 200
+      - 404
+    prober: http
+    timeout: 10s
+  https_basic_404_skipssl_ipv4:
+    http:
+      ip_protocol_fallback: false
+      method: GET
+      preferred_ip_protocol: ip4
+      tls_config:
+        insecure_skip_verify: true
+      valid_http_versions:
+      - HTTP/1.0
+      - HTTP/1.1
+      - HTTP/2.0
+      valid_status_codes:
+      - 200
+      - 404
+    prober: http
+    timeout: 10s
+  https_basic_404_skipssl_ipv6:
+    http:
+      ip_protocol_fallback: false
+      method: GET
+      tls_config:
+        insecure_skip_verify: true
+      valid_http_versions:
+      - HTTP/1.0
+      - HTTP/1.1
+      - HTTP/2.0
+      valid_status_codes:
+      - 200
+      - 404
+    prober: http
+    timeout: 10s
+  https_basic_503:
+    http:
+      method: GET
+      preferred_ip_protocol: ip4
+      valid_http_versions:
+      - HTTP/1.0
+      - HTTP/1.1
+      - HTTP/2.0
+      valid_status_codes:
+      - 200
+      - 401
+      - 400
+      - 503
+    prober: http
+    timeout: 10s
+  https_basic_proxy:
+    http:
+      method: GET
+      preferred_ip_protocol: ip4
+      proxy_url: http://proxy-client.infra.dvag.net:3128
+      valid_http_versions:
+      - HTTP/1.0
+      - HTTP/1.1
+      - HTTP/2.0
+      valid_status_codes:
+      - 200
+      - 400
+      - 401
+      - 404
+    prober: http
+    timeout: 10s
+  https_basic_proxy_403:
+    http:
+      method: GET
+      preferred_ip_protocol: ip4
+      proxy_url: http://proxy-client.infra.dvag.net:3128
+      tls_config:
+        insecure_skip_verify: true
+      valid_http_versions:
+      - HTTP/1.0
+      - HTTP/1.1
+      - HTTP/2.0
+      valid_status_codes:
+      - 200
+      - 401
+      - 403
+    prober: http
+    timeout: 10s
+  https_basic_proxy_503:
+    http:
+      method: GET
+      preferred_ip_protocol: ip4
+      proxy_url: http://proxy-client.infra.dvag.net:3128
+      valid_http_versions:
+      - HTTP/1.0
+      - HTTP/1.1
+      - HTTP/2.0
+      valid_status_codes:
+      - 200
+      - 400
+      - 401
+      - 404
+      - 503
+    prober: http
+    timeout: 10s
+  https_basic_proxy_no_redirects:
+    http:
+      follow_redirects: false
+      method: GET
+      preferred_ip_protocol: ip4
+      proxy_url: http://proxy-client.infra.dvag.net:3128
+      valid_http_versions:
+      - HTTP/1.0
+      - HTTP/1.1
+      - HTTP/2.0
+      valid_status_codes:
+      - 302
+      - 200
+      - 301
+      - 302
+      - 401
+    prober: http
+    timeout: 10s
+  https_basic_proxy_noredirects:
+    http:
+      follow_redirects: false
+      method: GET
+      preferred_ip_protocol: ip4
+      proxy_url: http://proxy-client.infra.dvag.net:3128
+      valid_http_versions:
+      - HTTP/1.0
+      - HTTP/1.1
+      - HTTP/2.0
+      valid_status_codes:
+      - 200
+      - 400
+      - 301
+      - 302
+      - 401
+      - 404
+    prober: http
+    timeout: 10s
+  https_basic_proxy_skipssl:
+    http:
+      method: GET
+      preferred_ip_protocol: ip4
+      proxy_url: http://proxy-client.infra.dvag.net:3128
+      tls_config:
+        insecure_skip_verify: true
+      valid_http_versions:
+      - HTTP/1.0
+      - HTTP/1.1
+      - HTTP/2.0
+      valid_status_codes:
+      - 200
+      - 401
+    prober: http
+    timeout: 10s
+  https_basic_proxy_skipssl_no_redirects:
+    http:
+      follow_redirects: false
+      method: GET
+      preferred_ip_protocol: ip4
+      proxy_url: http://proxy-client.infra.dvag.net:3128
+      tls_config:
+        insecure_skip_verify: true
+      valid_http_versions:
+      - HTTP/1.0
+      - HTTP/1.1
+      - HTTP/2.0
+      valid_status_codes:
+      - 302
+      - 200
+      - 302
+      - 401
+    prober: http
+    timeout: 10s
+  https_basic_proxy_skipssl_noredirects:
+    http:
+      follow_redirects: false
+      method: GET
+      preferred_ip_protocol: ip4
+      proxy_url: http://proxy-client.infra.dvag.net:3128
+      tls_config:
+        insecure_skip_verify: true
+      valid_http_versions:
+      - HTTP/1.0
+      - HTTP/1.1
+      - HTTP/2.0
+      valid_status_codes:
+      - 200
+      - 401
+      - 301
+      - 302
+    prober: http
+    timeout: 10s
+  https_basic_skipssl:
+    http:
+      method: GET
+      preferred_ip_protocol: ip4
+      tls_config:
+        insecure_skip_verify: true
+      valid_http_versions:
+      - HTTP/1.0
+      - HTTP/1.1
+      - HTTP/2.0
+      valid_status_codes:
+      - 200
+      - 401
+    prober: http
+  icmp_ipv4:
+    icmp:
+      preferred_ip_protocol: ip4
+    prober: icmp
+    timeout: 30s
+  k8s_webcheck:
+    http:
+      fail_if_body_matches_regexp:
+      - DOWN
+      method: GET
+      preferred_ip_protocol: ip4
+      tls_config:
+        insecure_skip_verify: true
+      valid_http_versions:
+      - HTTP/1.0
+      - HTTP/1.1
+      - HTTP/2.0
+      valid_status_codes:
+      - 200
+      - 404
+    prober: http
+  logsammler_health_check:
+    http:
+      fail_if_body_not_matches_regexp:
+      - ismaster
+      method: GET
+      preferred_ip_protocol: ip4
+      valid_http_versions:
+      - HTTP/1.0
+      - HTTP/1.1
+      - HTTP/2.0
+      valid_status_codes:
+      - 200
+    prober: http
+    timeout: 10s
+  mobileiron_status:
+    http:
+      fail_if_body_not_matches_regexp:
+      - 'MOBILEIRON-STATUS: OK'
+      method: GET
+      preferred_ip_protocol: ip4
+      proxy_url: http://proxy-client.infra.dvag.net:3128
+      valid_http_versions:
+      - HTTP/1.0
+      - HTTP/1.1
+      - HTTP/2.0
+      valid_status_codes:
+      - 200
+    prober: http
+    timeout: 10s
+  smtp:
+    prober: tcp
+    tcp:
+      preferred_ip_protocol: ip4
+      query_response:
+      - expect: '^220 '
+      - send: "EHLO prober\r"
+      - expect: ^250
+      - send: "QUIT\r"
+    timeout: 10s
+  smtp_starttls:
+    prober: tcp
+    tcp:
+      preferred_ip_protocol: ip4
+      query_response:
+      - expect: '^220 '
+      - send: "EHLO prober\r"
+      - expect: ^250
+      - send: "STARTTLS\r"
+      - expect: ^220
+      - starttls: true
+      - send: "QUIT\r"
+    timeout: 10s
+  ssh_banner:
+    prober: tcp
+    tcp:
+      query_response:
+      - expect: ^SSH-2.0-
+    timeout: 10s
+  ssms_gui_soap_mgt:
+    http:
+      fail_if_body_not_matches_regexp:
+      - Authorization failed
+      method: GET
+      preferred_ip_protocol: ip4
+      tls_config:
+        insecure_skip_verify: true
+      valid_http_versions:
+      - HTTP/1.0
+      - HTTP/1.1
+      - HTTP/2.0
+      valid_status_codes:
+      - 200
+      - 500
+    prober: http
+    timeout: 10s
+  ssms_services_asm_rest:
+    http:
+      fail_if_body_not_matches_regexp:
+      - ASM :-\)
+      method: GET
+      preferred_ip_protocol: ip4
+      tls_config:
+        insecure_skip_verify: true
+      valid_http_versions:
+      - HTTP/1.0
+      - HTTP/1.1
+      - HTTP/2.0
+      valid_status_codes:
+      - 200
+    prober: http
+    timeout: 10s
+  ssms_services_soap_svc:
+    http:
+      fail_if_body_not_matches_regexp:
+      - .asm.
+      method: GET
+      preferred_ip_protocol: ip4
+      tls_config:
+        insecure_skip_verify: true
+      valid_http_versions:
+      - HTTP/1.0
+      - HTTP/1.1
+      - HTTP/2.0
+      valid_status_codes:
+      - 200
+    prober: http
+    timeout: 10s
+  tcp_connect:
+    prober: tcp
+    tcp:
+      preferred_ip_protocol: ip4
+    timeout: 10s
+  tcp_connect_ipv4:
+    prober: tcp
+    tcp:
+      ip_protocol_fallback: false
+      preferred_ip_protocol: ip4
+    timeout: 10s
+  tcp_connect_ipv6:
+    prober: tcp
+    tcp:
+      ip_protocol_fallback: false
+      preferred_ip_protocol: ip6
+    timeout: 10s
+  zob-starter_http:
+    http:
+      fail_if_body_not_matches_regexp:
+      - ^."status":"UP"
+      method: GET
+      preferred_ip_protocol: ip4
+      tls_config:
+        insecure_skip_verify: true
+      valid_http_versions:
+      - HTTP/1.0
+      - HTTP/1.1
+      - HTTP/2.0
+      valid_status_codes:
+      - 200
+    prober: http
+```
+
+## Example Playbook
+
+```yaml
+- name: Apply blackbox_exporter
+  hosts: all
+  become: true
+  roles:
+    - role: lenmail.monitoring.blackbox_exporter
+```
+
+## Testing
+
+The collection CI runs `ansible-lint`, `ansible-test sanity`, repository consistency tests, and per-role syntax checks using `roles/blackbox_exporter/tests/test.yml`.

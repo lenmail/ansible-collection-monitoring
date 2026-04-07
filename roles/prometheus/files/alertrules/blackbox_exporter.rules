@@ -1,0 +1,80 @@
+groups:
+- name: blackbox_exporter
+  rules:
+  - alert: "SSH Probleme"
+    expr: probe_success{alerting_required!='false',job='ssh_check'} == 0
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      metric_name: probe_success%7Binstance='{{  $labels.instance  }}',job='ssh_check'%7D
+      value: '{{ $value }}'
+      summary: 'SSH Login Probleme auf {{ $labels.hostname }})'
+  - alert: "Port Check Failed"
+    expr: probe_success{alerting_required!='false',module=~'tcp_connect.+',job=~'blackbox.+'} == 0
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      metric_name: probe_success%7Binstance='{{  $labels.instance  }}'%7D
+      value: '{{ $value }}'
+      summary: 'Port Check failed (instance {{ $labels.instance }}) more than 5 minutes'
+  - alert: "Endpunkt Check Failed Web"
+    expr: probe_success{alerting_required!='false',module!~'tcp_connect.+',job=~'blackbox.+', hostname!="lai-time-customer01.pi-asp.de"} == 0
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      metric_name: probe_success%7Binstance='{{  $labels.instance  }}'%7D
+      value: '{{ $value }}'
+      summary: 'Endpunkt Check failed (instance {{ $labels.instance }}) more than 5 minutes'
+  - alert: "lai-time-customer01.pi-asp.de länger als 30 Minuten nicht erreichbar"
+    expr: probe_success{hostname="lai-time-customer01.pi-asp.de"} == 0
+    for: 30m
+    labels:
+      severity: critical
+    annotations:
+      metric_name: probe_success%7Binstance='{{  $labels.instance  }}'%7D
+      value: '{{ $value }}'
+      summary: 'Endpunkt Check failed (instance {{ $labels.instance }}) more than 5 minutes'
+  - alert: "Endpunkt Check Slow"
+    expr:  avg_over_time(probe_duration_seconds{alerting_required!='false',job=~'blackbox.+'}[5m]) > 5
+    for: 60m
+    labels:
+      severity: standard
+    annotations:
+      metric_name: avg_over_time(probe_duration_seconds%7Bjob=%7E'blackbox.%2B'%5b5m%5d)
+      value: '{{ $value }}'
+      summary: 'Slow Endpunkt Check (instance {{ $labels.instance }})'
+      description: 'Blackbox probe took more than 5s to complete'
+  - alert: "SSL Certificate Will Expire Soon"
+    expr: ((probe_ssl_earliest_cert_expiry{alerting_required!='false'} - time()) / 60 / 60 / 24) < 14
+    for: 3m
+    labels:
+      severity: standard
+      alert_scc: true
+    annotations:
+      metric_name: probe_ssl_earliest_cert_expiry%7Binstance='{{  $labels.instance  }}'%7D - time()
+      value: '{{ $value }}'
+      summary: 'SSL certificate will expire soon (instance {{ $labels.instance }})'
+      description: 'SSL certificate expires in 14 days'
+  - alert: "SSL Certificate Expired"
+    expr: ((probe_ssl_earliest_cert_expiry{alerting_required!='false'} - time()) / 60 / 60 / 24)  <= 0
+    for: 3m
+    labels:
+      severity: critical
+    annotations:
+      metric_name: probe_ssl_earliest_cert_expiry%7Binstance='{{  $labels.instance  }}'%7D - time()
+      value: '{{ $value }}'
+      summary: 'SSL certificate expired (instance {{ $labels.instance }})'
+      description: 'SSL certificate has expired already'
+  - alert: "HTTP Slow Requests"
+    expr: avg_over_time(probe_http_duration_seconds{alerting_required!='false',job=~'blackbox.+'}[1m]) > 5
+    for: 60m
+    labels:
+      severity: standard
+    annotations:
+      metric_name: avg_over_time(probe_http_duration_seconds%7Binstance='{{  $labels.instance  }}',job=%7E'blackbox.%2B'%7D%5b1m%5d)
+      value: '{{ $value }}'
+      summary: 'HTTP slow requests (instance {{ $labels.instance }})'
+      description: 'HTTP request took more than 1s'

@@ -1,0 +1,12 @@
+---
+- targets:
+  - https://shop.reifen-wolf.de/de/login/shop/
+  labels:
+    __param_module: https_200
+    alerting_required: 'true'
+    environment: Produktion
+    product: Webservices
+    monitoring: 'true'
+    severity: critical
+    grafana_id: xtkCtBkiz
+    job: blackbox-exporter

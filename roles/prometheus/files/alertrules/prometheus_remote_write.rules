@@ -1,0 +1,28 @@
+groups:
+- name: prometheus remote write
+  rules:
+  - alert: Prometheus Remote Write from K8S Prometheus failed
+    expr: (idelta(prometheus_remote_storage_samples_in_total{alerting_required!='false'}[30m])) < 20
+    labels:
+      severity: critical
+      alert_scc: no
+    annotations:
+      metric_name: (idelta(prometheus_remote_storage_samples_in_total%7Binstance='{{  $labels.instance  }}'%7D%5b30m%5d)) 
+      value: '{{ $value }}'
+      scc_info: 'Bitte MON-Team informieren'
+      summary: 'Prometheus remote write failed for (instance {{ $labels.clusterid }})'
+      description: 'K8S Prometheus is unable to remote write to MON Prometheus'
+  - alert: Prometheus Remote Write from K8S Prometheus failed
+    expr: absent(prometheus_remote_storage_samples_in_total{alerting_required!='false'})
+    for: 15m
+    labels:
+      severity: critical
+    alert_scc: no
+    annotations:
+      metric_name: absent(prometheus_remote_storage_samples_in_total%7Binstance='{{  $labels.instance  }}'%7D)
+      value: '{{ $value }}'
+      scc_info: 'Bitte MON-Team informieren'
+      summary: 'Prometheus remote write failed for (instance {{ $labels.clusterid }})'
+      description: 'K8S Prometheus is unable to remote write to MON Prometheus'
+
+

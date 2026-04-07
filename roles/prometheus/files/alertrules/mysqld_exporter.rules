@@ -1,0 +1,43 @@
+groups:
+- name: mysqld_exporter
+  rules:
+  - alert: MysqlDown
+    expr: mysql_up{alerting_required!='false'} == 0
+    for: 3m
+    labels:
+      severity: critical
+    annotations:
+      metric_name: mysql_up%7Binstance='{{  $labels.instance  }}'%7D 
+      value: '{{ $value }}'
+      summary: 'MySQL down (instance {{ $labels.instance }})'
+      description: 'MySQL instance is down on {{ $labels.instance }}'
+  - alert: MysqlTooManyConnections
+    expr: (mysql_global_status_threads_connected{alerting_required!='false'} / mysql_global_variables_max_connections) * 100 > 80
+    for: 3m
+    labels:
+      severity: standard
+    annotations:
+      metric_name: (mysql_global_status_threads_connected%7Binstance='{{  $labels.instance  }}'%7D / mysql_global_variables_max_connections) * 100 
+      value: '{{ $value }}'
+      summary: 'MySQL too many connections (instance {{ $labels.instance }})'
+      description: 'More than 80% of MySQL connections are in use on {{ $labels.instance }}'
+  - alert: MysqlSlowQueries
+    expr: mysql_global_status_slow_queries{alerting_required!='false'} > 0
+    for: 3m
+    labels:
+      severity: standard
+    annotations:
+      metric_name: mysql_global_status_slow_queries%7Binstance='{{  $labels.instance  }}'%7D
+      value: '{{ $value }}'
+      summary: 'MySQL slow queries (instance {{ $labels.instance }})'
+      description: 'MySQL server is having some slow queries.'
+  - alert: MysqlRestarted
+    expr: mysql_global_status_uptime{alerting_required!='false'} < 60
+    for: 3m
+    labels:
+      severity: standard
+    annotations:
+      metric_name: mysql_global_status_uptime%7Binstance='{{  $labels.instance  }}'%7D 
+      value: '{{ $value }}'
+      summary: 'MySQL restarted (instance {{ $labels.instance }})'
+      description: 'MySQL has just been restarted, less than one minute ago on {{ $labels.instance }}.'

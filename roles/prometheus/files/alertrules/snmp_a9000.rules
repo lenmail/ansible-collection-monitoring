@@ -1,0 +1,80 @@
+groups:
+- name: snmp_exporter_a9000
+  rules:
+  - alert: A9000 Machine status
+    annotations:
+      metric_name: snmp_comet_temperature%7Binstance='{{  $labels.instance  }}'%7D
+      value: '{{ $value }}'
+      description: 'The current operational state of the system'
+      summary: Machine status
+    expr: xivMachineStatus == 0
+    for: 3m
+    labels:
+      severity: standard
+      alert_scc: true
+  - alert: A9000 Failed flash cards
+    annotations:
+      metric_name: xivMachineStatus%7Binstance='{{  $labels.instance  }}'%7D
+      value: '{{ $value }}'
+      description: 'The number of failed flash cards in the system'
+      summary: xivFailedFlashCards
+    expr: xivFailedFlashCards > 0
+    for: 3m
+    labels:
+      severity: standard
+      alert_scc: true
+  - alert: A9000 Physical Capacity Utilization
+    annotations:
+      metric_name: xivFailedFlashCards%7Binstance='{{  $labels.instance  }}'%7D
+      value: '{{ $value }}'
+      description: 'The systems current physical capacity utilization percentage'
+      summary: 'xivUtilizationPhysical is higher than {{ $value }}'
+    expr: xivUtilizationPhysical > 90
+    for: 3m
+    labels:
+      severity: standard
+      alert_scc: true
+  - alert:  A9000 Data Protection Status
+    annotations:
+      metric_name: xivUtilizationPhysical%7Binstance='{{  $labels.instance  }}'%7D
+      value: '{{ $value }}'
+      description: 'The current data protection status of the system.'
+      summary:  xivDataProtectionStatus
+    expr: xivDataProtectionStatus == 0
+    for: 3m
+    labels:
+      severity: standard
+      alert_scc: true
+  - alert: A9000 Data Reduction State
+    annotations:
+      metric_name: xivDataProtectionStatus%7Binstance='{{  $labels.instance  }}'%7D 
+      value: '{{ $value }}'
+      description: 'The current data reduction state of the system.'
+      summary: xivDataReductionState
+    expr: xivDataReductionState == 0
+    for: 3m
+    labels:
+      severity: standard
+      alert_scc: true      
+  - alert: A9000 Interface Status
+    annotations:
+      metric_name: xivDataReductionState%7Binstance='{{  $labels.instance  }}'%7D 
+      value: '{{ $value }}'
+      description: 'The current operational state of the interface'
+      summary: 'Interface down {{ $labels.xivIfIndex }}'
+    expr: xivIfStatus{xivIfStatus='0x4F4B'} == 0
+    for: 3m
+    labels:
+      severity: standard
+      alert_scc: true
+  - alert: A9000 Interface current load
+    annotations:
+      metric_name: xivIfStatus%7Binstance='{{  $labels.instance  }}', xivIfStatus='0x4F4B'%7D 
+      value: '{{ $value }}'
+      description: 'The interfaces current load in I/Os per second.'
+      summary: 'Keine IOPS auf dem Interface  {{ $labels.xivIfIndex }}'
+    expr: xivIfIOPS < 300
+    for: 3m
+    labels:
+      severity: standard
+      alert_scc: true

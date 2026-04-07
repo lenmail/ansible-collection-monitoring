@@ -1,0 +1,15 @@
+groups:
+- name: memcached_exporter
+  rules:
+  - alert: Prometheus Target Missing Memcached Exporter
+    expr: up{alerting_required!='false',job='memcached-exporter'} == 0 or memcached_up{alerting_required!='false'} == 0
+    for: 3m
+    labels:
+      severity: critical
+      alert_scc: true
+    annotations:
+      metric_name: up%7Binstance='{{  $labels.instance  }}'%7D or memcached_up%7Binstance='{{  $labels.instance  }}'%7D
+      value: '{{ $value }}'
+      summary: 'Prometheus target missing Memcached Exporter (instance {{ $labels.instance }})'
+      description: 'A Prometheus target has disappeared. An exporter might be crashed.'
+      scc_info: 'Memcached Exporter auf Host {{ $labels.instance }} nicht mehr erreichbar. Bitte überprüfen, ob das System generell noch erreichbar ist. Falls ja mit systemctl status memcached_exporter den Status des Dienstes überprüfen. Falls erforderlich Ticket bei BP erstellen'

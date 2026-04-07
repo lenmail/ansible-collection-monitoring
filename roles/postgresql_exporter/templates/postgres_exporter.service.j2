@@ -1,0 +1,25 @@
+{{ ansible_managed | comment }}
+[Unit]
+Description=Prometheus Postgres Exporter
+Documentation=https://github.com/prometheus-community/postgres_exporter
+After=network-online.target
+StartLimitInterval=0
+
+[Service]
+Type=simple
+User=postgres
+Group=postgres
+Environment="DATA_SOURCE_NAME={{ postgres_exporter_data_source_name }}"
+ExecStart=/usr/local/bin/postgres_exporter \
+  --log.level warn \
+  --auto-discover-databases \
+  --extend.query-path /etc/postgres_exporter/{{ postgres_exporter_query_filename }} \
+  --web.listen-address 0.0.0.0:9187{% for key, value in postgres_exporter_config_flags_extra.items() %} \
+  --{{ key }}={{ value }}{% endfor %}
+
+SyslogIdentifier=postgres_exporter
+Restart=always
+RestartSec=1
+
+[Install]
+WantedBy=multi-user.target

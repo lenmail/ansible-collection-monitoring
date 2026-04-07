@@ -1,0 +1,77 @@
+groups:
+- name: haproxy_exporter
+  rules:
+  - alert: HaproxyHttpSlowingDownSSLB4
+    expr: (haproxy_backend_http_total_time_average_seconds{alerting_required!='false',hostname=~'ssllb[0-9][1-9].4.infra.dvag.net'}) > 2
+    for: 15m
+    labels:
+      severity: standard
+      alert_scc: true
+    annotations:
+      metric_name: (haproxy_backend_http_total_time_average_seconds%7Binstance='{{  $labels.instance  }}', backend='{{  $labels.backend }}'%7D)
+      value: '{{ $value }}'
+      summary: 'HAProxy HTTP slowing down (instance {{ $labels.instance }})'
+      description: 'Average request time is increasing\n'
+  - alert: HaproxyHighHttp5xxErrorRateServerSSLB4
+    expr: (irate(haproxy_server_http_responses_total{alerting_required!='false',code='5xx',hostname=~'ssllb[0-9][1-9].4.infra.dvag.net'}[5m])) / (irate(haproxy_server_http_responses_total[5m])) * 100 > 15
+    for: 15m
+    labels:
+      severity: critical
+      alert_scc: true
+    annotations:
+      metric_name: (irate(haproxy_server_http_responses_total%7Binstance='{{  $labels.instance  }}',code='5xx', backend='{{  $labels.backend }}'%7D%5b5m%5d)) / (irate(haproxy_server_http_responses_total%7Binstance='{{  $labels.instance  }}',code='5xx', backend='{{  $labels.backend }}'%7D%5b5m%5d)) * 100 
+      value: '{{ $value }}'
+      summary: 'HAProxy high HTTP 5xx error rate server (instance {{ $labels.instance }})'
+      description: 'Too many HTTP requests with status 5xx (> 15%) on server {{ $labels.server }}\n'
+  - alert: HaproxyBackendConnectionErrorsSSLB4
+    expr: (rate(haproxy_backend_connection_errors_total{alerting_required!='false',hostname=~'ssllb[0-9][1-9].4.infra.dvag.net'}[5m])) * 100 > 15
+    for: 15m
+    labels:
+      severity: critical
+      alert_scc: true
+    annotations:
+      metric_name: (rate(haproxy_backend_connection_errors_total%7Binstance='{{  $labels.instance  }}', backend='{{  $labels.backend }}'%7D%5b5m%5d)) * 100 
+      value: '{{ $value }}'
+      summary: 'HAProxy backend connection errors (instance {{ $labels.instance }})'
+      description: 'Too many connection errors to {{ $labels.fqdn }}/{{ $labels.backend }} backend (> 15%). Request throughput may be to high.\n'
+  - alert: HaproxyServerResponseErrorsSSLB4
+    expr: (rate(haproxy_server_response_errors_total{alerting_required!='false',hostname=~'ssllb[0-9][1-9].4.infra.dvag.net'}[5m])) * 100 > 15
+    for: 15m
+    labels:
+      severity: critical
+      alert_scc: true
+    annotations:
+      metric_name: (rate(haproxy_server_response_errors_total%7Binstance='{{  $labels.instance  }}', backend='{{  $labels.backend }}'%5b5m%5d)) * 100 
+      value: '{{ $value }}'
+      summary: 'HAProxy server response errors (instance {{ $labels.instance }})'
+      description: 'Too many response errors to {{ $labels.server }} server (> 15%).\n'
+  - alert: HaproxyBackendDownSSLB4
+    expr: (haproxy_server_up{alerting_required!='false',hostname=~'ssllb[0-9][1-9].4.infra.dvag.net'} == 0)
+    for: 15m
+    labels:
+      severity: critical
+      alert_scc: true
+    annotations:
+      metric_name: (haproxy_server_up%7Binstance='{{  $labels.instance  }}',backend!%7E'vox__8282%7Cadmin_stats'%7D)
+      value: '{{ $value }}'
+      summary: 'HAProxy backend {{ $labels.backend }} down on (host {{ $labels.hostname }})'
+  - alert: HaproxyAllBackendsDown
+    expr: (haproxy_backend_up{alerting_required!='false'} == 0)
+    labels:
+      severity: critical
+      alert_scc: true
+    annotations:
+      metric_name: (haproxy_backend_up%7Binstance='{{  $labels.instance  }}', backend='{{  $labels.backend }}'%7D)
+      value: '{{ $value }}'
+      summary: 'All HAProxy backend {{ $labels.backend }} down on {{ $labels.hostname }}.'
+      scc_info: 'Alle Server von dem Backend {{ $labels.backend }} down. Bitte ASAP Verantwortlichen informieren'
+  - alert: HaproxyBackendDown
+    expr: (haproxy_server_up{alerting_required!='false'} == 0) AND ON(server) (haproxy_server_weight != 0)
+    for: 15m
+    labels:
+      severity: critical
+      alert_scc: true
+    annotations:
+      metric_name: (haproxy_server_up%7Binstance='{{  $labels.instance  }}', backend='{{  $labels.backend }}'%7D)
+      value: '{{ $value }}'
+      summary: 'All HAProxy backend {{ $labels.backend }} down on {{ $labels.hostname }}. Could be the non critical backup side'

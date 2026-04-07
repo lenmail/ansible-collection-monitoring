@@ -1,0 +1,52 @@
+---
+groups:
+- name: custom-rules
+  rules:
+  - alert: CloudFlareDDNSIPv4
+    annotations:
+      description: "USG Update for Cloudflare DDNS on IPv4 failed"
+      summary: '{% raw %}USG Update for Cloudflare DDNS on IPv4 failed (instance {{ $labels.exported_instance }}){% endraw %}'
+    expr: usg_ddns_update_ipv4 == 0
+    for: 30m
+    labels:
+      severity: critical
+  - alert: CloudFlareDDNSIPv4Missing
+    annotations:
+      description: "USG Update for Cloudflare DDNS for IPv4 metrics missing"
+      summary: '{% raw %}USG Update for Cloudflare DDNS for IPv4 metrics missing (instance {{ $labels.exported_instance }}){% endraw %}'
+    expr: absent(usg_ddns_update_ipv6)
+    for: 60m
+    labels:
+      severity: critical
+  - alert: CloudFlareDDNSIPv6
+    annotations:
+      description: "USG Update for Cloudflare DDNS on IPv6 failed"
+      summary: '{% raw %}USG Update for Cloudflare DDNS on IPv6 failed (instance {{ $labels.exported_instance }}){% endraw %}'
+    expr: usg_ddns_update_ipv6 == 0
+    for: 30m
+    labels:
+      severity: critical
+  - alert: CloudFlareDDNSIPv6Missing
+    annotations:
+      description: "USG Update for Cloudflare DDNS for IPv6 metrics missing"
+      summary: '{% raw %}USG Update for Cloudflare DDNS for IPv6 metrics missing (instance {{ $labels.exported_instance }}){% endraw %}'
+    expr: absent(usg_ddns_update_ipv6)
+    for: 60m
+    labels:
+      severity: critical
+  - alert: IGMPProxyDown
+    annotations:
+      description: "USG IGMPProxy restartet"
+      summary: '{% raw %}USG IGMPProxy restartet (instance {{ $labels.exported_instance }}){% endraw %}'
+    expr: usg_igmproxy_update == 0
+    for: 3m
+    labels:
+      severity: critical
+  - alert: IGMPProxyMissing
+    annotations:
+      description: "USG IGMPProxy metrics missing"
+      summary: '{% raw %}USG IGMPProxy metrics missing (instance {{ $labels.exported_instance }}){% endraw %}'
+    expr: absent(usg_igmproxy_update)
+    for: 5m
+    labels:
+      severity: critical

@@ -1,0 +1,57 @@
+---
+argument_specs:
+  main:
+    short_description: Entry point for the process_exporter role.
+    description:
+    - Validate variables for the `process_exporter` role.
+    options:
+      proxy_env:
+        description:
+        - Controls `proxy_env` for the `process_exporter` role.
+        required: false
+        type: dict
+      process_exporter_binary_install_dir:
+        description:
+        - Controls `process_exporter_binary_install_dir` for the `process_exporter` role.
+        required: false
+        type: str
+      process_exporter_version:
+        description:
+        - Controls `process_exporter_version` for the `process_exporter` role.
+        required: false
+        type: str
+      process_exporter_web_listen_address:
+        description:
+        - Controls `process_exporter_web_listen_address` for the `process_exporter` role.
+        required: false
+        type: str
+      process_exporter_web_listen_port:
+        description:
+        - Controls `process_exporter_web_listen_port` for the `process_exporter` role.
+        required: false
+        type: int
+      process_exporter_config_dir:
+        description:
+        - Controls `process_exporter_config_dir` for the `process_exporter` role.
+        required: false
+        type: str
+      process_exporter_system_user:
+        description:
+        - Controls `process_exporter_system_user` for the `process_exporter` role.
+        required: false
+        type: str
+      process_exporter_system_group:
+        description:
+        - Controls `process_exporter_system_group` for the `process_exporter` role.
+        required: false
+        type: str
+      process_exporter_create_consul_agent_service:
+        description:
+        - Controls `process_exporter_create_consul_agent_service` for the `process_exporter` role.
+        required: false
+        type: bool
+      process_exporter_names:
+        description:
+        - Controls `process_exporter_names` for the `process_exporter` role.
+        required: false
+        type: str

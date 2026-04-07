@@ -1,0 +1,67 @@
+---
+argument_specs:
+  main:
+    short_description: Entry point for the prometheus role.
+    description:
+    - Validate variables for the `prometheus` role.
+    options:
+      proxy_env:
+        description:
+        - Controls `proxy_env` for the `prometheus` role.
+        required: false
+        type: list
+      prometheus_version:
+        description:
+        - Controls `prometheus_version` for the `prometheus` role.
+        required: false
+        type: str
+      prometheus_web_external_url:
+        description:
+        - Controls `prometheus_web_external_url` for the `prometheus` role.
+        required: false
+        type: str
+      prometheus_webconfig:
+        description:
+        - Controls `prometheus_webconfig` for the `prometheus` role.
+        required: false
+        type: dict
+      prometheus_log_level:
+        description:
+        - Controls `prometheus_log_level` for the `prometheus` role.
+        required: false
+        type: str
+      prometheus_storage_retention_time:
+        description:
+        - Controls `prometheus_storage_retention_time` for the `prometheus` role.
+        required: false
+        type: str
+      prometheus_remote_write_reveicer:
+        description:
+        - Controls `prometheus_remote_write_reveicer` for the `prometheus` role.
+        required: false
+        type: bool
+      prometheus_config_flags_extra:
+        description:
+        - Controls `prometheus_config_flags_extra` for the `prometheus` role.
+        required: false
+        type: dict
+      prometheus_config:
+        description:
+        - Controls `prometheus_config` for the `prometheus` role.
+        required: false
+        type: str
+      prometheus_static_targets_files:
+        description:
+        - Controls `prometheus_static_targets_files` for the `prometheus` role.
+        required: false
+        type: str
+      prometheus_alert_rules_files:
+        description:
+        - Controls `prometheus_alert_rules_files` for the `prometheus` role.
+        required: false
+        type: str
+      defaults_prometheus_config:
+        description:
+        - Controls `defaults_prometheus_config` for the `prometheus` role.
+        required: false
+        type: dict

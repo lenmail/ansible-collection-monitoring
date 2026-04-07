@@ -1,0 +1,104 @@
+groups:
+- name: windows_exporter_treaton
+  rules:
+
+  - alert: Disk
+    expr: 100 - 100 * ((windows_logical_disk_free_bytes{alerting_required!='false',managedby='Treaton',volume!~'HarddiskVolume.+'} / 1024 / 1024 ) / (windows_logical_disk_size_bytes{managedby='Treaton',volume!~'HarddiskVolume.+'} / 1024 / 1024)) > 95
+    for: 5m
+    labels:
+      treaton_severity: standard
+      alert_it: true
+    annotations:
+      metric_name: 100 - 100 * ((windows_logical_disk_free_bytes%7Binstance='{{  $labels.instance  }}',managedby='Treaton',volume!%7E'HarddiskVolume.%2B'%7D / 1024 / 1024 ) / (windows_logical_disk_size_bytes%7Bmanagedby='Treaton',volume!%7E'HarddiskVolume.%2B'%7D / 1024 / 1024))
+      value: '{{ $value }} on {{ $labels.volume }}'
+      summary: 'Windows Server disk Space Usage (instance {{ $labels.instance }})'
+      description: 'Disk usage is more than 95%'
+      rcw_info: 'Treaton managed System Bereitschaft ist zwischen 17:00-08:00 Mo-Fr & 00:00-23:59 an Sa-So & Feiertagen zu informieren unter: \n Windows Rufbereitschaft: 069-34871947'
+
+  - alert: Disk
+    expr: 100 - 100 * ((windows_logical_disk_free_bytes{alerting_required!='false',managedby='Treaton',hostname!~'ldmailk1.id.dvag.com|vvmrfile11.mr.vilavita.intra|vvpanveeam02.pan.vilavita.intra',volume!~'HarddiskVolume.+'} / 1024 / 1024 ) / (windows_logical_disk_size_bytes{managedby='Treaton',hostname!~'ldmailk1.id.dvag.com|vvmrfile11.mr.vilavita.intra|vvpanveeam02.pan.vilavita.intra',volume!~'HarddiskVolume.+'} / 1024 / 1024)) > 90
+    for: 5m
+    labels:
+      treaton_severity: standard
+      alert_it: true
+    annotations:
+      metric_name: 100 - 100 * ((windows_logical_disk_free_bytes%7Binstance='{{  $labels.instance  }}',managedby='Treaton',hostname!%7E'ldmailk1.id.dvag.com%7Cvvmrfile11.mr.vilavita.intra%7Cvvpanveeam02.pan.vilavita.intra',volume!%7E'HarddiskVolume.%2B'%7D / 1024 / 1024 ) / (windows_logical_disk_size_bytes%7Bmanagedby='Treaton',hostname!%7E'ldmailk1.id.dvag.com%7Cvvmrfile11.mr.vilavita.intra%7Cvvpanveeam02.pan.vilavita.intra',volume!%7E'HarddiskVolume.%2B'%7D / 1024 / 1024))
+      value: '{{ $value }} on {{ $labels.volume }}'
+      summary: 'Windows Server disk Space Usage (instance {{ $labels.instance }})'
+      description: 'Disk usage is more than 95%'
+      rcw_info: 'Treaton managed System Bereitschaft ist zwischen 17:00-08:00 Mo-Fr & 00:00-23:59 an Sa-So & Feiertagen zu informieren unter: \n Windows Rufbereitschaft: 069-34871947'
+
+  - alert: WindowsExporter
+    expr:  up{alerting_required!='false',job='windows-exporter',managedby='Treaton'} == 0
+    for: 5m
+    labels:
+      treaton_severity: standard
+      alert_it: true
+    annotations:
+      metric_name: up%7Binstance='{{  $labels.instance  }}',job='windows-exporter',managedby='Treaton'%7D
+      value: '{{ $labels.instance }}'
+      summary: 'Service Windows Exporter down (instance {{ $labels.instance }})'
+      rcw_info: 'Treaton managed System Bereitschaft ist zwischen 17:00-08:00 Mo-Fr & 00:00-23:59 an Sa-So & Feiertagen zu informieren unter: \n Windows Rufbereitschaft: 069-34871947'
+
+  - alert: Service
+    expr: windows_service_state{alerting_required!='false',state='running',name!~'cbdhsvc.+|MicrosoftSearchInBing|tooliciousxmlinterface|dnscache|iaasvmprovider|onesyncsvc.+|shellhwdetection|wbioSrvc|wuauserv|cdpsvc|winhttpautoproxysvc|shellhwdetection|edgeupdate|trustedinstaller|clr_optimization|tiledatamodelsvc|gupdate|diagtrack|gpsvc|sppsvcmmcss|wbiosrvc|remoteregistry|sppsvc|ualsvc|audiosrv|mapsbroker|netmsmqactivator|bits|ui0detect|nettcpactivator|cdpusersvc.+|staterepository|sysmain|spice-agent|fdrespub|WpnUserService.*',managedby='Treaton'} != 1
+    for: 5m
+    labels:
+      treaton_severity: standard
+      alert_it: true
+    annotations:
+      metric_name: windows_service_state%7Binstance='{{  $labels.instance  }}',state='running',name!%7E'cbdhsvc.%2B%7CMicrosoftSearchInBing%7Ctooliciousxmlinterface%7Cdnscache%7Cveeamvsssupport%7Ciaasvmprovider%7Conesyncsvc.%2B%7Cshellhwdetection%7CwbioSrvc%7Cwuauserv%7Ccdpsvc%7Cwinhttpautoproxysvc%7Cshellhwdetection%7Cedgeupdate%7Cwindefend%7Ctrustedinstaller%7Cclr_optimization%7Ctiledatamodelsvc%7Cgupdate%7Cdiagtrack%7Cgpsvc%7Csppsvcmmcss%7Cwbiosrvc%7Cremoteregistry%7Csppsvc%7Cualsvc%7Caudiosrv%7Cdevfleetmgmt_server%7Cmapsbroker%7Csilklauncherservice%7Cnetmsmqactivator%7Cbits%7Cui0detect%7Cnettcpactivator%7Cconsul%7Cwindows-exporter%7Ccdpusersvc.+',managedby='Treaton'%7D
+      value: '{{ $labels.name }}'
+      summary: 'Dienst {{ $labels.name }} auf dem Windows Server {{ $labels.instance }} down'
+      rcw_info: 'Treaton managed System Bereitschaft ist zwischen 17:00-08:00 Mo-Fr & 00:00-23:59 an Sa-So & Feiertagen zu informieren unter: \n Windows Rufbereitschaft: 069-34871947'
+
+  - alert: Windows Server Cpu Usage
+    expr: (100 - avg without(core)(rate(windows_cpu_time_total{alerting_required!='false',mode='idle',managedby='Treaton'}[2m])) * 100 > 94)
+    for: 30m
+    labels:
+      treaton_severity: standard
+      alert_it: true
+    annotations:
+      metric_name: 100 - (rate(windows_cpu_time_total%7Binstance='{{  $labels.instance  }}',mode='idle',managedby='Treaton'%7D%5b2m%5d)) * 100
+      value: '{{ $value }}'
+      summary: 'Windows Server CPU Usage on host (instance {{ $labels.instance }}) is {{ $value }}'
+      description: 'CPU Usage is more than 94%'
+
+  - alert: Memory
+    expr: windows_os_physical_memory_free_bytes{alerting_required!='false',managedby='Treaton'} / windows_cs_physical_memory_bytes{managedby='Treaton'} * 100 < 5
+    for: 60m
+    labels:
+      treaton_severity: standard
+      alert_it: true
+    annotations:
+      metric_name: windows_os_physical_memory_free_bytes%7Binstance='{{  $labels.instance  }}',managedby='Treaton'%7D / windows_cs_physical_memory_bytes%7Bmanagedby='Treaton'%7D * 100
+      value: '{{ $value }}'
+      summary: 'Windows Server memory Usage on Host (instance {{ $labels.instance }}) is over {{ $value }}'
+      rcw_info: 'Treaton managed System Bereitschaft ist zwischen 17:00-08:00 Mo-Fr & 00:00-23:59 an Sa-So & Feiertagen zu informieren unter: \n Windows Rufbereitschaft: 069-34871947'
+      description: 'Memory usage is more than 95%'
+
+  - alert: IIS Application Pool State
+    expr: windows_iis_current_application_pool_state{alerting_required!='false',state="Running"} == 0
+    for: 3m
+    labels:
+      treaton_severity: standard
+      alert_it: true
+    annotations:
+      metric_name: windows_iis_current_application_pool_state%7Binstance='{{  $labels.instance  }}', app='{{  $labels.app  }}',managedby='Treaton',state='Running'%7D == 0
+      value: '{{ $labels.app }}'
+      summary: 'Windows Server IIS Application on {{ $labels.instance }}) is over down'
+      rcw_info: 'Treaton managed System Bereitschaft ist zwischen 17:00-08:00 Mo-Fr & 00:00-23:59 an Sa-So & Feiertagen zu informieren unter: \n Windows Rufbereitschaft: 069-34871947'
+      description: 'Windows Server IIS Application is down'
+
+  - alert: Disk
+    expr: 100 - 100 * ((windows_logical_disk_free_bytes{alerting_required!='false',managedby='Treaton',hostname=~'idmxmbxfp.+.id.dvag.com',volume='E:'} / 1024 / 1024 ) / (windows_logical_disk_size_bytes{managedby='Treaton',hostname=~'idmxmbxfp.+.id.dvag.com',volume='E:'} / 1024 / 1024)) > 95
+    for: 5m
+    labels:
+      treaton_severity: standard
+      alert_it: true
+    annotations:
+      metric_name: 100 - 100 * ((windows_logical_disk_free_bytes%7Binstance='{{  $labels.instance  }}',managedby='Treaton',volume='E:'%7D / 1024 / 1024 ) / (windows_logical_disk_size_bytes%7Bmanagedby='Treaton',volume='E:'%7D / 1024 / 1024))
+      value: '{{ $value }} on {{ $labels.volume }}'
+      summary: 'Windows Server disk Space Usage (instance {{ $labels.instance }})'
+      description: 'Disk usage is more than 80%'
+      rcw_info: 'Treaton managed System Bereitschaft ist zwischen 17:00-08:00 Mo-Fr & 00:00-23:59 an Sa-So & Feiertagen zu informieren unter: \n Windows Rufbereitschaft: 069-34871947'

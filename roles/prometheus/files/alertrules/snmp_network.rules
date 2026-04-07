@@ -1,0 +1,911 @@
+
+groups:
+- name: snmp_exporter_richtfunk
+  rules:
+#  - alert: Richtfunk Gerät nicht erreichbar
+#    expr: up{mib='cisco_air_ap'} == 0
+#    annotations:
+#      metric_name: up%7Binstance='{{  $labels.instance  }}', mib='cisco_air_ap'%7D == 0
+#      description: '{{ $labels.fqdn}} nicht erreichbar. \n Testen der Funktionalität: ping {{ $labels.fqdn}} oder \n snmpwalk -v2c -c {{ $labels.snmpCommunity }} {{ $labels.fqdn}}'
+#      scc_info: 'Bitte passenden Dienstleister anhand des Info Textes oben im Ticket informieren'
+#      value: '{{ $labels.fqdn}}'    
+#    for: 15m
+#    labels:
+#      severity: critical
+#      alert_scc: true
+  - alert: Richtfunk Gerät too low input power
+    expr: oduRSSI{alerting_required!='false'} * -0.1 < -72
+    annotations:
+      metric_name: oduRSSI%7Binstance='{{  $labels.instance  }}'%7D * -0.1
+      description: '{{ $labels.fqdn}} Odu input power from the remote Radio Unit (RSSI) too low.'
+      scc_info: 'Bitte passenden Dienstleister anhand des Info Textes oben im Ticket informieren'
+      value: '{{ $labels.fqdn}}'
+    for: 15m
+    labels:
+      severity: critical
+      alert_scc: true
+- name: snmp_exporter_usv_riello
+  rules:
+  - alert: Riello USV zu niedrige Temperatur
+    expr: upsBatteryTemperature{alerting_required!='false'} < 7
+    for: 5m
+    labels:
+      alert_scc: true
+      severity: critical
+    annotations:
+      metric_name: upsBatteryTemperature%7Binstance='{{  $labels.instance  }}'%7D
+      description: 'Zu niedrige Temperatur auf dem Gerät {{ $labels.fqdn}}. Temperatur derzeit bei {{ $value }}'
+      scc_info: 'Bitte passenden Dienstleister anhand des Info Textes oben im Ticket informieren'
+      value: '{{ $value }}'
+  - alert: Riello USV erhöhte Temperatur 55
+    expr: upsBatteryTemperature{alerting_required!='false', fqdn!='(usv-mr-rh2-3og-dv2-5.infra.dvag.com|usv-vv-pan-see-1.infra.dvag.com|usv-vv-see-wirt-1.infra.dvag.com|usv-vv-see-wd-1.infra.dvag.com|usv-vv-see-verw-1.infra.dvag.com|usv-vv-see-sd-1.infra.dvag.com|usv-vv-see-ad-1.infra.dvag.com|usv-mr-rh7-ug-dv7-1.infra.dvag.com|usv-mr-rh5-5og-dv5-6.infra.dvag.com|usv-mr-rh5-4og-dv5-5.infra.dvag.com|usv-mr-rh5-3og-dv5-4.infra.dvag.com|usv-mr-rh3-ug-dv3-1.infra.dvag.com|usv-mr-rh2-eg-dv2-2.infra.dvag.com|usv-mr-rh2-4og-dv2-4.infra.dvag.com|usv-vv-pan-wein-1.infra.dvag.com|usv-mr-rh2-ug-dv2-1.infra.dvag.com|usv-mr-rh5-ug-dv5-1.infra.dvag.com|usv-vv-pan-schilf-1.infra.dvag.com)'} > 55
+    for: 5m
+    labels:
+      alert_scc: true
+      severity: critical
+    annotations:
+      metric_name: upsBatteryTemperature%7Binstance='{{  $labels.instance  }}', fqdn!='(usv-mr-rh2-3og-dv2-5.infra.dvag.com%7Cusv-vv-pan-see-1.infra.dvag.com%7Cusv-vv-see-wirt-1.infra.dvag.com%7Cusv-vv-see-wd-1.infra.dvag.com%7Cusv-vv-see-verw-1.infra.dvag.com%7Cusv-vv-see-sd-1.infra.dvag.com%7Cusv-vv-see-ad-1.infra.dvag.com%7Cusv-mr-rh7-ug-dv7-1.infra.dvag.com%7Cusv-mr-rh5-5og-dv5-6.infra.dvag.com%7Cusv-mr-rh5-4og-dv5-5.infra.dvag.com%7Cusv-mr-rh5-3og-dv5-4.infra.dvag.com%7Cusv-mr-rh3-ug-dv3-1.infra.dvag.com%7Cusv-mr-rh2-eg-dv2-2.infra.dvag.com%7Cusv-mr-rh2-4og-dv2-4.infra.dvag.com%7Cusv-vv-pan-wein-1.infra.dvag.com%7Cusv-mr-rh2-ug-dv2-1.infra.dvag.com%7Cusv-mr-rh5-ug-dv5-1.infra.dvag.com%7Cusv-vv-pan-schilf-1.infra.dvag.com)'%7D 
+      description: 'Erhöhte Temperatur auf dem Gerät {{ $labels.fqdn}}. Temperatur derzeit bei {{ $value }}'
+      scc_info: 'Bitte passenden Dienstleister anhand des Info Textes oben im Ticket informieren'
+      value: '{{ $value}}'
+  - alert: Riello USV erhöhte Temperatur 45
+    expr: upsBatteryTemperature{fqdn!='(usv-mr-rh2-3og-dv2-5.infra.dvag.com|usv-vv-pan-see-1.infra.dvag.com|usv-vv-see-wirt-1.infra.dvag.com|usv-vv-see-wd-1.infra.dvag.com|usv-vv-see-verw-1.infra.dvag.com|usv-vv-see-sd-1.infra.dvag.com|usv-vv-see-ad-1.infra.dvag.com|usv-mr-rh7-ug-dv7-1.infra.dvag.com|usv-mr-rh5-5og-dv5-6.infra.dvag.com|usv-mr-rh5-4og-dv5-5.infra.dvag.com|usv-mr-rh5-3og-dv5-4.infra.dvag.com|usv-mr-rh3-ug-dv3-1.infra.dvag.com|usv-mr-rh2-eg-dv2-2.infra.dvag.com|usv-mr-rh2-4og-dv2-4.infra.dvag.com|usv-vv-pan-wein-1.infra.dvag.com|usv-mr-rh2-ug-dv2-1.infra.dvag.com|usv-mr-rh5-ug-dv5-1.infra.dvag.com|usv-vv-pan-schilf-1.infra.dvag.com)'} > 45
+    for: 5m
+    labels:
+      alert_scc: false
+      severity: warning
+    annotations:
+      metric_name: upsBatteryTemperature%7Binstance='{{  $labels.instance  }}', fqdn!='(usv-mr-rh2-3og-dv2-5.infra.dvag.com%7Cusv-vv-pan-see-1.infra.dvag.com%7Cusv-vv-see-wirt-1.infra.dvag.com%7Cusv-vv-see-wd-1.infra.dvag.com%7Cusv-vv-see-verw-1.infra.dvag.com%7Cusv-vv-see-sd-1.infra.dvag.com%7Cusv-vv-see-ad-1.infra.dvag.com%7Cusv-mr-rh7-ug-dv7-1.infra.dvag.com%7Cusv-mr-rh5-5og-dv5-6.infra.dvag.com%7Cusv-mr-rh5-4og-dv5-5.infra.dvag.com%7Cusv-mr-rh5-3og-dv5-4.infra.dvag.com%7Cusv-mr-rh3-ug-dv3-1.infra.dvag.com%7Cusv-mr-rh2-eg-dv2-2.infra.dvag.com%7Cusv-mr-rh2-4og-dv2-4.infra.dvag.com%7Cusv-vv-pan-wein-1.infra.dvag.com%7Cusv-mr-rh2-ug-dv2-1.infra.dvag.com%7Cusv-mr-rh5-ug-dv5-1.infra.dvag.com%7Cusv-vv-pan-schilf-1.infra.dvag.com)'%7D 
+      description: 'Erhöhte Temperatur auf dem Gerät {{ $labels.fqdn}}. Temperatur derzeit bei {{ $value }}'
+      scc_info: 'Bitte passenden Dienstleister anhand des Info Textes oben im Ticket informieren'
+      value: '{{ $value}}'
+- name: Riello USV erhöhte Temperatur 44 Grad
+  rules:
+  - alert: Riello USV erhöhte Temperatur 44
+    expr: upsBatteryTemperature{alerting_required!='false', fqdn=~'(usv-mr-rh2-3og-dv2-5.infra.dvag.com|usv-vv-pan-see-1.infra.dvag.com|usv-vv-see-wirt-1.infra.dvag.com|usv-vv-see-wd-1.infra.dvag.com|usv-vv-see-verw-1.infra.dvag.com|usv-vv-see-sd-1.infra.dvag.com|usv-vv-see-ad-1.infra.dvag.com|usv-mr-rh7-ug-dv7-1.infra.dvag.com)',fqdn!~'(usv-mr-rh5-5og-dv5-6.infra.dvag.com|usv-mr-rh5-4og-dv5-5.infra.dvag.com|usv-mr-rh5-3og-dv5-4.infra.dvag.com|usv-mr-rh3-ug-dv3-1.infra.dvag.com|usv-mr-rh2-eg-dv2-2.infra.dvag.com|usv-mr-rh2-4og-dv2-4.infra.dvag.com|usv-vv-pan-wein-1.infra.dvag.com|usv-mr-rh2-ug-dv2-1.infra.dvag.com|usv-mr-rh5-ug-dv5-1.infra.dvag.com|usv-vv-pan-schilf-1.infra.dvag.com)'} > 44
+    for: 5m
+    labels:
+      alert_scc: true
+      severity: critical
+    annotations:
+      metric_name: upsBatteryTemperature%7Binstance='{{  $labels.instance  }}', fqdn=%7E'(usv-mr-rh2-3og-dv2-5.infra.dvag.com%7Cusv-vv-pan-see-1.infra.dvag.com%7Cusv-vv-see-wirt-1.infra.dvag.com%7Cusv-vv-see-wd-1.infra.dvag.com%7Cusv-vv-see-verw-1.infra.dvag.com%7Cusv-vv-see-sd-1.infra.dvag.com%7Cusv-vv-see-ad-1.infra.dvag.com%7Cusv-mr-rh7-ug-dv7-1.infra.dvag.com)',fqdn!%7E'(usv-mr-rh5-5og-dv5-6.infra.dvag.com%7Cusv-mr-rh5-4og-dv5-5.infra.dvag.com%7Cusv-mr-rh5-3og-dv5-4.infra.dvag.com%7Cusv-mr-rh3-ug-dv3-1.infra.dvag.com%7Cusv-mr-rh2-eg-dv2-2.infra.dvag.com%7Cusv-mr-rh2-4og-dv2-4.infra.dvag.com%7Cusv-vv-pan-wein-1.infra.dvag.com%7Cusv-mr-rh2-ug-dv2-1.infra.dvag.com%7Cusv-mr-rh5-ug-dv5-1.infra.dvag.com%7Cusv-vv-pan-schilf-1.infra.dvag.com)'%7D 
+      description: 'Erhöhte Temperatur auf dem Gerät {{ $labels.fqdn}}. Temperatur derzeit bei {{ $value }}'
+      scc_info: 'Bitte passenden Dienstleister anhand des Info Textes oben im Ticket informieren'
+      value: '{{ $value}}'
+  - alert: Riello USV erhöhte Temperatur 40
+    expr: upsBatteryTemperature{alerting_required!='false', fqdn=~'(usv-mr-rh5-5og-dv5-6.infra.dvag.com|usv-mr-rh5-4og-dv5-5.infra.dvag.com|usv-mr-rh5-3og-dv5-4.infra.dvag.com|usv-mr-rh3-ug-dv3-1.infra.dvag.com|usv-mr-rh2-eg-dv2-2.infra.dvag.com|usv-mr-rh2-4og-dv2-4.infra.dvag.com|usv-vv-pan-wein-1.infra.dvag.com)',fqdn!~'(usv-mr-rh2-3og-dv2-5.infra.dvag.com|usv-vv-pan-see-1.infra.dvag.com|usv-vv-see-wirt-1.infra.dvag.com|usv-vv-see-wd-1.infra.dvag.com|usv-vv-see-verw-1.infra.dvag.com|usv-vv-see-sd-1.infra.dvag.com|usv-vv-see-ad-1.infra.dvag.com|usv-mr-rh7-ug-dv7-1.infra.dvag.com|usv-mr-rh2-ug-dv2-1.infra.dvag.com|usv-mr-rh5-ug-dv5-1.infra.dvag.com|usv-vv-pan-schilf-1.infra.dvag.com)'} > 40
+    for: 5m
+    labels:
+      alert_scc: true
+      severity: critical
+    annotations:
+      metric_name: upsBatteryTemperature%7Binstance='{{  $labels.instance  }}', fqdn=%7E'(usv-mr-rh5-5og-dv5-6.infra.dvag.com%7Cusv-mr-rh5-4og-dv5-5.infra.dvag.com%7Cusv-mr-rh5-3og-dv5-4.infra.dvag.com%7Cusv-mr-rh3-ug-dv3-1.infra.dvag.com%7Cusv-mr-rh2-eg-dv2-2.infra.dvag.com%7Cusv-mr-rh2-4og-dv2-4.infra.dvag.com%7Cusv-vv-pan-wein-1.infra.dvag.com)',fqdn!%7E'(usv-mr-rh2-3og-dv2-5.infra.dvag.com%7Cusv-vv-pan-see-1.infra.dvag.com%7Cusv-vv-see-wirt-1.infra.dvag.com%7Cusv-vv-see-wd-1.infra.dvag.com%7Cusv-vv-see-verw-1.infra.dvag.com%7Cusv-vv-see-sd-1.infra.dvag.com%7Cusv-vv-see-ad-1.infra.dvag.com%7Cusv-mr-rh7-ug-dv7-1.infra.dvag.com%7Cusv-mr-rh2-ug-dv2-1.infra.dvag.com%7Cusv-mr-rh5-ug-dv5-1.infra.dvag.com%7Cusv-vv-pan-schilf-1.infra.dvag.com)'%7D 
+      description: 'Erhöhte Temperatur auf dem Gerät {{ $labels.fqdn}}. Temperatur derzeit bei {{ $value }}'
+      scc_info: 'Bitte passenden Dienstleister anhand des Info Textes oben im Ticket informieren'
+      value: '{{ $value}}'
+  - alert: Riello USV erhöhte Temperatur 35
+    expr: upsBatteryTemperature{alerting_required!='false', fqdn=~'(usv-mr-rh2-ug-dv2-1.infra.dvag.com|usv-mr-rh5-ug-dv5-1.infra.dvag.com|usv-vv-pan-schilf-1.infra.dvag.com)',fqdn!~'(usv-mr-rh2-3og-dv2-5.infra.dvag.com|usv-vv-pan-see-1.infra.dvag.com|usv-vv-see-wirt-1.infra.dvag.com|usv-vv-see-wd-1.infra.dvag.com|usv-vv-see-verw-1.infra.dvag.com|usv-vv-see-sd-1.infra.dvag.com|usv-vv-see-ad-1.infra.dvag.com|usv-mr-rh7-ug-dv7-1.infra.dvag.com|usv-mr-rh5-5og-dv5-6.infra.dvag.com|usv-mr-rh5-4og-dv5-5.infra.dvag.com|usv-mr-rh5-3og-dv5-4.infra.dvag.com|usv-mr-rh3-ug-dv3-1.infra.dvag.com|usv-mr-rh2-eg-dv2-2.infra.dvag.com|usv-mr-rh2-4og-dv2-4.infra.dvag.com|usv-vv-pan-wein-1.infra.dvag.com)'} > 35
+    for: 5m
+    labels:
+      alert_scc: true
+      severity: critical
+    annotations:
+      metric_name: upsBatteryTemperature%7Binstance='{{  $labels.instance  }}', fqdn=%7E'(usv-mr-rh2-ug-dv2-1.infra.dvag.com%7Cusv-mr-rh5-ug-dv5-1.infra.dvag.com%7Cusv-vv-pan-schilf-1.infra.dvag.com)',fqdn!%7E'(usv-mr-rh2-3og-dv2-5.infra.dvag.com%7Cusv-vv-pan-see-1.infra.dvag.com%7Cusv-vv-see-wirt-1.infra.dvag.com%7Cusv-vv-see-wd-1.infra.dvag.com%7Cusv-vv-see-verw-1.infra.dvag.com%7Cusv-vv-see-sd-1.infra.dvag.com%7Cusv-vv-see-ad-1.infra.dvag.com%7Cusv-mr-rh7-ug-dv7-1.infra.dvag.com%7Cusv-mr-rh5-5og-dv5-6.infra.dvag.com%7Cusv-mr-rh5-4og-dv5-5.infra.dvag.com%7Cusv-mr-rh5-3og-dv5-4.infra.dvag.com%7Cusv-mr-rh3-ug-dv3-1.infra.dvag.com%7Cusv-mr-rh2-eg-dv2-2.infra.dvag.com%7Cusv-mr-rh2-4og-dv2-4.infra.dvag.com%7Cusv-vv-pan-wein-1.infra.dvag.com)'%7D 
+      description: 'Erhöhte Temperatur auf dem Gerät {{ $labels.fqdn}}. Temperatur derzeit bei {{ $value }}'
+      scc_info: 'Bitte passenden Dienstleister anhand des Info Textes oben im Ticket informieren'
+      value: '{{ $value}}'
+  - alert: Riello USV Alarm present
+    expr: upsAlarmsPresent{alerting_required!='false'} == 1
+    labels:
+      alert_scc: true
+      severity: critical
+    annotations:
+      metric_name: upsAlarmsPresent%7Binstance='{{  $labels.instance  }}'%7D
+      description: 'Die USV {{ $labels.fqdn}} hat einen aktiven Alarm.'
+      scc_info: 'Bitte passenden Dienstleister anhand des Info Textes oben im Ticket informieren'
+      value: '{{ $labels.fqdn}}'
+  - alert: Riello USV Batteries are discharging
+    expr: upsEstimatedChargeRemaining{alerting_required!='false'} == 1
+    labels:
+      alert_scc: true
+      severity: critical
+    annotations:
+      metric_name: upsEstimatedChargeRemaining%7Binstance='{{  $labels.instance  }}'%7D
+      description: 'Die USV {{ $labels.fqdn}} hat einen aktiven Alarm.'
+      scc_info: 'Bitte passenden Dienstleister anhand des Info Textes oben im Ticket informieren'
+      value: '{{ $labels.fqdn}}'
+
+- name: snmp_exporter_usv_apc
+  rules:
+  ## treshold changed MON-4608
+  - alert: APC USV erhöhte Temperatur 35
+    expr: upsAdvBatteryTemperature{alerting_required!='false', fqdn!~'(usv-vv-see-rest-1.infra.dvag.com|usv-mr-fhdw-wdh-eg-1.infra.dvag.com|usv-gi-lz-1.infra.dvag.com|usv-f-wl-ua-1.infra.dvag.com)'} > 35
+    for: 5m
+    labels:
+      alert_scc: true
+      severity: critical
+    annotations:
+      metric_name: upsAdvBatteryTemperature%7Binstance='{{  $labels.instance  }}', fqdn!%7E'(usv-vv-see-rest-1.infra.dvag.com%7Cusv-mr-fhdw-wdh-eg-1.infra.dvag.com%7Cusv-gi-lz-1.infra.dvag.com%7Cusv-f-wl-ua-1.infra.dvag.com)'%7D 
+      description: 'Erhöhte Temperatur auf dem Gerät {{ $labels.fqdn}}. Temperatur derzeit bei {{ $value }}'
+      scc_info: 'Bitte passenden Dienstleister anhand des Info Textes oben im Ticket informieren'
+      value: '{{ $value}}'
+  - alert: APC USV erhöhte Temperatur 35
+    expr: upsAdvBatteryTemperature{alerting_required!='false', fqdn=~'(usv-vv-see-rest-1.infra.dvag.com|usv-mr-fhdw-wdh-eg-1.infra.dvag.com|usv-gi-lz-1.infra.dvag.com)',fqdn!='(usv-f-wl-ua-1.infra.dvag.com)'} > 35
+    for: 5m
+    labels:
+      alert_scc: true
+      severity: critical
+    annotations:
+      metric_name: upsAdvBatteryTemperature%7Binstance='{{  $labels.instance  }}', fqdn=%7E'(usv-vv-see-rest-1.infra.dvag.com%7Cusv-mr-fhdw-wdh-eg-1.infra.dvag.com%7Cusv-gi-lz-1.infra.dvag.com)',fqdn!='(usv-f-wl-ua-1.infra.dvag.com)'%7D 
+      description: 'Erhöhte Temperatur auf dem Gerät {{ $labels.fqdn}}. Temperatur derzeit bei {{ $value }}'
+      scc_info: 'Bitte passenden Dienstleister anhand des Info Textes oben im Ticket informieren'
+      value: '{{ $value}}'
+  - alert: APC USV erhöhte Temperatur 40
+    expr: upsAdvBatteryTemperature{alerting_required!='false', fqdn='usv-f-wl-ua-1.infra.dvag.com'} > 40
+    for: 5m
+    labels:
+      alert_scc: true
+      severity: critical
+    annotations:
+      metric_name: upsAdvBatteryTemperature%7Binstance='{{  $labels.instance  }}', fqdn='usv-f-wl-ua-1.infra.dvag.com'%7D 
+      description: 'Erhöhte Temperatur auf dem Gerät {{ $labels.fqdn}}. Temperatur derzeit bei {{ $value }}'
+      scc_info: 'Bitte passenden Dienstleister anhand des Info Textes oben im Ticket informieren'
+      value: '{{ $value}}'
+  - alert: APC USV battery voltage unter 200 Volt
+    expr: upsBatteryVoltage{alerting_required!='false'} < 200
+    for: 5m
+    labels:
+      alert_scc: true
+      severity: critical
+    annotations:
+      metric_name: upsBatteryVoltage%7Binstance='{{  $labels.instance  }}'%7D
+      description: 'Battery voltage auf {{ $labels.fqdn}} unter {{ $value }}'
+      scc_info: 'Bitte passenden Dienstleister anhand des Info Textes oben im Ticket informieren'
+      value: '{{ $value}}'
+  - alert: APC USV battery output load über 90%
+    expr: upsAdvOutputLoad{alerting_required!='false'} > 90
+    for: 5m
+    labels:
+      alert_scc: true
+      severity: critical
+    annotations:
+      metric_name: upsAdvOutputLoad%7Binstance='{{  $labels.instance  }}'%7D
+      description: 'Battery output load auf {{ $labels.fqdn}} über {{ $value }}'
+      scc_info: 'Bitte passenden Dienstleister anhand des Info Textes oben im Ticket informieren'
+      value: '{{ $value}}'
+  - alert: APC USV battery power too low for the load
+    expr: upsBasicBatteryStatus{alerting_required!='false'} == 3
+    for: 5m
+    labels:
+      alert_scc: true
+      severity: critical
+    annotations:
+      metric_name: upsBasicBatteryStatus%7Binstance='{{  $labels.instance  }}'%7D
+      description: 'battery power too low for the load auf {{ $labels.fqdn }}'
+      scc_info: 'Bitte passenden Dienstleister anhand des Info Textes oben im Ticket informieren'
+      value: '{{ $labels.fqdn }}'
+  - alert: APC USV battery replace indicator
+    expr: upsAdvBatteryReplaceIndicator{alerting_required!='false'} == 0
+    for: 5m
+    labels:
+      alert_scc: true
+      severity: critical
+    annotations:
+      metric_name: upsAdvBatteryReplaceIndicator%7Binstance='{{  $labels.instance  }}'%7D
+      description: 'Indicates whether the UPS batteries need replacing auf {{ $labels.fqdn }}'
+      scc_info: 'Bitte passenden Dienstleister anhand des Info Textes oben im Ticket informieren'
+      value: '{{ $labels.fqdn }}'
+  - alert: APC USV battery runtime remaining
+    expr: upsAdvBatteryRunTimeRemaining{alerting_required!='false'} < 1200
+    for: 5m
+    labels:
+      alert_scc: true
+      severity: critical
+    annotations:
+      metric_name: upsAdvBatteryRunTimeRemaining%7Binstance='{{  $labels.instance  }}'%7D 
+      description: 'Batterielaufzeit weniger als 20 Minuten. Momentan bei {{ $value }} Sekunden auf {{ $labels.fqdn }}'
+      scc_info: 'Bitte passenden Dienstleister anhand des Info Textes oben im Ticket informieren'
+      value: '{{ $value}}'
+
+- name: snmp_exporter_cisco_asa
+  rules:
+  - alert: Cisco ASA Traffic Outside ungewöhnlich Hoch (Connections)
+    expr: cfwConnectionStatValue{alerting_required!='false', fqdn=~'inetafw0.+',cfwConnectionStatType='6'}  > 25000
+    annotations:
+      metric_name: cfwConnectionStatValue%7Binstance='{{  $labels.instance  }}', fqdn=%7E'inetafw0.%2B',cfwConnectionStatType='6'%7D 
+      description: 'Traffic Outside ungewöhnlich Hoch (Connections) auf dem Gerät {{ $labels.fqdn }}. Ist über {{ $value }}'
+      scc_info: 'Bitte FR Ticket bei Blue Networks erstellen und Sven Wieck im Ticket erwähnen'
+      value: '{{ $value }}'
+    for: 5m
+    labels:
+      severity: critical
+      alert_scc: true 
+  - alert: Eingehender Traffic über 90% des Port Limits
+    ## Umrechung von Bytes  in Bits/s, da ifHighSpeed Bit/s 
+    expr: (irate(ifHCInOctets{alerting_required!='false', mib='cisco_asa',ifDescr=~'Adaptive Security Appliance.+'}[10m])  * 8 / 1024 / 1024) / ifHighSpeed > 0.9
+    annotations:
+      metric_name: (irate(ifHCInOctets%7Binstance='{{  $labels.instance  }}', mib='cisco_asa',ifDescr=%7E'Adaptive Security Appliance.+'%7D%5b10m%5d)  * 8 / 1024 / 1024) / ifHighSpeed
+      description: 'Auf Port {{ $labels.ifAlias  }} beträgt die Auslastung über 90% der maximalen Port Geschwindigkeit'
+      scc_info: 'Bitte passenden Dienstleister anhand des Info Textes oben im Ticket informieren'
+      value: '{{ $value }}'
+    for: 5m
+    labels:
+      severity: critical
+      alert_scc: true
+  - alert: Ausgehender Traffic über 90% des Port Limits
+    expr: (irate(ifHCOutOctets{alerting_required!='false', mib='cisco_asa',ifDescr=~'Adaptive Security Appliance.+'}[10m])  * 8 / 1024 / 1024) / ifHighSpeed > 0.9
+    annotations:
+      metric_name: (irate(ifHCInOctets%7Binstance='{{  $labels.instance  }}', mib='cisco_asa',ifDescr=%7E'Adaptive Security Appliance.%2B'%7D%5b10m%5d)  * 8 / 1024 / 1024) / ifHighSpeed
+      description: 'Auf Port {{ $labels.ifAlias}} beträgt die Auslastung über 90% der maximalen Port Geschwindigkeit'
+      scc_info: 'Bitte passenden Dienstleister anhand des Info Textes oben im Ticket informieren'
+      value: '{{ $value }}'
+    ## Umrechung von Bytes  in Bits/s, da ifHighSpeed Bit/s     
+    for: 5m
+    labels:
+      severity: critical
+      alert_scc: true
+  - alert: AnyConnect VPN Users Limit
+    expr: crasNumUsers{alerting_required!='false'} > 620
+    annotations:
+      metric_name: crasNumUsers%7Binstance='{{  $labels.instance  }}'%7D
+      description: 'Die Anzahl der per AnyConnect verbundenen VPN User ist bei {{ $value }} auf {{ $labels.fqdn}} \n Limit bei 750'
+      scc_info: 'Bitte passenden Dienstleister anhand des Info Textes oben im Ticket informieren'
+      value: '{{ $value }}'
+    for: 3m
+    labels:
+      severity: critical
+      alert_scc: true
+- name: snmp_exporter_nexus_sfp
+  rules:
+  - alert: Zu schwache Sende/Empfangsleistung auf LAN SFP Module High Alarm
+    expr: (entSensorValue{alerting_required!='false', entSensorType='14',entSensorPrecision='1'} /10 > ignoring(entSensorPrecision,entSensorScale,entSensorType,entSensorThresholdIndex) (entSensorThresholdValue{entSensorThresholdIndex='1'} / 10)) != 0
+    annotations:
+      metric_name: (entSensorValue%7Binstance='{{  $labels.instance  }}', entSensorType='14',entSensorPrecision='1'%7D /10 > ignoring(entSensorPrecision,entSensorScale,entSensorType,entSensorThresholdIndex) (entSensorThresholdValue%7BentSensorThresholdIndex='1'%7D / 10)) 
+      description: 'Zu schwache Sende/Empfangsleistung auf SFP Module auf {{ $labels.fqdn}} Module {{ $labels.entPhysicalName}}'
+      scc_info: 'Bitte passenden Dienstleister anhand des Info Textes oben im Ticket informieren. Grafana Dashboard https://grafana.mon.dvag.net/d/KoafHDHnz/'
+      value: '{{ $value }}'
+    for: 10m
+    labels:
+      severity: critical
+      alert_scc: true
+  - alert: Zu schwache Sende/Empfangsleistung auf LAN SFP Module High Warning
+    expr: (entSensorValue{alerting_required!='false', entSensorType='14',entSensorPrecision='1'} /10 > ignoring(entSensorPrecision,entSensorScale,entSensorType,entSensorThresholdIndex) (entSensorThresholdValue{entSensorThresholdIndex='2'} / 10)) != 0
+    annotations:
+      metric_name: (entSensorValue%7Binstance='{{  $labels.instance  }}', entSensorType='14',entSensorPrecision='1'%7D /10 > ignoring(entSensorPrecision,entSensorScale,entSensorType,entSensorThresholdIndex) (entSensorThresholdValue%7BentSensorThresholdIndex='2'%7D / 10)) 
+      description: 'Zu schwache Sende/Empfangsleistung auf SFP Module auf {{ $labels.fqdn}} Module {{ $labels.entPhysicalName}}'
+      scc_info: 'Bitte passenden Dienstleister anhand des Info Textes oben im Ticket informieren. Grafana Dashboard https://grafana.mon.dvag.net/d/KoafHDHnz/'
+      value: '{{ $value }}'
+    for: 10m
+    labels:
+      severity: critical
+      alert_scc: true
+  - alert: Zu schwache Sende/Empfangsleistung auf LAN SFP Module Low Alarm
+    expr: (entSensorValue{alerting_required!='false', entSensorType='14',entSensorPrecision='1'} /10 < ignoring(entSensorPrecision,entSensorScale,entSensorType,entSensorThresholdIndex) (entSensorThresholdValue{entSensorThresholdIndex='3'} / 10)) != 0 > -9
+    annotations:
+      metric_name: (entSensorValue%7Binstance='{{  $labels.instance  }}', entSensorType='14',entSensorPrecision='1'%7D /10 < ignoring(entSensorPrecision,entSensorScale,entSensorType,entSensorThresholdIndex) (entSensorThresholdValue%7BentSensorThresholdIndex='3'%7D / 10)) != 0 
+      description: 'Zu schwache Sende/Empfangsleistung auf SFP Module auf {{ $labels.fqdn}} Module {{ $labels.entPhysicalName}}'
+      scc_info: 'Bitte passenden Dienstleister anhand des Info Textes oben im Ticket informieren. Grafana Dashboard https://grafana.mon.dvag.net/d/KoafHDHnz/ '
+      value: '{{ $value }}'
+    for: 10m
+    labels:
+      severity: critical
+      alert_scc: true
+  - alert: Zu schwache Sende/Empfangsleistung auf LAN SFP Module Low Warning
+    expr: (entSensorValue{alerting_required!='false', entSensorType='14',entSensorPrecision='1'} /10 < ignoring(entSensorPrecision,entSensorScale,entSensorType,entSensorThresholdIndex) (entSensorThresholdValue{entSensorThresholdIndex='4'} / 10)) != 0 > -9
+    annotations:
+      metric_name: (entSensorValue%7Binstance='{{  $labels.instance  }}', entSensorType='14',entSensorPrecision='1'%7D /10 < ignoring(entSensorPrecision,entSensorScale,entSensorType,entSensorThresholdIndex) (entSensorThresholdValue%7BentSensorThresholdIndex='4'%7D / 10)) != 0 
+      description: 'Zu schwache Sende/Empfangsleistung auf SFP Module auf {{ $labels.fqdn}} Module {{ $labels.entPhysicalName}}'
+      scc_info: 'Bitte passenden Dienstleister anhand des Info Textes oben im Ticket informieren. Grafana Dashboard https://grafana.mon.dvag.net/d/KoafHDHnz/'
+      value: '{{ $value }}'
+    for: 10m
+    labels:
+      severity: critical
+      alert_scc: true
+  - alert: Zu schwache Sende/Empfangsleistung auf RZNetz SFP Module High Alarm
+    expr: (entSensorValue{alerting_required!='false', entSensorType='14',entSensorPrecision='0'} / 1000) > ignoring(entSensorPrecision,entSensorScale,entSensorType,entSensorThresholdIndex) (entSensorThresholdValue{entSensorThresholdIndex='1'} / 1000) != 0 
+    annotations:
+      metric_name: (entSensorValue%7Binstance='{{  $labels.instance  }}', entSensorType='14',entSensorPrecision='0'%7D / 1000) > ignoring(entSensorPrecision,entSensorScale,entSensorType,entSensorThresholdIndex) (entSensorThresholdValue%7BentSensorThresholdIndex='1'%7D / 1000) 
+      description: 'Zu schwache Sende/Empfangsleistung auf SFP Module auf {{ $labels.fqdn}} Module {{ $labels.entPhysicalName}}'
+      scc_info: 'Bitte passenden Dienstleister anhand des Info Textes oben im Ticket informieren. Grafana Dashboard https://grafana.mon.dvag.net/d/KoafHDHnz/'
+      value: '{{ $value }}'
+    for: 10m
+    labels:
+      severity: critical
+      alert_scc: true
+  - alert: Zu schwache Sende/Empfangsleistung auf RZNetz SFP Module High Warning
+    expr: ((entSensorValue{alerting_required!='false', entSensorType='14',entSensorPrecision='0'} / 1000) != 0) > ignoring(entSensorPrecision,entSensorScale,entSensorType,entSensorThresholdIndex) (entSensorThresholdValue{entSensorThresholdIndex='2'} / 1000) != 0
+    annotations:
+      metric_name: ((entSensorValue%7Binstance='{{  $labels.instance  }}', entSensorType='14',entSensorPrecision='0'%7D / 1000) != 0) > ignoring(entSensorPrecision,entSensorScale,entSensorType,entSensorThresholdIndex) (entSensorThresholdValue%7BentSensorThresholdIndex='2'%7D / 1000) 
+      description: 'Zu schwache Sende/Empfangsleistung auf SFP Module auf {{ $labels.fqdn}} Module {{ $labels.entPhysicalName}}'
+      scc_info: 'Bitte passenden Dienstleister anhand des Info Textes oben im Ticket informieren. Grafana Dashboard https://grafana.mon.dvag.net/d/KoafHDHnz/'
+      value: '{{ $value }}'
+    for: 10m
+    labels:
+      severity: critical
+      alert_scc: true
+  - alert: Zu schwache Sende/Empfangsleistung auf RZNetz SFP Module Low Alarm
+    expr: ((entSensorValue{alerting_required!='false', entSensorType='14',entSensorPrecision='0'} / 1000) != 0) < ignoring(entSensorPrecision,entSensorScale,entSensorType,entSensorThresholdIndex) (entSensorThresholdValue{entSensorThresholdIndex='3'} / 1000) != 0 > -9
+    annotations:
+      metric_name: ((entSensorValue%7Binstance='{{  $labels.instance  }}', entSensorType='14',entSensorPrecision='0'%7D / 1000) != 0) < ignoring(entSensorPrecision,entSensorScale,entSensorType,entSensorThresholdIndex) (entSensorThresholdValue%7BentSensorThresholdIndex='3'%7D / 1000) != 0 
+      value: '{{ $value }}'
+      description: 'Zu schwache Sende/Empfangsleistung auf SFP Module auf {{ $labels.fqdn}} Module {{ $labels.entPhysicalName}}'
+      scc_info: 'Bitte passenden Dienstleister anhand des Info Textes oben im Ticket informieren. Grafana Dashboard https://grafana.mon.dvag.net/d/KoafHDHnz/'
+    for: 10m
+    labels:
+      severity: critical
+      alert_scc: true
+  - alert: Zu schwache Sende/Empfangsleistung auf RZNetz SFP Module Low Warning
+    expr: ((entSensorValue{alerting_required!='false', entSensorType='14',entSensorPrecision='0'} / 1000) != 0) < ignoring(entSensorPrecision,entSensorScale,entSensorType,entSensorThresholdIndex) (entSensorThresholdValue{entSensorThresholdIndex='4'} / 1000) != 0 > -9
+    annotations:
+      metric_name: ((entSensorValue%7Binstance='{{  $labels.instance  }}', entSensorType='14',entSensorPrecision='0'%7D / 1000) != 0) < ignoring(entSensorPrecision,entSensorScale,entSensorType,entSensorThresholdIndex) (entSensorThresholdValue%7BentSensorThresholdIndex='4'%7D / 1000) != 0 
+      description: 'Zu schwache Sende/Empfangsleistung auf SFP Module auf {{ $labels.fqdn}} Module {{ $labels.entPhysicalName}}'
+      scc_info: 'Bitte passenden Dienstleister anhand des Info Textes oben im Ticket informieren. Grafana Dashboard https://grafana.mon.dvag.net/d/KoafHDHnz/'
+      value: '{{ $value }}'
+    for: 10m
+    labels:
+      severity: critical
+      alert_scc: true
+- name: snmp_exporter_nexus
+  rules:
+  - alert: Fan critical
+    expr: cefcFanTrayOperStatus{alerting_required!='false'} != 2
+    annotations:
+      metric_name: cefcFanTrayOperStatus%7Binstance='{{  $labels.instance  }}'%7D 
+      description: 'Fan Fehler auf {{ $labels.fqdn}}'
+      scc_info: 'Bitte passenden Dienstleister anhand des Info Textes oben im Ticket informieren'
+      value: '{{ $value }}'
+    for: 3m
+    labels:
+      severity: critical
+      alert_scc: true
+  - alert: erhöhte CPU Auslastung
+    expr: cpmCPUTotal5minRev{alerting_required!='false'} > 90 
+    annotations:
+      metric_name: cpmCPUTotal5minRev%7Binstance='{{  $labels.instance  }}'%7D 
+      description: '{{ $labels.fqdn}} CPU Auslastung bei {{ $value }}%'
+      scc_info: 'Bitte passenden Dienstleister anhand des Info Textes oben im Ticket informieren'
+      value: '{{ $value }}'
+    for: 30m
+    labels:
+      severity: warning
+      alert_scc: true
+  - alert: Temperatur Sensor erhöht
+    expr: entSensorValue{alerting_required!='false', entSensorType='8',entPhysicalName=~'.+Temperature.+',entSensorScale='8'} / 1000 > 65 and entSensorValue{entSensorType='8',entPhysicalName=~'.+Temperature.+',entSensorScale='8'} / 1000 < 90
+    annotations:
+      metric_name: entSensorValue%7Binstance='{{  $labels.instance  }}', entSensorType='8',entPhysicalName=%7E'.%2BTemperature.%2B',entSensorScale='8'%7D / 1000 and entSensorValue%7BentSensorType='8',entPhysicalName=%7E'.%2BTemperature.%2B',entSensorScale='8'%7D / 1000 
+      description: 'Temperatur Sensor auf {{ $labels.fqdn}} bei {{ $value }}'
+      scc_info: 'Bitte passenden Dienstleister anhand des Info Textes oben im Ticket informieren'
+      value: '{{ $value }}'
+    for: 30m
+    labels:
+      severity: warning
+      alert_scc: true      
+  - alert: Temperatur Sensor erhöht
+    expr: entSensorValue{alerting_required!='false', entSensorType='8',entSensorScale='8'} / 1000 > 55 and entSensorValue{entSensorScale='8',entSensorType='8'} / 1000 < 90
+    annotations:
+      metric_name: entSensorValue%7Binstance='{{  $labels.instance  }}', entSensorType='8',entSensorScale='8'%7D / 1000 and entSensorValue{entSensorScale='8',entSensorType='8'%7D / 1000 
+      description: 'Temperatur Sensor auf {{ $labels.fqdn}} bei {{ $value }}'
+      scc_info: 'Bitte passenden Dienstleister anhand des Info Textes oben im Ticket informieren'
+      value: '{{ $value }}'
+    for: 30m
+    labels:
+      severity: warning
+      alert_scc: true   
+  - alert: Power Supply Fehler
+    expr: cefcFRUPowerOperStatus{alerting_required!='false'} == 1
+    annotations:
+      metric_name: cefcFRUPowerOperStatus%7Binstance='{{  $labels.instance  }}'%7D 
+      description: 'Power Supply {{ $labels.fqdn}} Fehler. \n Fehlermeldung des Power Supply: offEnvOther'
+      scc_info: 'Bitte passenden Dienstleister anhand des Info Textes oben im Ticket informieren'
+      value: '{{ $labels.fqdn}}'
+    labels:
+      severity: critical
+      alert_scc: true   
+  - alert: Power Supply Fehler
+    expr: cefcFRUPowerOperStatus{alerting_required!='false'} == 3
+    annotations:
+      metric_name: cefcFRUPowerOperStatus%7Binstance='{{  $labels.instance  }}'%7D 
+      description: 'Power Supply {{ $labels.fqdn}} Fehler. \n Fehlermeldung des Power Supply: offAdmin'
+      scc_info: 'Bitte passenden Dienstleister anhand des Info Textes oben im Ticket informieren'
+      value: '{{ $labels.fqdn}}'
+    labels:
+      severity: critical
+      alert_scc: true   
+  - alert: Power Supply Fehler
+    expr: cefcFRUPowerOperStatus{alerting_required!='false'} == 5
+    annotations:
+      metric_name: cefcFRUPowerOperStatus%7Binstance='{{  $labels.instance  }}'%7D 
+      description: 'Power Supply {{ $labels.fqdn}} Fehler. \n Fehlermeldung des Power Supply: offEnvPower'
+      scc_info: 'Bitte passenden Dienstleister anhand des Info Textes oben im Ticket informieren'
+      value: '{{ $labels.fqdn}}'
+    labels:
+      severity: critical
+      alert_scc: true   
+  - alert: Power Supply Fehler
+    expr: cefcFRUPowerOperStatus{alerting_required!='false'} == 6
+    annotations:
+      metric_name: cefcFRUPowerOperStatus%7Binstance='{{  $labels.instance  }}'%7D 
+      description: 'Power Supply {{ $labels.fqdn}} Fehler. \n Fehlermeldung des Power Supply: offEnvTemp'
+      scc_info: 'Bitte passenden Dienstleister anhand des Info Textes oben im Ticket informieren'
+      value: '{{ $labels.fqdn}}'
+    labels:
+      severity: critical
+      alert_scc: true   
+  - alert: Power Supply Fehler
+    expr: cefcFRUPowerOperStatus{alerting_required!='false'} == 7
+    annotations:
+      metric_name: cefcFRUPowerOperStatus%7Binstance='{{  $labels.instance  }}'%7D 
+      description: 'Power Supply {{ $labels.fqdn}} Fehler. \n Fehlermeldung des Power Supply: offEnvFan'
+      scc_info: 'Bitte passenden Dienstleister anhand des Info Textes oben im Ticket informieren'
+      value: '{{ $labels.fqdn}}'
+    labels:
+      severity: critical
+      alert_scc: true   
+  - alert: Power Supply Fehler
+    expr: cefcFRUPowerOperStatus{alerting_required!='false'} == 8
+    annotations:
+      metric_name: cefcFRUPowerOperStatus%7Binstance='{{  $labels.instance  }}'%7D 
+      description: 'Power Supply {{ $labels.fqdn}} Fehler. \n Fehlermeldung des Power Supply: Failed'
+      scc_info: 'Bitte passenden Dienstleister anhand des Info Textes oben im Ticket informieren'
+      value: '{{ $labels.fqdn}}'
+    labels:
+      severity: critical
+      alert_scc: true   
+  - alert: Power Supply Fehler
+    expr: cefcFRUPowerOperStatus{alerting_required!='false'} == 9
+    annotations:
+      metric_name: cefcFRUPowerOperStatus%7Binstance='{{  $labels.instance  }}'%7D 
+      description: 'Power Supply {{ $labels.fqdn}} Fehler. \n Fehlermeldung des Power Supply: onButFanFail'
+      scc_info: 'Bitte passenden Dienstleister anhand des Info Textes oben im Ticket informieren'
+      value: '{{ $labels.fqdn}}'
+    labels:
+      severity: critical
+      alert_scc: true   
+  - alert: Power Supply Redudanz Fehler
+    expr: cefcPowerRedundancyMode{alerting_required!='false'} == 1
+    annotations:
+      metric_name: cefcPowerRedundancyMode%7Binstance='{{  $labels.instance  }}'%7D 
+      description: 'Power Supply {{ $labels.fqdn}} Fehler. \n Fehlermeldung des Power Supply: notsupported'
+      scc_info: 'Bitte passenden Dienstleister anhand des Info Textes oben im Ticket informieren'
+      value: '{{ $labels.fqdn}}'
+    labels:
+      severity: critical
+      alert_scc: true   
+  - alert: Power Supply Redudanz Fehler
+    expr: cefcPowerRedundancyMode{alerting_required!='false'} == 4
+    annotations:
+      metric_name: cefcPowerRedundancyMode%7Binstance='{{  $labels.instance  }}'%7D 
+      description: 'Power Supply {{ $labels.fqdn}} Fehler. \n Fehlermeldung des Power Supply: nonRedundant'
+      scc_info: 'Bitte passenden Dienstleister anhand des Info Textes oben im Ticket informieren'
+      value: '{{ $labels.fqdn}}'
+    labels:
+      severity: critical
+      alert_scc: true   
+  - alert: Power Supply Overloaded
+    expr: cefcTotalAvailableCurrent{alerting_required!='false'} < cefcTotalDrawnCurrent
+    annotations:
+      metric_name: cefcTotalAvailableCurrent%7Binstance='{{  $labels.instance  }}'%7D 
+      description: 'Power Supply {{ $labels.fqdn}} Fehler. \n Fehlermeldung des Power Supply: Overloaded'
+      scc_info: 'Bitte passenden Dienstleister anhand des Info Textes oben im Ticket informieren'
+      value: '{{ $labels.fqdn}}'
+    for: 10m
+    labels:
+      severity: critical
+      alert_scc: true   
+  - alert: Fan Fehler
+    expr: cefcFanTrayOperStatus{alerting_required!='false'} == 1
+    annotations:
+      metric_name: cefcFanTrayOperStatus%7Binstance='{{  $labels.instance  }}'%7D 
+      description: 'Fan on {{ $labels.fqdn}} Fehler. \n Fehlermeldung des Fans: Fan state unknown'
+      scc_info: 'Bitte passenden Dienstleister anhand des Info Textes oben im Ticket informieren'
+      value: '{{ $labels.fqdn}}'
+    labels:
+      severity: critical
+      alert_scc: true   
+  - alert: Fan Fehler
+    expr: cefcFanTrayOperStatus{alerting_required!='false'} == 4
+    annotations:
+      metric_name: cefcFanTrayOperStatus%7Binstance='{{  $labels.instance  }}'%7D 
+      description: 'Fan on {{ $labels.fqdn}} Fehler. \n Fehlermeldung des Fans: Fan state warning'
+      scc_info: 'Bitte passenden Dienstleister anhand des Info Textes oben im Ticket informieren'
+      value: '{{ $labels.fqdn}}'
+    labels:
+      severity: critical
+      alert_scc: true
+- name: snmp_exporter_wlc
+  rules:
+  - alert: Cisco Mobility Group Member Control Data
+    expr: cLMobilityGroupMemberControlPathStatusUp{alerting_required!='false', fqdn=~'wlc-f-wm-dc-anchor-[1,2,3].infra.dvag.com|wlc-f-wm-dc-[1,2].infra.dvag.com|wlc-f-ebl-dc-anchor-[1,2,3].infra.dvag.com'} == 2
+    annotations:
+      metric_name: cLMobilityGroupMemberControlPathStatusUp%7Binstance='{{  $labels.instance  }}', fqdn=%7E'wlc-f-wm-dc-anchor-%5b1,2,3%5d.infra.dvag.com%7Cwlc-f-wm-dc-%5b1,2%5d.infra.dvag.com%7Cwlc-f-ebl-dc-anchor-%5b1,2,3%5d.infra.dvag.com'%7D 
+      description: 'Cisco Mobility Group Member Path Data {{ $labels.cLMobilityGroupMemberGroupName}} auf {{ $labels.fqdn}} Verbindung nicht aktiv'
+      scc_info: 'Bitte passenden Dienstleister anhand des Info Textes oben im Ticket informieren'
+    for: 10m
+    labels:
+      severity: warning
+      alert_scc: true
+  - alert: Cisco Mobility Group Member Path Data
+    expr: cLMobilityGroupMemberDataPathStatusUp{alerting_required!='false', fqdn=~'wlc-f-wm-dc-anchor-[1,2,3].infra.dvag.com|wlc-f-wm-dc-[1,2].infra.dvag.com|wlc-f-ebl-dc-anchor-[1,2,3].infra.dvag.com'} == 2
+    annotations:
+      metric_name: cLMobilityGroupMemberDataPathStatusUp%7Binstance='{{  $labels.instance  }}', fqdn=%7E'wlc-f-wm-dc-anchor-%5b1,2,3%5d.infra.dvag.com%7Cwlc-f-wm-dc-%5b1,2%5d.infra.dvag.com%7Cwlc-f-ebl-dc-anchor-%5b1,2,3%5d.infra.dvag.com'%7D 
+      description: 'Cisco Mobility Group Member Path Data {{ $labels.cLMobilityGroupMemberGroupName}} auf {{ $labels.fqdn}} Verbindung nicht aktiv'
+      scc_info: 'Bitte passenden Dienstleister anhand des Info Textes oben im Ticket informieren'
+    for: 10m
+    labels:
+      severity: warning
+      alert_scc: true
+  - alert: Temperatur Sensor erhöht
+    expr: bsnSensorTemperature{alerting_required!='false'} > 92
+    annotations:
+      metric_name: bsnSensorTemperature%7Binstance='{{  $labels.instance  }}'%7D 
+      description: 'Temperatur Sensor auf {{ $labels.fqdn}} bei {{ $value }}'
+      scc_info: 'Bitte passenden Dienstleister anhand des Info Textes oben im Ticket informieren'
+      value: '{{ $value }}'
+    for: 10m
+    labels:
+      severity: warning
+      alert_scc: true
+- name: snmp_exporter_overall
+  rules:
+  - alert: Prometheus Target Missing Netzwerkgerät
+    expr: up{alerting_required!='false', job='snmp-exporter-network'} == 0
+    annotations:
+      metric_name: up%7Binstance='{{  $labels.instance  }}'%7D 
+      description: '{{ $labels.fqdn }} kann keine SNMP Daten mehr liefern. \n Testen der Funktionalität: ping {{ $labels.fqdn}} oder \n snmpwalk -v2c -c {{ $labels.snmpCommunity }} {{ $labels.fqdn}}'
+      scc_info: 'Bitte passenden Dienstleister anhand des Info Textes oben im Ticket informieren'
+      value: '{{ $labels.fqdn}}'
+    for: 30m
+    labels:
+      severity: critical
+      alert_scc: true
+# Kann nicht genutzt werden, da ifSpeed nicht auf allen Ports verfügbar
+#  - alert: Eingehender Traffic über 90% des Port Limits
+#    annotations:
+#      description: 'Auf Port {{ $labels.ifAlias}} beträgt die Auslastung über 90% der maximalen Port Geschwindigkeit'
+#      scc_info: 'Bitte passenden Dienstleister anhand des Info Textes oben im Ticket informieren'
+#      value: '{{ $value }}'
+#    ## Umrechung von Bytes  in Bits/s, da ifHighSpeed Bit/s 
+#    expr: ((irate(ifHCInOctets{snmpCommunity='DVAG'}[10m]) * 8 / 1024 / 1024) / (ifSpeed / 1e+6) * 100) > 90
+#    for: 5m
+#    labels:
+#      severity: critical
+#      alert_scc: true
+#  - alert: Ausgehender Traffic über 90% des Port Limits
+#    annotations:
+      #    metric_name: ((irate(ifHCInOctets{snmpCommunity='DVAG'}[10m]) * 8 / 1024 / 1024) / (ifSpeed / 1e+6) * 100) 
+#      description: 'Auf Port {{ $labels.ifAlias}} beträgt die Auslastung über 90% der maximalen Port Geschwindigkeit'
+#      scc_info: 'Bitte passenden Dienstleister anhand des Info Textes oben im Ticket informieren'
+#      value: '{{ $value }}'
+#    ## Umrechung von Bytes  in Bits/s, da ifHighSpeed Bit/s 
+#    expr: ((irate(ifHCOutOctets{snmpCommunity='DVAG'}[10m]) * 8 / 1024 / 1024) / (ifSpeed / 1e+6) * 100) > 90
+#    for: 5m
+#    labels:
+#      severity: critical
+#      alert_scc: true
+  - alert: CPU Auslastung über 90 %
+    expr: avg without(cpmCPUTotalIndex)(cpmCPUTotal1minRev{alerting_required!='false'} > 90)
+    annotations:
+      metric_name: avg without(cpmCPUTotalIndex)(cpmCPUTotal1minRev%7Binstance='{{  $labels.instance  }}'%7D) 
+      description: 'CPU Auslastung auf dem Gerät {{ $labels.fqdn }} ist über {{ $value }}'
+      scc_info: 'Bitte passenden Dienstleister anhand des Info Textes oben im Ticket informieren'
+      value: '{{ $value }}'
+    for: 15m
+    labels:
+      severity: critical
+      alert_scc: true
+  - alert: Interface Down
+    for: 5m
+    expr: ifOperStatus{alerting_required!='false', mib!="fortigate_snmp", ifAlias=~'(TRUNK.+|sw.+|rt.+|wlc.+|fw.+|ap.+|adva.+|Link.+|hsmx.+|mon.+|fb.+|fex.+|FEX.+)'}  == 2 and ifAdminStatus  == 1
+    annotations:
+      metric_name: ifOperStatus%7Binstance='{{  $labels.instance  }}', ifIndex='{{  $labels.ifIndex }}'%7D
+      description: 'Interface down {{ $labels.ifName  }} {{ $labels.ifDescr}} auf {{ $labels.fqdn}} Fehler.'
+      scc_info: 'Bitte passenden Dienstleister anhand des Info Textes oben im Ticket informieren'
+      value: '{{ $labels.fqdn}}'
+    labels:
+      severity: critical
+      alert_scc: true    
+  # MON-4486
+  - alert: Interface Down Fortigate
+    for: 5m
+    expr: ifOperStatus{alerting_required!='false', mib="fortigate_snmp", ifAlias=~'.+', ifName=~'port.+'}  == 2 and ifAdminStatus  == 1
+    annotations:
+      metric_name: ifOperStatus%7Binstance='{{  $labels.instance  }}', ifIndex='{{  $labels.ifIndex }}'%7D
+      description: 'Interface down {{ $labels.ifName  }} {{ $labels.ifDescr}} auf {{ $labels.fqdn}} Fehler.'
+      scc_info: 'Bitte passenden Dienstleister anhand des Info Textes oben im Ticket informieren'
+      value: '{{ $labels.fqdn}}'
+    labels:
+      severity: critical
+      alert_scc: true    
+  - alert: Temperatur Fehler
+    expr: ciscoEnvMonTemperatureStatusValue{alerting_required!='false'} > ciscoEnvMonTemperatureThreshold
+    annotations:
+      metric_name: ciscoEnvMonTemperatureStatusValue%7Binstance='{{  $labels.instance  }}'%7D 
+      description: 'Temperatur Fehler auf {{ $labels.fqdn}}'
+      scc_info: 'Bitte passenden Dienstleister anhand des Info Textes oben im Ticket informieren'
+      value: '{{ $labels.fqdn}}'
+    for: 3m
+    labels:
+      severity: critical
+      alert_scc: true
+  - alert: Power supply Fehler
+    expr: ciscoEnvMonSupplyState{alerting_required!='false'} == 0
+    annotations:
+      metric_name: ciscoEnvMonSupplyState%7Binstance='{{  $labels.instance  }}'%7D 
+      description: 'Power Supply fehler auf {{ $labels.fqdn}}'
+      scc_info: 'Bitte passenden Dienstleister anhand des Info Textes oben im Ticket informieren'
+      value: '{{ $labels.fqdn}}'
+    for: 3m
+    labels:
+      severity: critical
+      alert_scc: true
+  - alert: Power supply Fehler
+    expr: caemSupplyFailedComponent{alerting_required!='false'} == 2
+    annotations:
+      metric_name: caemSupplyFailedComponent%7Binstance='{{  $labels.instance  }}'%7D 
+      description: 'Power Supply fehler auf {{ $labels.fqdn}} \n Power supply component inputVoltage failure'
+      scc_info: 'Bitte passenden Dienstleister anhand des Info Textes oben im Ticket informieren'
+      value: '{{ $labels.fqdn}}'
+    for: 3m
+    labels:
+      severity: critical
+      alert_scc: true
+  - alert: Power supply Fehler
+    expr: caemSupplyFailedComponent{alerting_required!='false'} == 3
+    annotations:
+      metric_name: caemSupplyFailedComponent%7Binstance='{{  $labels.instance  }}'%7D 
+      description: 'Power Supply fehler auf {{ $labels.fqdn}} \n Power supply component dcOutputVoltage failure'
+      scc_info: 'Bitte passenden Dienstleister anhand des Info Textes oben im Ticket informieren'
+      value: '{{ $labels.fqdn}}'
+    for: 3m
+    labels:
+      severity: critical
+      alert_scc: true       
+  - alert: Power supply Fehler
+    expr: caemSupplyFailedComponent{alerting_required!='false'} == 4
+    annotations:
+      metric_name: caemSupplyFailedComponent%7Binstance='{{  $labels.instance  }}'%7D 
+      description: 'Power Supply fehler auf {{ $labels.fqdn}} \n Power supply component thermal failure'
+      scc_info: 'Bitte passenden Dienstleister anhand des Info Textes oben im Ticket informieren'
+      value: '{{ $labels.fqdn}}'
+    for: 3m
+    labels:
+      severity: critical
+      alert_scc: true       
+  - alert: Power supply Fehler
+    expr: caemSupplyFailedComponent{alerting_required!='false'} == 5
+    annotations:
+      metric_name: caemSupplyFailedComponent%7Binstance='{{  $labels.instance  }}'%7D 
+      description: 'Power Supply fehler auf {{ $labels.fqdn}} \n Power supply component multiple failure'
+      scc_info: 'Bitte passenden Dienstleister anhand des Info Textes oben im Ticket informieren'
+      value: '{{ $labels.fqdn}}'
+    for: 3m
+    labels:
+      severity: critical
+      alert_scc: true       
+  - alert: Power supply Fehler
+    expr: caemSupplyFailedComponent{alerting_required!='false'} == 6
+    annotations:
+      metric_name: caemSupplyFailedComponent%7Binstance='{{  $labels.instance  }}'%7D 
+      description: 'Power Supply fehler auf {{ $labels.fqdn}} \n Power supply component fan failure'
+      scc_info: 'Bitte passenden Dienstleister anhand des Info Textes oben im Ticket informieren'
+      value: '{{ $labels.fqdn}}'
+    for: 3m
+    labels:
+      severity: critical
+      alert_scc: true       
+  - alert: Power supply Fehler
+    expr: caemSupplyFailedComponent{alerting_required!='false'} == 7
+    annotations:
+      metric_name: caemSupplyFailedComponent%7Binstance='{{  $labels.instance  }}'%7D 
+      description: 'Power Supply fehler auf {{ $labels.fqdn}} \n Power supply component overvoltage failure'
+      scc_info: 'Bitte passenden Dienstleister anhand des Info Textes oben im Ticket informieren'
+      value: '{{ $labels.fqdn}}'
+    for: 3m
+    labels:
+      severity: critical
+      alert_scc: true       
+  - alert: Fan critical
+    expr: ciscoEnvMonFanState{alerting_required!='false'} == 3
+    annotations:
+      metric_name: ciscoEnvMonFanState%7Binstance='{{  $labels.instance  }}'%7D 
+      description: 'Fan Fehler auf {{ $labels.fqdn}}'
+      scc_info: 'Bitte passenden Dienstleister anhand des Info Textes oben im Ticket informieren'
+      value: '{{ $labels.fqdn}}'
+    for: 3m
+    labels:
+      severity: critical
+      alert_scc: true 
+  - alert: Fan critical
+    expr: ciscoEnvMonFanState{alerting_required!='false'} != 1
+    annotations:
+      metric_name: ciscoEnvMonFanState%7Binstance='{{  $labels.instance  }}'%7D 
+      description: 'Fan Fehler auf {{ $labels.fqdn}}'
+      scc_info: 'Bitte passenden Dienstleister anhand des Info Textes oben im Ticket informieren'
+      value: '{{ $value }}'
+    for: 3m
+    labels:
+      severity: critical
+      alert_scc: true 
+  - alert: freier Speicher ist unter 5%
+    expr: 100 * ciscoMemoryPoolFree{alerting_required!='false', mib='if_mib'} /  (ciscoMemoryPoolFree + ciscoMemoryPoolUsed) < 5
+    annotations:
+      metric_name: 100 * ciscoMemoryPoolFree%7Binstance='{{  $labels.instance  }}', mib='if_mib'%7D /  (ciscoMemoryPoolFree + ciscoMemoryPoolUsed)
+      description: '{{ $labels.fqdn}} memory pool unter 9%'
+      scc_info: 'Bitte passenden Dienstleister anhand des Info Textes oben im Ticket informieren'
+      value: '{{ $value }}'
+    for: 15m
+    labels:
+      severity: warning
+      alert_scc: true
+  - alert: Cisco Switchstack Statusänderung 
+    expr: changes(cswStackPortOperStatus{alerting_required!='false'}[5m]) == 2
+    annotations:
+      metric_name: changes(cswStackPortOperStatus%7Binstance='{{  $labels.instance  }}'%7D%5b5m%5d) 
+      description: 'Switch {{ $labels.fqdn}} Port {{ $labels.ifIndex }} Switchstack Statusänderung'
+      scc_info: 'Bitte passenden Dienstleister anhand des Info Textes oben im Ticket informieren. Bitte prüfen ob 1 Switch offline ist oder hinzugefügt wurde.'
+      value: '{{ $value }}'
+    labels:
+      severity: warning
+      alert_scc: true
+- name: snmp_exporter_fortigate
+  rules:
+  - alert: Fortigate check for active HA member
+    expr: sum by (fqdn,hostname) (fgVpnTunEntOutOctets) == 0
+    for: 5m
+    labels:
+      internal_alert: 'true'
+    annotations:
+      description: 'this alarm is only active on all standby fortigates. inhibation for all other vpn alerts will be activated'
+  - alert: HA - UnSynchronized
+    expr: fgHaStatsSyncStatus{alerting_required!='false',fqdn!~"fw-hof-reit-1og-1.infra.dvag.com|fw-mr-aff-1.infra.dvag.com|fw-mr-lg-1.infra.dvag.com|fw-mr-zlr-1.infra.dvag.com|fw-mr-vita-1.infra.dvag.com|fw-mr-bueck-1.infra.dvag.com|fw-ka-wgan-1.infra.dvag.com"} == 0
+    annotations:
+      metric_name: fgHaStatsSyncStatus%7Binstance='{{  $labels.instance  }}'%7D 
+      description: 'HA Status auf {{ $labels.fqdn}} UnSynchronized'
+      scc_info: 'Prüfen warum die Firewall geschwenkt hat, SCC Informieren und fragen ob alle Systeme wie gewohnt arbeiten. Mail an netzwerk@dvag.com verschicken mit Information das die Firewall geschwenkt hat, warum und der Rückmeldung des SCCs'
+      value: '{{ $labels.fqdn}}'
+    for: 3m
+    labels:
+      severity: critical
+      alert_scc: true 
+  - alert: HA - Disabled
+    expr: fgHaAutoSync{alerting_required!='false'} == 0
+    annotations:
+      metric_name: fgHaAutoSync%7Binstance='{{  $labels.instance  }}'%7D 
+      description: 'HA Status auf {{ $labels.fqdn}} Disabled'
+      scc_info: 'Prüfen warum die Firewall nicht HA fähig ist'
+      value: '{{ $labels.fqdn}}'
+    for: 3m
+    labels:
+      severity: critical
+      alert_scc: true
+  - alert: Fortigate HW Sensor Failure
+    expr: fgHwSensorEntAlarmStatus == 1
+    annotations:
+      metric_name: fgHwSensorEntAlarmStatus%7Binstance='{{  $labels.instance  }}'%7D 
+      description: 'HW Sensor mit ID {{ $labels.fgHwSensorEntIndex }} hat einen Fehler. Bitte direkt auf dem Gerät{{ $labels.fqdn }} prüfen.'
+      scc_info: 'Bitte direkt auf dem Gerät {{ $labels.fqdn }} prüfen.'
+      value: '{{ $labels.fqdn }}'
+    for: 10m
+    labels:
+      severity: critical
+      alert_scc: true 
+  - alert: Fortigate CPU Usage
+    expr: fgSysCpuUsage{alerting_required!='false'} > 95
+    annotations:
+      metric_name: fgSysCpuUsage%7Binstance='{{  $labels.instance  }}'%7D 
+      description: 'CPU Load auf {{ $labels.fqdn}} critical'
+      scc_info: 'Prüfen woher die CPU Last kommt, z.B. ist mehr Last auf den Interfaces, gibt es mehr Connections oder einen Prozess auf der Firewall der sehr viel CPU benötigt. SCC und Netzwerk per Mail Informieren'
+      value: '{{ $value }}'
+    for: 10m
+    labels:
+      severity: critical
+      alert_scc: true 
+  - alert: Fortigate Memory Usage
+    expr: fgSysMemUsage{alerting_required!='false'} > 75
+    annotations:
+      metric_name: fgSysMemUsage%7Binstance='{{  $labels.instance  }}'%7D 
+      description: 'Memory Load auf {{ $labels.fqdn}} critical'
+      scc_info: 'Memory usage on Fortinet is more than 80% during the last three checks'
+      value: '{{ $value }}'
+    for: 10m
+    labels:
+      severity: critical
+      alert_scc: true 
+  - alert: Fortigate Disk Usage
+    expr: fgSysDiskUsage{alerting_required!='false'} / fgSysDiskCapacity * 100 > 90
+    annotations:
+      metric_name: fgSysDiskUsage%7Binstance='{{  $labels.instance  }}'%7D / fgSysDiskCapacity * 100 
+      description: 'Disk Usage auf {{ $labels.fqdn}} höher als {{ $value }}'
+      scc_info: 'Disk usage on Fortinet is more than 90%'
+      value: '{{ $value }}'
+    for: 3m
+    labels:
+      severity: critical
+      alert_scc: true
+- name: snmp_exporter_pdu
+  rules:
+  - alert: PDU Temperatur zu hoch
+    expr: e3IpmSensorTemperatureCelsius{alerting_required!='false'} / 10 > 36
+    annotations:
+      metric_name: e3IpmSensorTemperatureCelsius%7Binstance='{{  $labels.instance  }}'%7D / 10 
+      description: 'Temperatur auf PDU {{ $labels.fqdn }} bei {{ $value }}.'
+      scc_info: 'Bitte RZ-Team informieren'
+      value: '{{ $value }}'
+    labels:
+      severity: critical
+      alert_scc: true
+  - alert: PDU Temperatur zu hoch
+    expr: e3IpmSensorTemperatureCelsius{alerting_required!='false'} / 10 > 36
+    annotations:
+      metric_name: e3IpmSensorTemperatureCelsius%7Binstance='{{  $labels.instance  }}'%7D / 10 
+      description: 'Temperatur auf PDU {{ $labels.fqdn }} bei {{ $value }}.'
+      scc_info: 'Bitte RZ-Team informieren'
+      value: '{{ $value }}'
+    labels:
+      severity: critical
+      alert_scc: true
+- name: snmp_exporter_temperatur_wien
+  rules:
+  - alert: Wien Temperatur Sensor erhöht
+    expr: snmp_comet_temperature > 40
+    annotations:
+      metric_name: snmp_comet_temperature%7Binstance='{{  $labels.instance  }}'%7D 
+      description: 'Temperatur Sensor auf {{ $labels.fqdn}} bei {{ $value }}'
+      scc_info: 'Temperatur Problem im Wien RZ. Bitte entweder Rainer Pistl-Syha (+43676884005700) oder wenn nicht erreichbar Daniel Herzog (+436769601152) anrufen.'
+      value: '{{ $value }}'
+    for: 10m
+    labels:
+      severity: critical
+      alert_scc: true
+- name: snmp_exporter_wdm_pandacom
+  rules:
+  - alert: WDM Pandacom FC Transceiver TX power event
+    annotations:
+      description: "Port { $labels.speedDuallineFCPortIndex}} auf {{ $labels.fqdn}} zu geringer Sendepegel."
+      scc_info: "Sendepegel auf DWDM Fiberchannel Kanal zu Gering. Bitte SAN Team informieren und Prüfen ob es im Fiberchannel bzw. Storagebereich Probleme gibt"
+      value: "{{ $value}}"
+    expr: speedDuallineFCPortXCVDMITxLowAlarm == 0
+    for: 15m
+    labels:
+      severity: critical
+      alert_scc: false
+  - alert: WDM Pandacom FC Transceiver temperature event
+    annotations:
+      description: "Port { $labels.speedDuallineFCPortIndex}} auf {{ $labels.fqdn}} zu geringe Temperatur."
+      scc_info: "Temperatur auf DWDM Fiberchannel Kanal zu Gering. Bitte SAN Team informieren und Prüfen ob es im Fiberchannel bzw. Storagebereich Probleme gibt"
+      value: "{{ $value}}"
+    expr: speedDuallineFCPortXCVTempHighAlarm == 0
+    for: 15m
+    labels:
+      severity: critical
+      alert_scc: false
+  - alert: WDM Pandacom 10G Transceiver RX power event
+    annotations:
+      description: "Port { $labels.speedDuallineFCPortIndex}} auf {{ $labels.fqdn}} zu geringer Empfangspegel."
+      scc_info: "Empfangspegel auf DWDM Netzwerk Kanal zu Gering. Bitte Netzwerk Team informieren und Prüfen ob es Probleme im Onlinesystem gibt"
+      value: "{{ $value}}"
+    expr: speedDualline10GPortXCVDMIRxPowerAlarm == 0
+    for: 15m
+    labels:
+      severity: critical
+      alert_scc: false
+  - alert: WDM Pandacom 10G Transceiver TX power event
+    annotations:
+      description: "Port { $labels.speedDuallineFCPortIndex}} auf {{ $labels.fqdn}} zu geringer Sendepegel."
+      scc_info: "Sendepegel auf DWDM Netzwerk Kanal zu Gering. Bitte Netzwerk Team informieren und Prüfen ob es Probleme im Onlinesystem gibt"
+      value: "{{ $value}}"
+    expr: speedDualline10GPortXCVDMITxLowAlarm == 0
+    for: 15m
+    labels:
+      severity: critical
+      alert_scc: false
+  - alert: WDM Pandacom 10G Transceiver temperature event
+    annotations:
+      description: "Port { $labels.speedDuallineFCPortIndex}} auf {{ $labels.fqdn}} zu geringe Temperatur."
+      scc_info: "Temperatur auf DWDM Netzwerk Kanal zu Gering. Bitte Netzwerk Team informieren und Prüfen ob es Probleme im Onlinesystem gibt"
+      value: "{{ $value}}"
+    expr: speedDualline10GPortXCVTempHighAlarm == 0
+    for: 15m
+    labels:
+      severity: critical
+      alert_scc: false

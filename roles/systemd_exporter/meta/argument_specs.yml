@@ -1,0 +1,97 @@
+---
+argument_specs:
+  main:
+    short_description: Entry point for the systemd_exporter role.
+    description:
+    - Validate variables for the `systemd_exporter` role.
+    options:
+      proxy_env:
+        description:
+        - Controls `proxy_env` for the `systemd_exporter` role.
+        required: false
+        type: dict
+      systemd_exporter_version:
+        description:
+        - Controls `systemd_exporter_version` for the `systemd_exporter` role.
+        required: false
+        type: str
+      systemd_exporter_web_listen_address:
+        description:
+        - Controls `systemd_exporter_web_listen_address` for the `systemd_exporter` role.
+        required: false
+        type: str
+      systemd_exporter_web_listen_port:
+        description:
+        - Controls `systemd_exporter_web_listen_port` for the `systemd_exporter` role.
+        required: false
+        type: int
+      systemd_exporter_log_level:
+        description:
+        - Controls `systemd_exporter_log_level` for the `systemd_exporter` role.
+        required: false
+        type: str
+      systemd_exporter_log_format:
+        description:
+        - Controls `systemd_exporter_log_format` for the `systemd_exporter` role.
+        required: false
+        type: str
+      systemd_exporter_binary_install_dir:
+        description:
+        - Controls `systemd_exporter_binary_install_dir` for the `systemd_exporter` role.
+        required: false
+        type: str
+      systemd_exporter_create_consul_agent_service:
+        description:
+        - Controls `systemd_exporter_create_consul_agent_service` for the `systemd_exporter` role.
+        required: false
+        type: bool
+      systemd_exporter_system_user:
+        description:
+        - Controls `systemd_exporter_system_user` for the `systemd_exporter` role.
+        required: false
+        type: str
+      systemd_exporter_system_group:
+        description:
+        - Controls `systemd_exporter_system_group` for the `systemd_exporter` role.
+        required: false
+        type: str
+      systemd_exporter_user_additional_groups:
+        description:
+        - Controls `systemd_exporter_user_additional_groups` for the `systemd_exporter` role.
+        required: false
+        type: str
+      systemd_exporter_collector_private:
+        description:
+        - Controls `systemd_exporter_collector_private` for the `systemd_exporter` role.
+        required: false
+        type: bool
+      systemd_exporter_ccollector_user:
+        description:
+        - Controls `systemd_exporter_ccollector_user` for the `systemd_exporter` role.
+        required: false
+        type: bool
+      systemd_exporter_ccollector_enable_restart_count:
+        description:
+        - Controls `systemd_exporter_ccollector_enable_restart_count` for the `systemd_exporter` role.
+        required: false
+        type: bool
+      systemd_exporter_ccollector_enable_file_descriptor_size:
+        description:
+        - Controls `systemd_exporter_ccollector_enable_file_descriptor_size` for the `systemd_exporter` role.
+        required: false
+        type: bool
+      systemd_exporter_ccollector_enable_ip_accounting:
+        description:
+        - Controls `systemd_exporter_ccollector_enable_ip_accounting` for the `systemd_exporter` role.
+        required: false
+        type: bool
+      systemd_exporter_collector_unit_whitelist:
+        description:
+        - Controls `systemd_exporter_collector_unit_whitelist` for the `systemd_exporter` role.
+        required: false
+        type: str
+      systemd_exporter_collector_unit_blacklist:
+        description:
+        - Controls `systemd_exporter_collector_unit_blacklist` for the `systemd_exporter` role.
+        required: false
+        type: str

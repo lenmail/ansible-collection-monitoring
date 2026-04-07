@@ -1,0 +1,22 @@
+---
+argument_specs:
+  main:
+    short_description: Entry point for the unbound_exporter role.
+    description:
+    - Validate variables for the `unbound_exporter` role.
+    options:
+      proxy_env:
+        description:
+        - Controls `proxy_env` for the `unbound_exporter` role.
+        required: false
+        type: dict
+      unbound_exporter_log_level:
+        description:
+        - Controls `unbound_exporter_log_level` for the `unbound_exporter` role.
+        required: false
+        type: str
+      unbound_exporter_config_flags_extra:
+        description:
+        - Controls `unbound_exporter_config_flags_extra` for the `unbound_exporter` role.
+        required: false
+        type: dict

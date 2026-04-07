@@ -1,0 +1,104 @@
+groups:
+- name: blackbox_exporter_icmp-ping
+  rules:
+  - alert: Ping failed on Pannonia Core FW
+    expr: probe_success{hostname='10.61.255.1'} == 0 
+    for: 10m
+    labels:
+      severity: critical
+      alert_scc: true
+    annotations:
+      metric_name: probe_success%7Binstance='{{  $labels.instance  }}', hostname='10.61.255.1'%7D
+      summary: 'Ping failed on host (instance {{ $labels.fqdn }})'
+      scc_info: 'Die FW am Standort Pannonia ist ausgefallen. Dadurch sind auch alle anderen Verbindungen ausgefallen, um eine Ticket Flut zu vermeiden werden alle anderen Alarme am Standort unterdrückt, dieses Ticket bitte sofort eskalieren'
+      value: '{{ $value}}'
+  - alert: Ping failed on BN SNMP device
+    expr: probe_success{alerting_required!='false', job='icmp-ping-network',managedby='BN',hostname!~"vpn.+-fu--.+"} == 0 or up{alerting_required!='false', job='icmp-ping-network',managedby='BN',hostname!~"vpn.+-fu--.+"} == 0
+    for: 3m
+    labels:
+      severity: critical
+      alert_scc: true
+    annotations:
+      metric_name: probe_success%7Binstance='{{  $labels.instance  }}'%7D or up%7Binstance='{{  $labels.instance  }}'%7D 
+      summary: 'Ping failed on BN managed host (instance {{ $labels.fqdn }})'
+      value: '{{ $value}}'
+  - alert: Ping failed on LTE-router
+    expr: probe_success{alerting_required!='false', job='icmp-ping-network',managedby='BN', hostname=~"vpn.+-fu--.+"} == 0 or up{alerting_required!='false', job='icmp-ping-network',managedby='BN', hostname=~"vpn.+-fu--.+"} == 0
+    for: 4h
+    labels:
+      severity: critical
+      alert_scc: true
+    annotations:
+      metric_name: probe_success%7Binstance='{{  $labels.instance  }}'%7D or up%7Binstance='{{  $labels.instance  }}'%7D 
+      summary: 'Ping failed on BN managed host (instance {{ $labels.fqdn }})'
+      value: '{{ $value}}'
+#  - alert: Ping failed on VPN
+#    expr: probe_success{alerting_required!='false', job='icmp-ping-network',managedby='BN',category='VPN'} == 0 or up{job='icmp-ping',managedby='BN',category='VPN'} == 0
+#    for: 12h
+#    labels:
+#      severity: critical
+#      alert_scc: true
+#    annotations:
+#      metric_name: probe_success%7Binstance='{{  $labels.instance  }}'%7D or up%7Binstance='{{  $labels.instance  }}'%7D 
+#      summary: 'Ping failed on BN managed host (instance {{ $labels.fqdn }})'
+#      value: '{{ $value}}'
+  - alert: Ping failed on JT SNMP device
+    expr: probe_success{alerting_required!='false', job='icmp-ping-network',managedby='JT'} == 0 or up{job='icmp-ping',managedby='JT'} == 0
+    for: 15m
+    labels:
+      severity: critical
+      alert_scc: true
+    annotations:
+      metric_name: probe_success%7Binstance='{{  $labels.instance  }}'%7D or up%7Binstance='{{  $labels.instance  }}'%7D 
+      summary: 'Ping failed on JT managed host (instance {{ $labels.fqdn }})'
+      value: '{{ $value}}'
+  - alert: Ping failed on Dell IDRAC device
+    expr: probe_success{product='Dell Idracs'} == 0
+    for: 13m
+    labels:
+      severity: critical
+      alert_scc: true
+    annotations:
+      metric_name: probe_success%7Binstance='{{  $labels.instance  }}'%7D 
+      summary: 'Ping failed on host (instance {{ $labels.fqdn }})'
+      value: '{{ $value}}'
+  - alert: Ping failed
+    expr: probe_success{alerting_required='yes',job=~'icmp-ping|icmp-ping-hardware',managedby!='Treaton',snmpCommunity!='DVAG'} == 0 or up{alerting_required='yes',job='icmp-ping|icmp-ping-hardware',managedby!='Treaton',snmpCommunity!='DVAG',product!='Netscaler'} == 0
+    for: 3m
+    labels:
+      severity: critical
+      alert_scc: false
+    annotations:
+      metric_name: probe_success%7Binstance='{{  $labels.instance  }}', alerting_required='yes',job=~'icmp-ping|icmp-ping-hardware',managedby!='Treaton',snmpCommunity!='DVAG'} or up{instance='{{  $labels.instance  }}', alerting_required='yes',job=~'icmp-ping|icmp-ping-hardware',managedby!='Treaton',snmpCommunity!='DVAG',product!='Netscaler'%7D 
+      summary: 'Ping failed on host (instance {{ $labels.hostname }})'
+      value: '{{ $value}}'
+  - alert: Ping Treaton ESXi
+    expr: probe_success{alerting_required='yes',managedby='Treaton',product='ESXi',job='icmp-ping'} == 0 or up{alerting_required='yes', managedby='Treaton',product='ESXi',job='icmp-ping'} == 0
+    for: 3m
+    labels:
+      alert_scc: true
+    annotations:
+      metric_name: probe_success%7Binstance='{{  $labels.instance  }}', alerting_required='yes',managedby='Treaton',product='ESXi',job='icmp-ping'} or up{instance='{{  $labels.instance  }}', alerting_required='yes',job='icmp-ping',managedby='Treaton',product='ESXi',job='icmp-ping'%7D 
+      summary: 'Ping failed on host (instance {{ $labels.hostname }})'
+      value: '{{ $value}}'
+      scc_info: 'Treaton managed System Bereitschaft ist zwischen 17:00-08:00 Mo-Fr & 00:00-23:59 an Sa-So & Feiertagen zu informieren unter: \n Rufbereitschaft Virtualisierung:  069-34871946'
+  - alert: Ping Treaton
+    expr: probe_success{alerting_required='yes',managedby='Treaton',product!='ESXi', job='icmp-ping'} == 0 or up{alerting_required='yes',managedby='Treaton',product!='ESXi', job='icmp-ping'} == 0
+    for: 3m
+    labels:
+      alert_scc: true
+    annotations:
+      metric_name: probe_success%7Binstance='{{  $labels.instance  }}', alerting_required='yes',managedby='Treaton',product!='ESXi',job='icmp-ping'} or up{instance='{{  $labels.instance  }}', alerting_required='yes',managedby='Treaton',product!='ESXi',job='icmp-ping'%7D 
+      summary: 'Ping failed on host (instance {{ $labels.hostname }})'
+      value: '{{ $value}}'
+      scc_info: 'Treaton managed System Bereitschaft ist zwischen 17:00-08:00 Mo-Fr & 00:00-23:59 an Sa-So & Feiertagen zu informieren unter: \n Windows Rufbereitschaft: 069-34871947'
+  - alert: Ping Slow on SNMP device
+    expr: avg_over_time(probe_icmp_duration_seconds{job='icmp-ping-network',managedby!='Treaton'}[6m]) > 0.32
+    for: 15m
+    labels:
+      severity: standard
+      alert_scc: true
+    annotations:
+      metric_name: avg_over_time(probe_icmp_duration_seconds%7Binstance='{{  $labels.instance  }}', job='icmp-ping-network'%7D%5b6m%5d)
+      summary: 'Pingslow on host (instance {{ $labels.fqdn }})'
+      value: '{{ $value}}'      

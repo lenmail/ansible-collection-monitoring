@@ -1,0 +1,23 @@
+---
+groups:
+- name: alertmanager
+  rules:
+  - alert: "Alertmanager Configuration Reload"
+    expr: alertmanager_config_last_reload_successful{alerting_required!='false'} != 1
+    annotations:
+      metric_name: alertmanager_config_last_reload_successful%7Binstance='{{  $labels.instance  }}'%7D
+      value: '{{ $value }}'
+      description: 'AlertManager configuration reload error'
+      summary: AlertManager configuration reload (instance {{ $labels.instance }})
+    for: 3m
+    labels:
+      severity: critical
+  - alert: "Alertmanager Notifications Failing"
+    expr: avg (rate(alertmanager_notifications_failed_total{alerting_required!='false',integration="webhook"}[2m])) > 0
+    for: 15m
+    labels:
+      severity: critical
+    annotations:
+      metric_name: avg (rate(alertmanager_notifications_failed_total%7binstance='{{  $labels.instance  }}'%7b%5b2m%5d))
+      value: '{{ $value }}'
+      description: 'Alertmanager webhook notification error'

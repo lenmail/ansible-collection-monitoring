@@ -1,0 +1,14 @@
+groups:
+- name: consul template
+  rules:
+  - alert: Consul_Template_not_running
+    expr: node_systemd_unit_state{alerting_required!='false',name=~'consul-template.service|prometheus.service',state='active',hostname!='prom-test01.1.mon.dvag.net'} == 0
+    for: 3m
+    labels:
+      severity: critical
+      alert_scc: true
+    annotations:
+      metric_name: node_systemd_unit_state%7Binstance='{{  $labels.instance  }}',name=%7E'consul-template.service%7Cprometheus.service',state='active',hostname!='prom-test01.1.mon.dvag.net'%7D 
+      value: '{{ $value }}'
+      summary: 'Consul Template not runnung on host (instance {{ $labels.hostname }}:{{ $labels.port }})'
+      scc_info: 'Ticket bei Team MON eröffnen'

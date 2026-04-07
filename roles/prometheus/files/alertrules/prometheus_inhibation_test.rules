@@ -1,0 +1,50 @@
+groups:
+- name: prometheus_inhibation
+  rules:
+  - alert: Prometheus internal exporter-test down
+    expr: up{alerting_required!='false',instance=~'exporter-test01.1.mon.dvag.net:911[5,6]'} == 0
+    labels:
+      severity: critical
+      alert_scc: true
+    annotations:
+      metric_name: up%7Binstance='{{  $labels.instance  }}'%7D 
+      value: '{{ $value }}'
+      summary: 'Prometheus internal exporter-test down'
+      description: 'Monitoring internal exporter down. Es können keine SNMP/Ping Checks für Netzwerkgeräte mehr ausgeführt werden.'
+      scc_info: 'Bitte ASAP jemanden vom Monitoring Team per Handy kontaktieren. Ein SNMP/Blackbox Exporter ist down, es können keine Checks mehr ausgeführt werden.'
+
+  - alert: Prometheus internal exporter-test down
+    expr: up{alerting_required!='false',instance=~'exporter-test02.1.mon.dvag.net:911[5,6]'} == 0
+    labels:
+      severity: critical
+      alert_scc: true
+    annotations:
+      metric_name: up%7Binstance='{{  $labels.instance  }}'%7D 
+      value: '{{ $value }}'
+      summary: 'Prometheus internal exporter-test down'
+      description: 'Monitoring internal exporter down. Es können keine SNMP/Ping Checks für Netzwerkgeräte mehr ausgeführt werden.'
+      scc_info: 'Bitte ASAP jemanden vom Monitoring Team per Handy kontaktieren. Ein SNMP/Blackbox Exporter ist down, es können keine Checks mehr ausgeführt werden.'
+
+  - alert: Prometheus internal exporter-ext-test down
+    expr: up{alerting_required!='false',instance=~'exporter-ext-test01.1.mon.dvag.net:9115'} == 0
+    labels:
+      severity: critical
+      alert_scc: true
+    annotations:
+      metric_name: up%7Binstance='{{  $labels.instance  }}'%7D 
+      value: '{{ $value }}'
+      summary: 'Prometheus internal exporter-ext-test down'
+      description: 'Monitoring internal exporter down. Es können keine Web/Port Checks mehr ausgeführt werden.'
+      scc_info: 'Bitte ASAP jemanden vom Monitoring Team per Handy kontaktieren. Ein Blackbox Exporter ist down, es können keine Web Checks mehr ausgeführt werden.'
+
+  - alert: Prometheus internal exporter-ext-test down
+    expr: up{alerting_required!='false',instance=~'exporter-ext-test02.1.mon.dvag.net:9115'} == 0
+    labels:
+      severity: critical
+      alert_scc: true
+    annotations:
+      metric_name: up%7Binstance='{{  $labels.instance  }}'%7D 
+      value: '{{ $value }}'
+      summary: 'Prometheus internal exporter-ext-test down'
+      description: 'Monitoring internal exporter down. Es können keine Web/Port Checks mehr ausgeführt werden.'
+      scc_info: 'Bitte ASAP jemanden vom Monitoring Team per Handy kontaktieren. Ein Blackbox Exporter ist down, es können keine Web Checks mehr ausgeführt werden.'

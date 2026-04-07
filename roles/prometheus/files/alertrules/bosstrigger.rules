@@ -1,0 +1,45 @@
+groups:
+- name: bosstrigger
+  rules:
+  - alert: bosstrigger_linux
+    annotations:
+      description: "CPU Load and Disk write I/O suspectful high"
+      summary: CPU Load, and Disk write I/O suspectful high (instance {{ $labels.instance }})
+    expr: sum by (instance,environment,job,product,severity,type) (irate(node_disk_written_bytes_total{instance!="vvrootveeam01.vilavita.intra:9182"}[5m])) / 1024 / 1024 > 120 and on(instance,job)
+          100 - (avg by(instance,environment,job,product,severity,type) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 95
+    for: 15m
+    labels:
+      severity: info
+      scc: no
+  - alert: bosstrigger_windows
+    annotations:
+      description: "CPU Load and Disk write I/O suspectful high"
+      summary: CPU Load, and Disk write I/O suspectful high (instance {{ $labels.instance }})
+    expr: 100 - (avg by (instance,environment,job,product,severity,type) (rate(windows_cpu_time_total{mode="idle",instance!="vvrootveeam01.vilavita.intra:9182"}[2m]))* 100) > 90 and on(instance,job)
+          irate(windows_logical_disk_write_bytes_total[5m]) / 1024 / 1024 > 120
+    for: 15m
+    labels:
+      severity: info
+      scc: no
+  - alert: bosstrigger_linux_scc
+    annotations:
+      description: "CPU Load and Disk write I/O suspectful high on at least 3 Hosts"
+      summary: "CPU Load, and Disk write I/O suspectful high"
+      scc_info: "Prometheus meldet mindestens 3 aktive Boss Trigger. Bitte überprüfen unter: https://prometheus.mon.dvag.net/graph?g0.expr=ALERTS{alertname%3D~%22bosstrigger.%2B%22}&g0.tab=1&g0.stacked=0&g0.range_input=1h \n Troubleshooting über Grafana Dashboard: https://grafana.mon.dvag.net/d/0L0vn4Zgz/prometheus-node-exporter?orgId=1"
+    expr: sum (ALERTS{alertname="bosstrigger_linux"}) > 2
+    labels:
+      severity: critical
+      environment: Produktion
+      hostname: na
+      scc: yes
+  - alert: bosstrigger_windows_scc
+    annotations:
+      description: "CPU Load and Disk write I/O suspectful high on at least 3 Hosts"
+      summary: "CPU Load, and Disk write I/O suspectful high "
+      scc_info: "Prometheus meldet mindestens 3 aktive Boss Trigger. Bitte überprüfen unter: https://prometheus.mon.dvag.net/graph?g0.expr=ALERTS{alertname%3D~%22bosstrigger.%2B%22}&g0.tab=1&g0.stacked=0&g0.range_input=1h \n Troubleshooting über Grafana Dashboard: https://grafana.mon.dvag.net/d/0L0vn4Zgz/prometheus-node-exporter?orgId=1"
+    expr: sum (ALERTS{alertname="bosstrigger_windows"}) > 2
+    labels:
+      severity: critical
+      environment: Produktion
+      hostname: na
+      scc: yes

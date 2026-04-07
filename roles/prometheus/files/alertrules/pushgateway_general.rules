@@ -1,0 +1,13 @@
+groups:
+- name: pushgateway
+  rules:
+  - alert: Pushgateway Inconsistent Metrics
+    expr: rate(pushgateway_http_requests_total{code=~'(4\\d\\d|5\\d\\d)',handler='push'}[2m]) > 0
+    for: 15m
+    labels:
+      severity: critical
+      alert_scc: false
+    annotations:
+      metric_name: rate(pushgateway_http_requests_total%7Binstance=%27{{  $labels.instance  }}%27)
+      value: '{{ $value }}'
+      summary: 'Someone is continuously trying to push inconsistent metrics to the Pushgateway'

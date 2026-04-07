@@ -1,0 +1,36 @@
+groups:
+- name: squid_exporter
+  rules:
+  - alert: SquidExporterTooHighErrorRate
+    expr: 100 * (squid_client_http_errors_total{alerting_required!='false'} / squid_client_http_requests_total) > 40
+    for: 3m
+    labels:
+      severity: critical
+      alert_scc: false
+    annotations:
+      metric_name: 100 * (squid_client_http_errors_total{instance='{{  $labels.instance  }}'} / squid_client_http_requests_total) 
+      value: '{{ $value }}'
+      summary: 'Squid Exporter on Host (instance {{ $labels.instance }}) too high error rate'
+      description: 'Too high error rate'
+  - alert: SquidUp
+    expr: squid_up{alerting_required!='false'} == 0
+    for: 3m
+    labels:
+      severity: critical
+      alert_scc: true
+    annotations:
+      metric_name: squid_up%7Binstance='{{  $labels.instance  }}'%7D
+      value: '{{ $value }}'
+      summary: 'Squid Exporter on Host (instance {{ $labels.instance }}) is down'
+      scc_info: 'Bitte Team Monitoring informieren. \n Eskalationsdokument: \n https://projektportal.dvag.com/confluence/pages/viewpage.action?pageId=352233934&src=contextnavpagetreemode'
+  - alert: Squid Error Rate
+    expr: squid_client_http_errors_total{alerting_required!='false',hostname!~'gwout.+.3.id.dvag.net'} / squid_client_http_requests_total * 100 > 30
+    for: 3m
+    labels:
+      severity: standard
+      alert_scc: false
+    annotations:
+      metric_name: squid_client_http_errors_total%7Binstance='{{  $labels.instance  }}'%7D / squid_client_http_requests_total * 100 
+      value: '{{ $value }}'
+      summary: 'Squid Error Rate to high on Host (instance {{ $labels.instance }})'
+      scc_info: 'Bitte Team Monitoring informieren. \n Eskalationsdokument: \n https://projektportal.dvag.com/confluence/pages/viewpage.action?pageId=352233934&src=contextnavpagetreemode'

@@ -1,0 +1,123 @@
+groups:
+- name: node_exporter
+  rules:
+  - alert: Prometheus Target Missing Node Exporter
+    expr: up{alerting_required!='false',job='node-exporter'} == 0
+    for: 3m
+    labels:
+      severity: critical
+      alert_scc: true
+    annotations:
+      metric_name: up%7Binstance='{{  $labels.instance  }}'%7D
+      value: '{{ $value }}'
+      summary: 'Prometheus target missing Node Exporter (Linux Server)(instance {{ $labels.instance }})'
+      scc_info: 'Node Exporter auf Host {{ $labels.instance }} nicht mehr erreichbar. Bitte überprüfen, ob das System generell noch erreichbar ist. Falls ja mit systemctl status node_exporter den Status des Dienstes überprüfen.'
+  - alert: JobRestarting
+    annotations:
+      metric_name: squid_client_http_errors_total / squid_client_http_requests_total%7D * 100 
+      value: '{{ $value }}'
+      description: 'Dienst auf dem Host haengt in einer restart Loop.'
+    expr: avg without(instance)(changes(process_start_time_seconds{job='test-node_exporter'}[1h])) > 3 
+    for: 3m
+    labels:
+      severity: critical
+      alert_scc: false
+  - alert: OutOfMemory
+    annotations:
+      metric_name: avg without(instance)(changes(process_start_time_seconds{job='test-node_exporter'}[1h]))
+      value: '{{ $value }}'
+      description: 'Node memory is filling up (< 5% left)\n VALUE = {{ $value }}'
+      summary: Out of memory (instance {{ $labels.instance }})
+    expr: node_memory_MemAvailable_bytes{hostname!~'shadowmailarc2[0,1].4.mail.dvag.net'} / node_memory_MemTotal_bytes{hostname!~'shadowmailarc2[0,1].4.mail.dvag.net'} * 100 < 5
+    for: 120m
+    labels:
+      severity: standard
+      alert_scc: false
+  - alert: OutOfDiskSpace
+    annotations:
+      metric_name: node_memory_MemAvailable_bytes%7Bhostname!~'shadowmailarc2[0,1].4.mail.dvag.net'} / node_memory_MemTotal_bytes{hostname!~'shadowmailarc2[0,1].4.mail.dvag.net'%7D * 100
+      value: '{{ $value }}'
+      description: 'Disk is almost full (< 10% left)\n VALUE = {{ $value }}'
+      summary: Out of disk space (instance {{ $labels.instance }})
+    expr: node_filesystem_free_bytes{mountpoint!~'^(/run/.*|$|/var/lib/.*|$)', fstype!~'(nfs4|squashfs|fuse.*)',hostname!~'zbxbackup01.1.mgmt.dvag.net|mailarc(19|20).4.mail.dvag.net|shadowmailarc20.4.mail.dvag.net'} / node_filesystem_size_bytes{mountpoint!~'^(/run/.*|$|/var/lib/.*|$)', fstype!~'(nfs4|squashfs|fuse.*)'} * 100 < 10
+    for: 10m
+    labels:
+      severity: standard
+      alert_scc: false
+  - alert: OutOfDiskSpacemailarcs
+    annotations:
+      metric_name: node_filesystem_free_bytes%7Bmountpoint!~'^(/run/.*|$|/var/lib/.*|$)', fstype!~'(nfs4|squashfs|fuse.*)',hostname!~'zbxbackup01.1.mgmt.dvag.net|mailarc(19|20).4.mail.dvag.net|shadowmailarc20.4.mail.dvag.net'} / node_filesystem_size_bytes{mountpoint!~'^(/run/.*|$|/var/lib/.*|$)', fstype!~'(nfs4|squashfs|fuse.*)'%7D * 100 
+      value: '{{ $value }}'
+      description: 'Disk is almost full (< 10% left)\n VALUE = {{ $value }}'
+      summary: Out of disk space (instance {{ $labels.instance }})
+# Umrechung in TB. Alarmierung unter 1 TB free Space MON-3480
+    expr: node_filesystem_free_bytes{mountpoint='/var/mailfs',hostname=~'mailarc(19|20).4.mail.dvag.net|shadowmailarc20.4.mail.dvag.net'} / 1024 / 1024 / 1024 / 1024  < 1
+    for: 10m
+    labels:
+      severity: standard
+      alert_scc: false
+  - alert: HighCpuLoad
+    annotations:
+      metric_name: node_filesystem_free_bytes%7Bmountpoint='/var/mailfs',hostname=~'mailarc(19|20).4.mail.dvag.net|shadowmailarc20.4.mail.dvag.net'%7D / 1024 / 1024 / 1024 / 1024 
+      value: '{{ $value }}'
+      description: 'CPU load is > 90%\n VALUE = {{ $value }}'
+      summary: High CPU load (instance {{ $labels.instance }})
+    expr: 100 - (avg by (instance) (rate(node_cpu_seconds_total{mode='idle'}[5m])) * 100) > 95
+    for: 120m
+    labels:
+      severity: standard
+      scc: no
+  - alert: Mdatp SystemdServiceCrashed
+    annotations:
+      metric_name: 100 - (avg by (instance) (rate(node_cpu_seconds_total{mode='idle'}[5m])) * 100) 
+      value: '{{ $value }}'
+      description: 'SystemD service crashed'
+      summary: SystemD service crashed (instance {{ $labels.instance }})
+    expr: node_systemd_unit_state{name='mdatp.service',state=~'failed|inactive',type!='lxc'} == 1
+    for: 3m
+    labels:
+      severity: standard
+      alert_scc: false
+  - alert: CriticalCPULoad
+    annotations:
+      metric_name: node_systemd_unit_state%7Bname='mdatp.service',state=~'failed|inactive',type!='lxc'%7D 
+      value: '{{ $value }}'
+      description: '{{ $labels.instance }} of job {{ $labels.job }} has Critical CPU load for more than 10 minutes.'
+      summary: Instance {{ $labels.instance }} - Critical CPU load
+    expr: 100 - (avg by (instance) (irate(node_cpu_seconds_total{job='node',mode='idle'}[5m])) * 100) > 96
+    for: 120m
+    labels:
+      severity: critical
+      alert_scc: false
+  - alert: Node Exporter stopped
+    expr: node_systemd_unit_state{name="jiralert.service", state="inactive",type="simple"} == 1
+    annotations:
+      metric_name: node_systemd_unit_state%7Binstance='{{  $labels.instance  }}', name='{{ $labels.name }}', state="active"%7D
+      description: 'SystemD service crashed'
+      summary: SystemD service crashed (instance {{ $labels.instance }})
+      value: '{{ $value }} on {{ $labels.instance }}'
+      scc_info: 'Bitte auf dem entsprechenden Host {{ $labels.hostname }} folgenden Befehl ausführen und überprüfen, ob der Fehler weiterhin besteht: 1) ssh {{ $labels.hostname }}\n 2) sudo systemctl reset-failed. \n 3)Überprüfen mit sudo systemctl status {{ $labels.name }}\n 4) Falls der Fehler weiterhin besteht bitte den Verantwortlichen informieren.'    
+    labels:
+      severity: critical
+      alert_scc: true
+  - alert: RebootRequired
+    annotations:
+      metric_name: 100 - (avg by (instance) (irate(node_cpu_seconds_total{job='node',mode='idle'}[5m])) * 100) 
+      value: '{{ $value }}'
+      description: '{{ $labels.instance }} requires a reboot.'
+      summary: Instance {{ $labels.instance }} - reboot required
+    expr: node_reboot_required > 0
+    labels:
+      severity: standard
+      alert_scc: false
+  - alert: ClockSkewDetected
+    annotations:
+      metric_name: node_reboot_required
+      value: '{{ $value }}'
+      description: 'Clock skew detected on {{ $labels.instance }}. Ensure NTP is configured correctly on this host.'
+      summary: Instance {{ $labels.instance }} - Clock skew detected
+    expr: abs(node_timex_offset_seconds) * 1000 > 30
+    for: 2m
+    labels:
+      severity: standard
+      alert_scc: false

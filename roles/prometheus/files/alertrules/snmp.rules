@@ -1,0 +1,9 @@
+  - alert: Interface Down
+    annotations:
+      description: "Interface down {{ $labels.fqdn}} Fehler. \n Fehlermeldung des Fans: Fan state warning"
+      scc_info: "Bitte Netzwerker informieren"
+      value: "{{ $labels.fqdn}}"
+    expr: ifOperStatus{ifAlias=~"^(sw.+|rt.+|wlc.+|fw.+|fex.+|wan.+|monitor.+|mon.+|fb.+)"}  == 2 and ifAdminStatus  == 1
+    labels:
+      severity: critical
+      alert_scc: false

@@ -1,0 +1,77 @@
+---
+argument_specs:
+  main:
+    short_description: Entry point for the victoriametrics role.
+    description:
+    - Validate variables for the `victoriametrics` role.
+    options:
+      proxy_env:
+        description:
+        - Controls `proxy_env` for the `victoriametrics` role.
+        required: false
+        type: dict
+      victoriametrics_version:
+        description:
+        - Controls `victoriametrics_version` for the `victoriametrics` role.
+        required: false
+        type: str
+      victoriametrics_web_listen_address:
+        description:
+        - Controls `victoriametrics_web_listen_address` for the `victoriametrics` role.
+        required: false
+        type: str
+      victoriametrics_web_listen_port:
+        description:
+        - Controls `victoriametrics_web_listen_port` for the `victoriametrics` role.
+        required: false
+        type: int
+      victoriametrics_binary_install_dir:
+        description:
+        - Controls `victoriametrics_binary_install_dir` for the `victoriametrics` role.
+        required: false
+        type: str
+      victoriametrics_system_user:
+        description:
+        - Controls `victoriametrics_system_user` for the `victoriametrics` role.
+        required: false
+        type: str
+      victoriametrics_system_group:
+        description:
+        - Controls `victoriametrics_system_group` for the `victoriametrics` role.
+        required: false
+        type: str
+      victoriametrics_data_dir:
+        description:
+        - Controls `victoriametrics_data_dir` for the `victoriametrics` role.
+        required: false
+        type: str
+      victoriametrics_config_dir:
+        description:
+        - Controls `victoriametrics_config_dir` for the `victoriametrics` role.
+        required: false
+        type: str
+      victoriametrics_log_level:
+        description:
+        - Controls `victoriametrics_log_level` for the `victoriametrics` role.
+        required: false
+        type: str
+      victoriametrics_log_format:
+        description:
+        - Controls `victoriametrics_log_format` for the `victoriametrics` role.
+        required: false
+        type: str
+      victoriametrics_prometheus_config:
+        description:
+        - Controls `victoriametrics_prometheus_config` for the `victoriametrics` role.
+        required: false
+        type: dict
+      victoriametrics_limit_nofile:
+        description:
+        - Controls `victoriametrics_limit_nofile` for the `victoriametrics` role.
+        required: false
+        type: int
+      victoriametrics_config:
+        description:
+        - Controls `victoriametrics_config` for the `victoriametrics` role.
+        required: false
+        type: dict

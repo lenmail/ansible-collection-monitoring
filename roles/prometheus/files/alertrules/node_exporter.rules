@@ -1,0 +1,122 @@
+---
+groups:
+- name: node_exporter
+  rules:
+  - alert: Prometheus Target Missing Node Exporter
+    expr: up{alerting_required!='false',job='node-exporter'} == 0
+    for: 3m
+    labels:
+      severity: critical
+    annotations:
+      metric_name: up%7Binstance='{{  $labels.instance  }}'%7D
+      value: '{{ $value }}'
+      summary: 'Prometheus target missing Node-Exporter (Linux Server) on {{ $labels.instance }}'
+      scc_info: 'Cant scrape Node-Exporter on host {{ $labels.instance }}'
+  - alert: Network Error
+    expr: rate(node_network_receive_errs_total{alerting_required!='false'}[2m]) / rate(node_network_receive_packets_total[2m]) > 0.02
+    annotations:
+      metric_name: rate(node_network_receive_errs_total%7Binstance='{{  $labels.instance  }}'%7D%5b2m%5d) / rate(node_network_receive_packets_total%5b2m%5d)
+      description: 'Network error on interface device {{ $labels.device }}'
+      summary: Error Rate higher than 1% of total traffic
+      value: '{{ $value }}'
+    for: 5m
+    labels:
+      severity: critical
+  - alert: Out of memory
+    expr: node_memory_MemAvailable_bytes{alerting_required!='false'} / node_memory_MemTotal_bytes * 100 < 5
+    annotations:
+      metric_name: node_memory_MemAvailable_bytes%7Binstance='{{  $labels.instance  }}' %2f node_memory_MemTotal_bytes * 100
+      description: 'Node memory is filling up (< 5% left)'
+      summary: Out of Memory on {{ $labels.instance }}
+      value: '{{ $value }}'
+    for: 15m
+    labels:
+      severity: warning
+  - alert: Out of SWAP
+    expr: changes(node_vmstat_pswpin{alerting_required!='false'}[5m]) > 64 and on(instance,job) changes(node_vmstat_pswpout[5m]) > 64 and on(instance,job) (node_memory_SwapFree_bytes / node_memory_SwapTotal_bytes * 100 < 20)
+    annotations:
+      metric_name: changes(node_vmstat_pswpin%7Binstance='{{  $labels.instance  }}'%7D%5b5m%5d) and on(instance,job) changes(node_vmstat_pswpout%5b5m%5d) and on(instance,job) (node_memory_SwapFree_bytes / node_memory_SwapTotal_bytes * 100)
+      description: 'Node SWAP is filling up (< 20% left) and pages in/out are increasing.'
+      summary: Out of SWAP and pages in/out are increasing on {{ $labels.instance }}
+      value: '{{ $value }}'
+    for: 15m
+    labels:
+      severity: warning
+  - alert: Out Of Disk Space
+    expr: node_filesystem_free_bytes{alerting_required!="false",device!~"//.+",fstype!~"(squashfs|fuse.*)",mountpoint!~"^(/run/.*)"} / node_filesystem_size_bytes * 100 < 10
+    annotations:
+      metric_name: node_filesystem_free_bytes%7Binstance='{{  $labels.instance  }}', mountpoint='{{ $labels.mountpoint }}'%7D / node_filesystem_size_bytes%7Binstance='{{  $labels.instance  }}', mountpoint='{{  $labels.mountpoint  }}'%7D * 100
+      description: 'Disk is almost full (< 10% left)'
+      summary: Mount {{ $labels.mountpoint }} runs out of disk space on {{ $labels.instance }}
+      value: '{{ $value }}'
+    for: 5m
+    labels:
+      severity: critical
+  - alert: Systemd Unit Crashed
+    expr: node_systemd_unit_state{alerting_required!='false',state=~'failed'} == 1
+    annotations:
+      metric_name: node_systemd_unit_state%7Binstance='{{  $labels.instance  }}', name='{{ $labels.name }}', state="active"%7D
+      description: 'SystemD service crashed'
+      summary: "Systemd unit {{ $labels.name }} on {{ $labels.hostname }} crashed"
+      value: '{{ $value }}'
+    for: 5m
+    labels:
+      severity: critical
+  - alert: Critical CPU Load
+    expr:  100 - (avg without (cpu) (irate(node_cpu_seconds_total{alerting_required!='false',mode='idle'}[5m])) * 100) > 98
+    annotations:
+      metric_name: 100 - (avg without (cpu) (irate(node_cpu_seconds_total{%7Binstance='{{  $labels.instance  }}',mode='idle'}[5m])) * 100)
+      description: '{{ $labels.instance }} of job {{ $labels.job }} has critical cpu load for more than 30 minutes.'
+      summary: 'Critical cpu load over 30 minutes on {{ $labels.hostname }} - {{ $value }}'
+      value: '{{ $value }}'
+    for: 30m
+    labels:
+      severity: critical
+  - alert: Reboot Required
+    expr: node_reboot_required{alerting_required!='false'} > 0
+    annotations:
+      metric_name: node_reboot_required%7Binstance='{{  $labels.instance  }}'%7D
+      description: '{{ $labels.instance }} requires a reboot.'
+      summary: Instance {{ $labels.instance }} - reboot required
+      value: '{{ $labels.instance }}'
+    labels:
+      severity: warning
+  - alert: Clock Skew Detected
+    expr: abs(node_timex_offset_seconds{alerting_required!='false'}) * 1000 > 30
+    annotations:
+      metric_name: abs(node_timex_offset_seconds%7Binstance='{{  $labels.instance  }}'%7D) * 1000
+      description: 'Clock skew detected on {{ $labels.instance }}. Ensure NTP is configured correctly on this host.'
+      summary: Instance {{ $labels.instance }} - Clock skew detected
+      value:  '{{ $labels.instance }}'
+    for: 2m
+    labels:
+      severity: warning
+  - alert: Time spent doing I/Os too high
+    expr: (irate(node_disk_io_time_seconds_total[5m]) * 100) > 100
+    annotations:
+      metric_name: (irate(node_disk_io_time_seconds_total%7Binstance='{{  $labels.instance  }}', product!='oracle'%7D%5b5m%5d) * 100)
+      description: 'Time spent doing I/Os on {{ $labels.instance }} is over 100ms.'
+      summary: Instance {{ $labels.instance }} - Time spent doing I/Os is too high.
+      value:  '{{ $labels.instance }}'
+    for: 2m
+    labels:
+      severity: warning
+  - alert: Number of active slaves per bond interface
+    expr: node_bonding_active{alerting_required!='false'} != 2
+    for: 3m
+    annotations:
+      metric_name: node_bonding_active %7Binstance='{{  $labels.instance  }}'%7D != 2
+      description: 'Number of active slaves per bonding interface on {{ $labels.instance }} is {{ $value }}'
+      summary: "Instance {{ $labels.instance }} - Number of active slaves per bonding interface is not two."
+      value:  '{{ $value }}'
+    labels:
+      severity: warning
+  - alert: Number of configured slaves per bond interface
+    expr: node_bonding_slaves{alerting_required!='false'} != 2
+    annotations:
+      metric_name: node_bonding_slaves%7Binstance='{{  $labels.instance  }}'%7D != 2
+      description: 'Number of configured slaves per bonding interface on {{ $labels.instance }} is {{ $value }}'
+      summary: "Instance {{ $labels.instance }} - Number of configured slaves per bonding interface is not two."
+      value:  '{{ $value }}'
+    labels:
+      severity: warning

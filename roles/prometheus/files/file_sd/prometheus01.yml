@@ -1,0 +1,45 @@
+---
+# Linux Server
+- targets: ["ns01.wolf.local:9100"]
+  labels: {__scheme__: http, job: node-exporter, environment: prod, product: DNS, hostname: ns01.wolf.local, ip: 10.60.20.21, os: 'Ubuntu 22.04'}
+- targets: ["ns01.wolf.local:9167"]
+  labels: {__scheme__: http, job: unbound-exporter, environment: prod, product: DNS, hostname: ns01.wolf.local, ip: 10.60.20.21, os: 'Ubuntu 22.04'}
+- targets: ["ns02.wolf.local:9100"]
+  labels: {__scheme__: http, job: node-exporter, environment: prod, product: DNS, hostname: ns02.wolf.local, ip: 10.60.20.22, os: 'Ubuntu 22.04'}
+- targets: ["ns02.wolf.local:9167"]
+  labels: {__scheme__: http, job: unbound-exporter, environment: prod, product: DNS, hostname: ns02.wolf.local, ip: 10.60.20.22, os: 'Ubuntu 22.04'}
+- targets: ["ntp01.wolf.local:9100"]
+  labels: {__scheme__: http, job: node-exporter, environment: prod, product: NTP, hostname: ntp01.wolf.local, ip: 10.60.20.23, os: 'Ubuntu 22.04'}
+- targets: ["ntp02.wolf.local:9100"]
+  labels: {__scheme__: http, job: node-exporter, environment: prod, product: NTP, hostname: ntp02.wolf.local, ip: 10.60.20.24, os: 'Ubuntu 22.04'}
+- targets: ["lb01.wolf.local:9100"]
+  labels: {__scheme__: http, job: node-exporter, environment: prod, product: Loadbalancer, hostname: lb01.wolf.local, ip: 10.60.20.25, os: 'Ubuntu 22.04'}
+- targets: ["lb01.wolf.local:9165"]
+  labels: {__scheme__: http, job: keepalived-exporter, environment: prod, product: Loadbalancer, hostname: lb01.wolf.local, ip: 10.60.20.25, os: 'Ubuntu 22.04'}
+- targets: ["lb01.wolf.local:6062"]
+  labels: {__scheme__: http, job: traefik-exporter, environment: prod, product: Loadbalancer, hostname: lb01.wolf.local, ip: 10.60.20.25, os: 'Ubuntu 22.04'}
+- targets: ["lb01.wolf.local:4181"]
+  labels: {__scheme__: http, job: oauth2proxy-exporter, environment: prod, product: Loadbalancer, hostname: lb01.wolf.local, ip: 10.60.20.25, os: 'Ubuntu 22.04'}
+- targets: ["lb02.wolf.local:9100"]
+  labels: {__scheme__: http, job: node-exporter, environment: prod, product: Loadbalancer, hostname: lb02.wolf.local, ip: 10.60.20.26, os: 'Ubuntu 22.04'}
+- targets: ["zabbix01.wolf.local:9100"]
+  labels: {__scheme__: http, job: zabbix, environment: prod, product: Monitoring, hostname: zabbix.wolf.local, ip: 10.60.30.6, os: 'Ubuntu 22.04'}
+- targets: ["lb02.wolf.local:9165"]
+  labels: {__scheme__: http, job: keepalived-exporter, environment: prod, product: Loadbalancer, hostname: lb02.wolf.local, ip: 10.60.20.26, os: 'Ubuntu 22.04'}
+- targets: ["lb02.wolf.local:6062"]
+  labels: {__scheme__: http, job: traefik-exporter, environment: prod, product: Loadbalancer, hostname: lb02.wolf.local, ip: 10.60.20.26, os: 'Ubuntu 22.04'}
+- targets: ["lb02.wolf.local:4181"]
+  labels: {__scheme__: http, job: oauth2proxy-exporter, environment: prod, product: Loadbalancer, hostname: lb02.wolf.local, ip: 10.60.20.26, os: 'Ubuntu 22.04'}
+- targets: ["prometheus01.wolf.local:9100"]
+  labels: {__scheme__: http, job: node-exporter, environment: prod, product: Monitoring, hostname: prometheus01.wolf.local, ip: 10.60.30.7, os: 'Ubuntu 22.04'}
+- targets: ["prometheus01.wolf.local:9090"]
+  labels: {__scheme__: http, job: prometheus, environment: prod, product: Monitoring, hostname: prometheus01.wolf.local, ip: 10.60.30.7, os: 'Ubuntu 22.04'}
+- targets: ["prometheus01.wolf.local:9115"]
+  labels: {__scheme__: http, job: blackbox-exporter, environment: prod, product: Exporter, hostname: prometheus01.wolf.local, ip: 10.60.30.7, os: 'Ubuntu 22.04'}
+- targets: ["prometheus01.wolf.local:9116"]
+  labels: {__scheme__: http, job: snmp-exporter, environment: prod, product: Exporter, hostname: prometheus01.wolf.local, ip: 10.60.30.7, os: 'Ubuntu 22.04'}
+- targets: ["prometheus01.wolf.local:9130"]
+  labels: {__scheme__: http, job: unifi-exporter, environment: prod, product: Exporter, hostname: prometheus01.wolf.local, ip: 10.60.30.7, os: 'Ubuntu 22.04'}
+# Windows Systeme
+- targets: ["gira01.wolf.local:9182"]
+  labels: {__scheme__: http, job: windows-exporter, environment: prod, product: "Gira Haussteuerung", hostname: gira01.wolf.local, ip: 10.60.30.56, os: 'Windows 11 Pro'}

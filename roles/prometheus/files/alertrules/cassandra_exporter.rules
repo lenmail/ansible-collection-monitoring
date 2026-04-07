@@ -1,0 +1,123 @@
+groups:
+- name: cassandra_exporter
+  rules:
+  - alert: CassandraHintsCount
+    expr: changes(cassandra_stats{alerting_required!='false',name='org:apache:cassandra:metrics:storage:totalhints:count'}[1m]) > 3
+    for: 3m
+    labels:
+      severity: critical
+    annotations:
+      metric_name: changes(cassandra_stats%7Binstance='{{  $labels.instance  }}',name='org:apache:cassandra:metrics:storage:totalhints:count'%7D%5b1m%5d)
+      value: '{{ $value }}'
+      summary: 'Cassandra hints count (instance {{ $labels.instance }})'
+      description: 'Cassandra hints count has changed on {{ $labels.instance }} some nodes may go down'
+  - alert: CassandraCompactionTaskPending
+    expr: avg_over_time(cassandra_stats{alerting_required!='false',name='org:apache:cassandra:metrics:compaction:pendingtasks:value'}[30m]) > 100
+    for: 3m
+    labels:
+      severity: standard
+    annotations:
+      metric_name: avg_over_time(instance='{{  $labels.instance  }}', cassandra_stats%7Balerting_required!='false',name='org:apache:cassandra:metrics:compaction:pendingtasks:value'%7D%5b30m%5d)
+      value: '{{ $value }}'
+      summary: 'Cassandra compaction task pending (instance {{ $labels.instance }})'
+      description: 'Many Cassandra compaction tasks are pending. You might need to increase I/O capacity by adding nodes to the cluster.'
+  - alert: CassandraViewwriteLatency
+    expr: cassandra_stats{alerting_required!='false',name='org:apache:cassandra:metrics:clientrequest:viewwrite:viewwritelatency:99thpercentile',service='cas'} > 100000
+    for: 3m
+    labels:
+      severity: standard
+    annotations:
+      metric_name: cassandra_stats%7Binstance='{{  $labels.instance  }}',name='org:apache:cassandra:metrics:clientrequest:viewwrite:viewwritelatency:99thpercentile',service='cas'%7D
+      value: '{{ $value }}'
+      summary: 'Cassandra viewwrite latency (instance {{ $labels.instance }})'
+      description: 'High viewwrite latency on {{ $labels.instance }} cassandra node'
+  - alert: CassandraCoolHacker
+    expr: irate(cassandra_stats{alerting_required!='false',name='org:apache:cassandra:metrics:client:authfailure:count'}[1m]) > 5
+    for: 3m
+    labels:
+      severity: standard
+    annotations:
+      metric_name: irate(cassandra_stats%7Binstance='{{  $labels.instance  }}',name='org:apache:cassandra:metrics:client:authfailure:count'%7D%5b1m%5d)
+      value: '{{ $value }}'
+      summary: 'Cassandra cool hacker (instance {{ $labels.instance }})'
+      description: 'Increase of Cassandra authentication failures'
+  - alert: CassandraNodeDown
+    expr: sum(cassandra_stats{alerting_required!='false',name='org:apache:cassandra:net:failuredetector:downendpointcount'}) by (service,group,cluster,env) > 0
+    for: 3m
+    labels:
+      severity: critical
+    annotations:
+      metric_name: sum(cassandra_stats%7Binstance='{{  $labels.instance  }}',name='org:apache:cassandra:net:failuredetector:downendpointcount'%7D) by (service,group,cluster,env)
+      value: '{{ $value }}'
+      summary: 'Cassandra node down (instance {{ $labels.instance }})'
+      description: 'Cassandra node down'
+  - alert: CassandraCommitlogPendingTasks
+    expr: cassandra_stats{alerting_required!='false',name='org:apache:cassandra:metrics:commitlog:pendingtasks:value'} > 15
+    for: 3m
+    labels:
+      severity: standard
+    annotations:
+      metric_name: cassandra_stats%7Binstance='{{  $labels.instance  }}',name='org:apache:cassandra:metrics:commitlog:pendingtasks:value'%7D
+      value: '{{ $value }}'
+      summary: 'Cassandra commitlog pending tasks (instance {{ $labels.instance }})'
+      description: 'Unexpected number of Cassandra commitlog pending tasks'
+  - alert: CassandraCompactionExecutorBlockedTasks
+    expr: cassandra_stats{alerting_required!='false',name='org:apache:cassandra:metrics:threadpools:internal:compactionexecutor:currentlyblockedtasks:count'} > 0
+    for: 3m
+    labels:
+      severity: standard
+    annotations:
+      metric_name: cassandra_stats%7Binstance='{{  $labels.instance  }}',name='org:apache:cassandra:metrics:threadpools:internal:compactionexecutor:currentlyblockedtasks:count'%7D
+      value: '{{ $value }}'
+      summary: 'Cassandra compaction executor blocked tasks (instance {{ $labels.instance }})'
+      description: 'Some Cassandra compaction executor tasks are blocked'
+  - alert: CassandraFlushWriterBlockedTasks
+    expr: cassandra_stats{alerting_required!='false',name='org:apache:cassandra:metrics:threadpools:internal:memtableflushwriter:currentlyblockedtasks:count'} > 0
+    for: 3m
+    labels:
+      severity: standard
+    annotations:
+      metric_name: cassandra_stats%7Binstance='{{  $labels.instance  }}',name='org:apache:cassandra:metrics:threadpools:internal:memtableflushwriter:currentlyblockedtasks:count'%7D
+      value: '{{ $value }}'
+      summary: 'Cassandra flush writer blocked tasks (instance {{ $labels.instance }})'
+      description: 'Some Cassandra flush writer tasks are blocked'
+  - alert: CassandraRepairPendingTasks
+    expr: cassandra_stats{alerting_required!='false',name='org:apache:cassandra:metrics:threadpools:internal:antientropystage:pendingtasks:value'} > 2
+    for: 3m
+    labels:
+      severity: standard
+    annotations:
+      metric_name: cassandra_stats%7Binstance='{{  $labels.instance  }}',name='org:apache:cassandra:metrics:threadpools:internal:antientropystage:pendingtasks:value'%7D
+      value: '{{ $value }}'
+      summary: 'Cassandra repair pending tasks (instance {{ $labels.instance }})'
+      description: 'Some Cassandra repair tasks are pending'
+  - alert: CassandraRepairBlockedTasks
+    expr: cassandra_stats{alerting_required!='false',name='org:apache:cassandra:metrics:threadpools:internal:antientropystage:currentlyblockedtasks:count'} > 0
+    for: 3m
+    labels:
+      severity: standard
+    annotations:
+      metric_name: cassandra_stats%7Binstance='{{  $labels.instance  }}',name='org:apache:cassandra:metrics:threadpools:internal:antientropystage:currentlyblockedtasks:count'%7D
+      value: '{{ $value }}'
+      summary: 'Cassandra repair blocked tasks (instance {{ $labels.instance }})'
+      description: 'Some Cassandra repair tasks are blocked'
+  - alert: CassandraConnectionTimeoutsTotal
+    expr: rate(cassandra_stats{alerting_required!='false',name='org:apache:cassandra:metrics:connection:totaltimeouts:count'}[1m]) > 5
+    for: 3m
+    labels:
+      severity: critical
+    annotations:
+      metric_name: rate(cassandra_stats%7Binstance='{{  $labels.instance  }}',name='org:apache:cassandra:metrics:connection:totaltimeouts:count'%7D%5b1m%5d)
+      value: '{{ $value }}'
+      summary: 'Cassandra connection timeouts total (instance {{ $labels.instance }})'
+      description: 'Some connection between nodes are ending in timeout'
+  - alert: CassandraStorageExceptions
+    expr: changes(cassandra_stats{alerting_required!='false',name='org:apache:cassandra:metrics:storage:exceptions:count'}[1m]) > 1
+    for: 3m
+    labels:
+      severity: critical
+    annotations:
+      metric_name: changes(cassandra_stats%7Binstance='{{  $labels.instance  }}',name='org:apache:cassandra:metrics:storage:exceptions:count'%7D%5b1m%5d)
+      value: '{{ $value }}'
+      summary: 'Cassandra storage exceptions (instance {{ $labels.instance }})'
+      description: 'Something is going wrong with cassandra storage'

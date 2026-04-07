@@ -1,0 +1,21 @@
+{{ ansible_managed | comment }}
+[Unit]
+Description=Prometheus ILO5 Exporter
+Documentation=https://github.com/MauveSoftware/ilo5_exporter
+After=network-online.target
+StartLimitInterval=0
+
+[Service]
+Type=simple
+User=prometheus
+Group=prometheus
+ExecStart=/usr/local/bin/ilo5_exporter \
+  --web.listen-address 0.0.0.0:9545{% for flag, flag_value in ilo5_exporter_config_flags_extra.items() %} \
+  --{{ flag }} {{ flag_value }}{% endfor %}
+
+SyslogIdentifier=ilo5_exporter
+Restart=always
+RestartSec=1
+
+[Install]
+WantedBy=multi-user.target

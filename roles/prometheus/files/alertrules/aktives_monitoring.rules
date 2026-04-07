@@ -1,0 +1,110 @@
+groups:
+- name: aktives-monitoring
+  rules:
+  - alert: E2E check Decreased Availability
+    expr: dvag_e2e_availability{hostname=~"(.+[R,r]un|sslurl.+)",job="aktives-monitoring"} < 49
+    for: 15m
+    labels:
+      alert_scc: true
+    annotations:
+      metric_name: dvag_e2e_availability%7Binstance='{{  $labels.instance  }}'%7D
+      value: '{{ $value }}'
+      summary: 'E2E check Decreased Availability {{ $value }} on host {{ $labels.instance}}'
+      description: 'E2E check Decreased Availability'
+
+  - alert: E2E check Duration Avarage too high
+    expr: dvag_e2e_durationavg{hostname=~"(.+[R,r]un|sslurl.+)",job="aktives-monitoring"} > 60000
+    for: 15m
+    labels:
+      alert_scc: true
+    annotations:
+      metric_name: dvag_e2e_durationavg%7Binstance='{{  $labels.instance  }}'%7D
+      value: '{{ $value }}'
+      summary: 'E2E check Duration Avarage too high {{ $value }} on host {{ $labels.instance}}'
+      description: 'E2E check Duration Avarage too high'
+
+  - alert: E2E check Duration Maxium too high
+    expr: dvag_e2e_durationmax{hostname=~"(.+[R,r]un|sslurl.+)",job="aktives-monitoring"} > 70000
+    for: 15m
+    labels:
+      alert_scc: true
+    annotations:
+      metric_name: dvag_e2e_durationmax%7Binstance='{{  $labels.instance  }}'%7D
+      value: '{{ $value }}'
+      summary: 'E2E check Duration Maxium too high {{ $value }} on host {{ $labels.instance}}'
+      description: 'E2E check Duration Maxium too high'
+
+  - alert: E2E check Error Count too high
+    expr: dvag_e2e_errorcnt{hostname=~"(.+[R,r]un|sslurl.+)",job="aktives-monitoring"} > 30
+    for: 15m
+    labels:
+      alert_scc: true
+    annotations:
+      metric_name: dvag_e2e_errorcnt%7Binstance='{{  $labels.instance  }}'%7D
+      value: '{{ $value }}'
+      summary: 'E2E check Error Count too high {{ $value }} on host {{ $labels.instance}}'
+      description: 'E2E check Error Count too high'
+
+  - alert: E2E SSL Certificate will expire soon
+    expr: dvag_e2e_ssldaysremaining{hostname=~"(.+[R,r]un|sslurl.+)",job="aktives-monitoring"} < 20
+    labels:
+      alert_scc: true
+    annotations:
+      metric_name: dvag_e2e_ssldaysremaining%7Binstance='{{  $labels.instance  }}'%7D
+      value: '{{ $value }}'
+      summary: 'E2E SSL Certificate will expirer in {{ $value }} on host {{ $labels.instance}}'
+      description: 'E2E SSL Certificate will expire soon'
+error=~"user \\d+ credentials could not be changed"}
+- name: aktives-monitoring-heartbeats
+  rules:
+  - alert: E2E Monitoring Heartbeat password change failed
+    expr: dvag_e2e_heartbeat{instance="func-inframon-change-credentials-(ent|prd)-01", error=~"user \\d+ credentials could not be changed"} == 0
+    labels:
+      alert_scc: false
+      product: monitoring
+    annotations:
+      metric_name: dvag_e2e_heartbeat%instance='{{  $labels.instance }}'%7D
+      value: '{{ $labels.name }}'
+      summary: 'Während der Ausführung der Change Password Function konnte bei einem User das Passwort nicht geändert werden. Bitte manuell überprüfen'
+      description: 'Passwort für User konnte nicht geändert werden.'
+  - alert: E2E Monitoring Heartbeat absent
+    expr: (time() - push_time_seconds{name=~"heartbeat-timetrigger(url|dynamic)-(prd|ent)"}) / 60 > 60
+    labels:
+      alert_scc: false
+      product: monitoring
+    annotations:
+      metric_name: push_time_seconds%7Bname='{{  $labels.name }}'%7D
+      value: '{{ $labels.name}}'
+      summary: 'Function {{ $labels.name}} liefert kein Heartbeat mehr. Bitte im Azure Portal überprüfen'
+      description: 'Function {{ $labels.name}} liefert kein Heartbeat mehr.'
+
+  - alert: E2E Monitoring Heartbeat function failed
+    expr: dvag_e2e_heartbeat == 0
+    labels:
+      alert_scc: false
+      product: monitoring
+    annotations:
+      metric_name: dvag_e2e_heartbeat%7Bname='{{  $labels.name }}'%7D
+      value: '{{ $labels.name }}'
+      summary: 'Function {{ $labels.name }} ist in einen Fehler gelaufen. Bitte im Azure Portal überprüfen'
+      description: 'Function {{ $labels.name }} ist in einen Fehler gelaufen.'
+
+  - alert: E2E Monitoring Heartbeat absent 
+    expr: (time() - push_time_seconds{name=~"func-inframon-kqlmetrics-(ent|prd)-01"} ) / 60 > 60
+    labels:
+      alert_scc: false
+    annotations:
+      metric_name: push_time_seconds%7Bname='{{  $labels.name }}'%7D
+      value: '{{ $labels.name }}'
+      summary: 'Function {{ $labels.name }} liefert länger als 60 Minuten kein Heartbeat mehr. Die Funktion sollte jede Minute laufen. Bitte im Azure Portal überprüfen'
+      description: 'Function {{ $labels.name }} liefert kein Heartbeat mehr.'
+
+  - alert: E2E Monitoring Heartbeat absent 
+    expr: (time() - push_time_seconds{name=~"func-inframon-adxingest-(ent|prd)-01|func-inframon-az2am-prd-01"} ) / 60 / 60 / 24 > 8
+    labels:
+      alert_scc: false
+    annotations:
+      metric_name: push_time_seconds%7Bname='{{  $labels.name }}'%7D
+      value: '{{ $labels.name }}'
+      summary: 'Function {{ $labels.name }} liefert länger als 8 Tage kein Heartbeat mehr. Die Funktion sollte jede wöchentlich laufen. Bitte im Azure Portal überprüfen'
+      description: 'Function {{ $labels.name }} liefert kein Heartbeat mehr.'

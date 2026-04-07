@@ -1,0 +1,11 @@
+groups:
+- name: windows_exporter_textfile_collector
+  rules:
+  - alert: mssql01 Port 1433 vom Server iltisapp01 / iltistestapp01 nicht erreichbar
+    expr: wolf_check_port{remote_target="mssql01.wolf.local"} == 0
+    for: 5m
+    labels:
+      alert_it: true
+    annotations:
+      value: '{{ $value }}'
+      info: 'Port 1433 vom Server iltisapp01 / iltistestapp01 zu mssql01.wolf.local nicht erreichbar'

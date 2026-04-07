@@ -1,0 +1,59 @@
+---
+- targets:
+  - https://grafana.reifen-wolf.de:443
+  - https://kameras.reifen-wolf.de:443
+  - https://pbs.reifen-wolf.de:8007
+  - https://prometheus-int.reifen-wolf.de:443
+  - https://prometheus.reifen-wolf.de:443
+  - https://pve.reifen-wolf.de:443
+  - https://zeiterfassung.reifen-wolf.de:443
+  - https://lai-time-customer01.pi-asp.de:443/hw4000generator/?db=RCWREIFE&host=RC
+  labels:
+    __param_module: https_200
+    alerting_required: 'true'
+    environment: Produktion
+    product: Webservices
+    severity: critical
+    grafana_id: xtkCtBkiz
+    job: blackbox-exporter
+- targets:
+  - https://reifen-wolf.de:443
+  labels:
+    __param_module: https_200
+    alerting_required: 'true'
+    environment: Produktion
+    product: Webservices
+    severity: critical
+    monitoring: 'true'
+    grafana_id: xtkCtBkiz
+    job: blackbox-exporter
+- targets:
+  - https://alertmanager.reifen-wolf.de:443/api/v1/alerts
+  labels:
+    __param_module: http_post_2xx_alertmanager_token
+    alerting_required: 'true'
+    environment: Production
+    product: Infra
+    severity: critical
+    grafana_id: xtkCtBkiz
+    job: blackbox-exporter
+- targets:
+  - https://pushgateway.reifen-wolf.de:443/metrics/job/pushgateway/instance/monitor01.wolf.local
+  labels:
+    __param_module: pushgw_test_post
+    alerting_required: 'true'
+    environment: Production
+    product: Infra
+    severity: critical
+    grafana_id: xtkCtBkiz
+    job: blackbox-exporter
+- targets:
+  - pbs001.tuxis.nl:8007
+  labels:
+    __param_module: tcp_connect_ipv4
+    alerting_required: 'true'
+    environment: Produktion
+    product: Webservices
+    severity: critical
+    grafana_id: xtkCtBkiz
+    job: blackbox-exporter

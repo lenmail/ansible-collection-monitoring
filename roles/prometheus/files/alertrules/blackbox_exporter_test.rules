@@ -1,0 +1,14 @@
+groups:
+- name: blackbox_exporter
+  rules:
+  - alert: EndpunktCheckFailed Web
+    expr: probe_success{hostname="ssms02.14.zob.dvag.net"} == 1
+    for: 5m
+    labels:
+      severity: critical
+      alert_scc: true
+    annotations:
+      metric_name: probe_success%7Binstance='{{  $labels.instance  }}'%7D or up%7Binstance='{{  $labels.instance  }}'%7D 
+      value: '{{ $value }}'
+      summary: 'Endpunkt Check failed (instance {{ $labels.instance }}) more than 5 minutes'
+      description: 'Endpunkt Check failed'
