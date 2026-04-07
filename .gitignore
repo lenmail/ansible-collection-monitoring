@@ -1,5 +1,9 @@
 .DS_Store
 .pytest_cache/
+.ruff_cache/
+.mypy_cache/
 .ansible/
 .venv/
+__pycache__/
+*.pyc
 *.retry
