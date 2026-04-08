@@ -1,0 +1,42 @@
+---
+argument_specs:
+  main:
+    short_description: Entry point for the squid_exporter role.
+    description:
+    - Validate variables for the `squid_exporter` role.
+    options:
+      squid_exporter_version:
+        description:
+        - Controls `squid_exporter_version` for the `squid_exporter` role.
+        required: false
+        type: str
+      squid_exporter_web_listen_address:
+        description:
+        - Controls `squid_exporter_web_listen_address` for the `squid_exporter` role.
+        required: false
+        type: str
+      squid_exporter_web_listen_port:
+        description:
+        - Controls `squid_exporter_web_listen_port` for the `squid_exporter` role.
+        required: false
+        type: int
+      squid_exporter_binary_local_dir:
+        description:
+        - Controls `squid_exporter_binary_local_dir` for the `squid_exporter` role.
+        required: false
+        type: str
+      squid_exporter_system_user:
+        description:
+        - Controls `squid_exporter_system_user` for the `squid_exporter` role.
+        required: false
+        type: str
+      squid_exporter_system_group:
+        description:
+        - Controls `squid_exporter_system_group` for the `squid_exporter` role.
+        required: false
+        type: str
+      squid_exporter_log_level:
+        description:
+        - Controls `squid_exporter_log_level` for the `squid_exporter` role.
+        required: false
+        type: str

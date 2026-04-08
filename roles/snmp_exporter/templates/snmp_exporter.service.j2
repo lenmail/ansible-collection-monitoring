@@ -1,0 +1,25 @@
+{{ ansible_managed | comment }}
+[Unit]
+Description=Prometheus SNMP Exporter
+Documentation=https://github.com/prometheus/snmp_exporter
+After=network-online.target
+
+[Service]
+Type=simple
+User={{ snmp_exporter_system_user }}
+Group={{ snmp_exporter_system_group }}
+ExecReload=/bin/kill -HUP $MAINPID
+ExecStart={{ snmp_exporter_binary_local_dir }}/snmp_exporter \
+  --web.listen-address={{ snmp_exporter_web_listen_address }}:{{ snmp_exporter_web_listen_port }} \
+  --log.level={{ snmp_exporter_log_level }} \
+  --log.format={{ snmp_exporter_log_format }} \
+  --config.file={{ snmp_exporter_config_dir }}/{{ snmp_exporter_config_file | default('snmp.yml') }}
+KillMode=process
+SyslogIdentifier=snmp_exporter
+Restart=always
+RestartSec=1
+LimitNOFILE={{ snmp_exporter_limit_nofile | default('8192') }}
+LimitMEMLOCK=infinity
+
+[Install]
+WantedBy=multi-user.target

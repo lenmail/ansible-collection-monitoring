@@ -1,0 +1,6 @@
+---
+proxy_env: {}
+unbound_exporter_log_level: warn
+unbound_exporter_config_flags_extra:
+  block-file: "/etc/unbound/unbound.block.conf"
+  unbound.uri: "tcp://localhost:953"

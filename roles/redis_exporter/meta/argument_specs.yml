@@ -1,0 +1,22 @@
+---
+argument_specs:
+  main:
+    short_description: Entry point for the redis_exporter role.
+    description:
+    - Validate variables for the `redis_exporter` role.
+    options:
+      proxy_env:
+        description:
+        - Controls `proxy_env` for the `redis_exporter` role.
+        required: false
+        type: dict
+      redis_exporter_version:
+        description:
+        - Controls `redis_exporter_version` for the `redis_exporter` role.
+        required: false
+        type: str
+      redis_exporter_config_flags_extra:
+        description:
+        - Controls `redis_exporter_config_flags_extra` for the `redis_exporter` role.
+        required: false
+        type: dict

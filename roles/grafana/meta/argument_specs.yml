@@ -1,0 +1,207 @@
+---
+argument_specs:
+  main:
+    short_description: Entry point for the grafana role.
+    description:
+    - Validate variables for the `grafana` role.
+    options:
+      grafana_version:
+        description:
+        - Controls `grafana_version` for the `grafana` role.
+        required: false
+        type: str
+      grafana_yum_repo_template:
+        description:
+        - Controls `grafana_yum_repo_template` for the `grafana` role.
+        required: false
+        type: str
+      grafana_manage_repo:
+        description:
+        - Controls `grafana_manage_repo` for the `grafana` role.
+        required: false
+        type: bool
+      grafana_use_provisioning:
+        description:
+        - Controls `grafana_use_provisioning` for the `grafana` role.
+        required: false
+        type: bool
+      grafana_provisioning_synced:
+        description:
+        - Controls `grafana_provisioning_synced` for the `grafana` role.
+        required: false
+        type: bool
+      grafana_instance:
+        description:
+        - Controls `grafana_instance` for the `grafana` role.
+        required: false
+        type: str
+      grafana_logs_dir:
+        description:
+        - Controls `grafana_logs_dir` for the `grafana` role.
+        required: false
+        type: str
+      grafana_data_dir:
+        description:
+        - Controls `grafana_data_dir` for the `grafana` role.
+        required: false
+        type: str
+      grafana_address:
+        description:
+        - Controls `grafana_address` for the `grafana` role.
+        required: false
+        type: str
+      grafana_port:
+        description:
+        - Controls `grafana_port` for the `grafana` role.
+        required: false
+        type: int
+      grafana_cap_net_bind_service:
+        description:
+        - Controls `grafana_cap_net_bind_service` for the `grafana` role.
+        required: false
+        type: bool
+      grafana_url:
+        description:
+        - Controls `grafana_url` for the `grafana` role.
+        required: false
+        type: str
+      grafana_api_url:
+        description:
+        - Controls `grafana_api_url` for the `grafana` role.
+        required: false
+        type: str
+      grafana_domain:
+        description:
+        - Controls `grafana_domain` for the `grafana` role.
+        required: false
+        type: str
+      grafana_server:
+        description:
+        - Controls `grafana_server` for the `grafana` role.
+        required: false
+        type: dict
+      grafana_security:
+        description:
+        - Controls `grafana_security` for the `grafana` role.
+        required: false
+        type: dict
+      grafana_database:
+        description:
+        - Controls `grafana_database` for the `grafana` role.
+        required: false
+        type: dict
+      grafana_remote_cache:
+        description:
+        - Controls `grafana_remote_cache` for the `grafana` role.
+        required: false
+        type: dict
+      grafana_welcome_email_on_sign_up:
+        description:
+        - Controls `grafana_welcome_email_on_sign_up` for the `grafana` role.
+        required: false
+        type: bool
+      grafana_users:
+        description:
+        - Controls `grafana_users` for the `grafana` role.
+        required: false
+        type: dict
+      grafana_auth:
+        description:
+        - Controls `grafana_auth` for the `grafana` role.
+        required: false
+        type: dict
+      grafana_ldap:
+        description:
+        - Controls `grafana_ldap` for the `grafana` role.
+        required: false
+        type: dict
+      grafana_session:
+        description:
+        - Controls `grafana_session` for the `grafana` role.
+        required: false
+        type: dict
+      grafana_analytics:
+        description:
+        - Controls `grafana_analytics` for the `grafana` role.
+        required: false
+        type: dict
+      grafana_smtp:
+        description:
+        - Controls `grafana_smtp` for the `grafana` role.
+        required: false
+        type: dict
+      grafana_alerting:
+        description:
+        - Controls `grafana_alerting` for the `grafana` role.
+        required: false
+        type: dict
+      grafana_log:
+        description:
+        - Controls `grafana_log` for the `grafana` role.
+        required: false
+        type: str
+      grafana_metrics:
+        description:
+        - Controls `grafana_metrics` for the `grafana` role.
+        required: false
+        type: dict
+      grafana_tracing:
+        description:
+        - Controls `grafana_tracing` for the `grafana` role.
+        required: false
+        type: dict
+      grafana_snapshots:
+        description:
+        - Controls `grafana_snapshots` for the `grafana` role.
+        required: false
+        type: dict
+      grafana_image_storage:
+        description:
+        - Controls `grafana_image_storage` for the `grafana` role.
+        required: false
+        type: dict
+      grafana_plugins:
+        description:
+        - Controls `grafana_plugins` for the `grafana` role.
+        required: false
+        type: list
+      grafana_dashboards:
+        description:
+        - Controls `grafana_dashboards` for the `grafana` role.
+        required: false
+        type: list
+      grafana_dashboards_dir:
+        description:
+        - Controls `grafana_dashboards_dir` for the `grafana` role.
+        required: false
+        type: str
+      grafana_alert_notifications:
+        description:
+        - Controls `grafana_alert_notifications` for the `grafana` role.
+        required: false
+        type: list
+      grafana_datasources:
+        description:
+        - Controls `grafana_datasources` for the `grafana` role.
+        required: false
+        type: list
+      grafana_api_keys:
+        description:
+        - Controls `grafana_api_keys` for the `grafana` role.
+        required: false
+        type: list
+      grafana_api_keys_dir:
+        description:
+        - Controls `grafana_api_keys_dir` for the `grafana` role.
+        required: false
+        type: str
+      grafana_environment:
+        description:
+        - Controls `grafana_environment` for the `grafana` role.
+        required: false
+        type: dict
+      grafana_panels:
+        description:
+        - Controls `grafana_panels` for the `grafana` role.
+        required: false
+        type: dict

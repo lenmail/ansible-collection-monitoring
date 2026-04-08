@@ -1,0 +1,8 @@
+---
+- name: restart ilo5_exporter
+  ansible.builtin.systemd:
+    daemon_reload: true
+    name: ilo5_exporter
+    state: restarted
+  become: true
+  tags: ilo5_exporter

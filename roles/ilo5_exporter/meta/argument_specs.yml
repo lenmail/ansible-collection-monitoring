@@ -1,0 +1,17 @@
+---
+argument_specs:
+  main:
+    short_description: Entry point for the ilo5_exporter role.
+    description:
+    - Validate variables for the `ilo5_exporter` role.
+    options:
+      proxy_env:
+        description:
+        - Controls `proxy_env` for the `ilo5_exporter` role.
+        required: false
+        type: dict
+      ilo5_exporter_config_flags_extra:
+        description:
+        - Controls `ilo5_exporter_config_flags_extra` for the `ilo5_exporter` role.
+        required: false
+        type: dict

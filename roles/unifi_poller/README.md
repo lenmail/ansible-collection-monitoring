@@ -1,0 +1,106 @@
+# unifi_poller
+
+Install and configure the Unifi Poller metrics exporter.
+
+## Supported platforms
+
+- Ubuntu 22.04+
+- Debian 12+
+- RHEL 9+
+
+## Role Variables
+
+The role interface is validated through `meta/argument_specs.yml`. Defaults are defined in `defaults/main.yml`.
+
+```yaml
+---
+proxy_env: {}
+unifi_poller_version: 2.1.3
+unifi_poller_system_user: unifi_poller
+unifi_poller_system_group: unifi_poller
+unifi_poller_binary_install_dir: /usr/local/bin
+unifi_poller_config_path: /etc/unifi_poller
+unifi_poller_manage_service: true
+unifi_poller_service_enabled: true
+unifi_poller_service_state: started
+unifi_poller_config:
+  poller:
+    quiet: false
+    debug: false
+    plugins: []
+  prometheus:
+    disable: false
+    http_listen: 0.0.0.0:9130
+    ssl_cert_path: ''
+    ssl_key_path: ''
+    report_errors: false
+  loki:
+    url: http://localhost:3100/api/v1/push
+    user: ''
+    pass: ''
+    verify_ssl: false
+    tenant_id: ''
+    interval: 2m
+    timeout: 10s
+  influxdb:
+    disable: false
+    interval: 30s
+    url: http://127.0.0.1:8086
+    user: ''
+    pass: ''
+    db: ''
+    verify_ssl: false
+    dead_ports: false
+  webserver:
+    enable: false
+    port: 37288
+    html_path: '{{ unifi_poller_config_path }}/web'
+    ssl_cert_path: ''
+    ssl_key_path: ''
+    max_events: 200
+    accounts: {}
+  unifi:
+    dynamic: false
+    defaults:
+      url: https://127.0.0.1:8443
+      user: ''
+      pass: ''
+      sites:
+      - all
+      save_ids: false
+      save_events: false
+      save_alarms: false
+      save_anomalies: false
+      save_dpi: false
+      save_sites: true
+      hash_pii: false
+      verify_ssl: false
+    controllers:
+    - url: https://127.0.0.1:8443
+      user: ''
+      pass: ''
+      sites:
+      - all
+      save_ids: false
+      save_events: false
+      save_alarms: false
+      save_anomalies: false
+      save_dpi: false
+      save_sites: true
+      hash_pii: false
+      verify_ssl: false
+```
+
+## Example Playbook
+
+```yaml
+- name: Apply unifi_poller
+  hosts: all
+  become: true
+  roles:
+    - role: lenmail.monitoring.unifi_poller
+```
+
+## Testing
+
+The collection CI runs `ansible-lint`, `ansible-test sanity`, repository consistency tests, and per-role syntax checks using `roles/unifi_poller/tests/test.yml`.

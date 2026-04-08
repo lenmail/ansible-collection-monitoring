@@ -1,0 +1,67 @@
+---
+argument_specs:
+  main:
+    short_description: Entry point for the vector role.
+    description:
+    - Validate variables for the `vector` role.
+    options:
+      vector_prepare:
+        description:
+        - Controls `vector_prepare` for the `vector` role.
+        required: false
+        type: bool
+      vector_install:
+        description:
+        - Controls `vector_install` for the `vector` role.
+        required: false
+        type: bool
+      vector_configure:
+        description:
+        - Controls `vector_configure` for the `vector` role.
+        required: false
+        type: bool
+      vector_service:
+        description:
+        - Controls `vector_service` for the `vector` role.
+        required: false
+        type: bool
+      vector_configure_rm_default:
+        description:
+        - Controls `vector_configure_rm_default` for the `vector` role.
+        required: false
+        type: bool
+      vector_configure_config_path:
+        description:
+        - Controls `vector_configure_config_path` for the `vector` role.
+        required: false
+        type: str
+      vector_configure_data_dir:
+        description:
+        - Controls `vector_configure_data_dir` for the `vector` role.
+        required: false
+        type: str
+      vector_configure_api:
+        description:
+        - Controls `vector_configure_api` for the `vector` role.
+        required: false
+        type: dict
+      vector_configure_sources:
+        description:
+        - Controls `vector_configure_sources` for the `vector` role.
+        required: false
+        type: dict
+      vector_configure_sinks:
+        description:
+        - Controls `vector_configure_sinks` for the `vector` role.
+        required: false
+        type: dict
+      vector_service_enabled:
+        description:
+        - Controls `vector_service_enabled` for the `vector` role.
+        required: false
+        type: bool
+      vector_service_status:
+        description:
+        - Controls `vector_service_status` for the `vector` role.
+        required: false
+        type: str

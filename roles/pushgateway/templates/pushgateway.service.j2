@@ -1,0 +1,41 @@
+{{ ansible_managed | comment}}
+[Unit]
+Description=Prometheus Pushgateway
+Documentation=https://github.com/prometheus/pushgateway
+After=network-online.target
+StartLimitInterval=0
+
+[Service]
+Type=simple
+User={{ pushgateway_system_user }}
+Group={{ pushgateway_system_group }}
+ExecStart={{ pushgateway_binary_local_dir }}/pushgateway \
+{% if pushgateway_persistence %}
+  --persistence.file="{{ pushgateway_persistence_dir }}/persistence" \
+{% endif %}
+{% if pushgateway_web_external_url %}
+  --web.external-url="{{ pushgateway_web_external_url }}" \
+{% endif %}
+  --log.level={{ pushgateway_log_level }} \
+  --log.format={{ pushgateway_log_format }} \
+  --web.listen-address={{ pushgateway_web_listen_address }}:{{ pushgateway_web_listen_port }}{% for flag, flag_value in pushgateway_config_flags_extra.items() %}\
+  --{{ flag }}{% if flag_value %}={{ flag_value }}{% endif %} {% endfor %}
+
+LimitNOFILE={{ pushgateway_limit_nofile | default('8192') }}
+LimitMEMLOCK=infinity
+NoNewPrivileges=true
+{% if pushgateway_persistence %}
+ReadWriteDirectories={{ pushgateway_persistence_dir }}
+{% endif %}
+{% if pushgateway_http_proxy is defined %}
+Environment="HTTP_PROXY={{ pushgateway_http_proxy }}"
+{% endif %}
+{% if pushgateway_http_proxy is defined %}
+Environment="HTTPS_PROXY={{ pushgateway_http_proxy }}"
+{% endif %}
+SyslogIdentifier=pushgateway
+Restart=always
+RestartSec=0
+
+[Install]
+WantedBy=multi-user.target

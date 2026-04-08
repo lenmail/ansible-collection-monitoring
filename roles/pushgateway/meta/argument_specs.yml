@@ -1,0 +1,82 @@
+---
+argument_specs:
+  main:
+    short_description: Entry point for the pushgateway role.
+    description:
+    - Validate variables for the `pushgateway` role.
+    options:
+      proxy_env:
+        description:
+        - Controls `proxy_env` for the `pushgateway` role.
+        required: false
+        type: dict
+      pushgateway_version:
+        description:
+        - Controls `pushgateway_version` for the `pushgateway` role.
+        required: false
+        type: str
+      pushgateway_web_listen_address:
+        description:
+        - Controls `pushgateway_web_listen_address` for the `pushgateway` role.
+        required: false
+        type: str
+      pushgateway_web_listen_port:
+        description:
+        - Controls `pushgateway_web_listen_port` for the `pushgateway` role.
+        required: false
+        type: int
+      pushgateway_web_external_url:
+        description:
+        - Controls `pushgateway_web_external_url` for the `pushgateway` role.
+        required: false
+        type: str
+      pushgateway_system_user:
+        description:
+        - Controls `pushgateway_system_user` for the `pushgateway` role.
+        required: false
+        type: str
+      pushgateway_system_group:
+        description:
+        - Controls `pushgateway_system_group` for the `pushgateway` role.
+        required: false
+        type: str
+      pushgateway_log_level:
+        description:
+        - Controls `pushgateway_log_level` for the `pushgateway` role.
+        required: false
+        type: str
+      pushgateway_log_format:
+        description:
+        - Controls `pushgateway_log_format` for the `pushgateway` role.
+        required: false
+        type: str
+      pushgateway_persistence:
+        description:
+        - Controls `pushgateway_persistence` for the `pushgateway` role.
+        required: false
+        type: bool
+      pushgateway_binary_local_dir:
+        description:
+        - Controls `pushgateway_binary_local_dir` for the `pushgateway` role.
+        required: false
+        type: str
+      pushgateway_persistence_dir:
+        description:
+        - Controls `pushgateway_persistence_dir` for the `pushgateway` role.
+        required: false
+        type: str
+      pushgateway_limit_nofile:
+        description:
+        - Controls `pushgateway_limit_nofile` for the `pushgateway` role.
+        required: false
+        type: int
+      pushgateway_http_proxy:
+        description:
+        - Controls `pushgateway_http_proxy` for the `pushgateway` role.
+        required: false
+        type: str
+      pushgateway_config_flags_extra:
+        description:
+        - Controls `pushgateway_config_flags_extra` for the `pushgateway` role.
+        required: false
+        type: dict

@@ -1,0 +1,177 @@
+# blackbox_exporter
+
+Install and configure the Prometheus blackbox_exporter.
+
+## Supported platforms
+
+- Ubuntu 22.04+
+- Debian 12+
+- RHEL 9+
+
+## Role Variables
+
+The role interface is validated through `meta/argument_specs.yml`. Defaults are defined in `defaults/main.yml`.
+
+```yaml
+---
+proxy_env: {}
+blackbox_exporter_version: 0.25.0
+blackbox_exporter_log_level: warn
+blackbox_exporter_webconfig: {}
+blackbox_exporter_config_flags_extra: {}
+blackbox_exporter_config: "{{ all_blackbox_exporter_config|default({}) | combine(group_vars_blackbox_exporter_config|default({}),recursive=True,list_merge='append') | combine(host_vars_blackbox_exporter_config|default({}),recursive=True,list_merge='append') | combine(defaults_blackbox_exporter_config|default({}),recursive=True,list_merge='append') }}"
+defaults_blackbox_exporter_config:
+  modules:
+    ssh_banner:
+      prober: tcp
+      tcp:
+        query_response:
+        - expect: ^SSH-2.0-
+        - send: SSH-2.0-blackbox-ssh-check
+    dns_tcp_ipv4:
+      prober: dns
+      timeout: 10s
+      dns:
+        transport_protocol: tcp
+        preferred_ip_protocol: ip4
+        query_name: '{{ ansible_external_domain }}'
+        query_type: A
+        valid_rcodes:
+        - NOERROR
+    dns_udp_ipv4:
+      prober: dns
+      timeout: 10s
+      dns:
+        transport_protocol: udp
+        preferred_ip_protocol: ip4
+        query_name: '{{ ansible_external_domain }}'
+        query_type: A
+        valid_rcodes:
+        - NOERROR
+    dns_tcp_ipv6:
+      prober: dns
+      timeout: 10s
+      dns:
+        transport_protocol: tcp
+        preferred_ip_protocol: ip6
+        query_name: '{{ ansible_external_domain }}'
+        query_type: A
+        valid_rcodes:
+        - NOERROR
+    dns_udp_ipv6:
+      prober: dns
+      timeout: 10s
+      dns:
+        transport_protocol: udp
+        preferred_ip_protocol: ip6
+        query_name: '{{ ansible_external_domain }}'
+        query_type: A
+        valid_rcodes:
+        - NOERROR
+    https_200:
+      http:
+        preferred_ip_protocol: ip4
+        method: GET
+        valid_http_versions:
+        - HTTP/1.0
+        - HTTP/1.1
+        - HTTP/2.0
+        valid_status_codes:
+        - 200
+        ip_protocol_fallback: true
+      prober: http
+      timeout: 10s
+    icmp_ipv4:
+      prober: icmp
+      timeout: 5s
+      icmp:
+        preferred_ip_protocol: ip4
+        ip_protocol_fallback: false
+    icmp_ipv6:
+      prober: icmp
+      timeout: 5s
+      icmp:
+        preferred_ip_protocol: ip6
+        ip_protocol_fallback: false
+    tcp_connect_ipv4:
+      prober: tcp
+      timeout: 5s
+      tcp:
+        preferred_ip_protocol: ip4
+        ip_protocol_fallback: false
+    tcp_connect_ipv6:
+      prober: tcp
+      timeout: 5s
+      tcp:
+        preferred_ip_protocol: ip6
+        ip_protocol_fallback: false
+    smtp_ipv4:
+      prober: tcp
+      timeout: 10s
+      tcp:
+        preferred_ip_protocol: ip4
+        ip_protocol_fallback: false
+        query_response:
+        - expect: '^220 '
+        - send: "EHLO {{ ansible_fqdn }}\r"
+        - expect: ^250
+        - send: "QUIT\r"
+    smtp_ipv6:
+      prober: tcp
+      timeout: 10s
+      tcp:
+        preferred_ip_protocol: ip6
+        ip_protocol_fallback: false
+        query_response:
+        - expect: '^220 '
+        - send: "EHLO {{ ansible_fqdn }}\r"
+        - expect: ^250
+        - send: "QUIT\r"
+    http_post_2xx_alertmanager_token:
+      http:
+        preferred_ip_protocol: ip4
+        headers:
+          Content-Type: application/json
+          Auth-User: '{{ traefik_alertmanager_auth_user }}'
+          Auth-Token: '{{ traefik_alertmanager_auth_token }}'
+          Host: alertmanager.reifen-wolf.de
+        method: POST
+        body: "[{\n  \"status\": \"firing\",\n  \"labels\": {\n    \"alertname\": \"Test Blackox-Exporter Post\",\n    \"test\": \"yes\"\n  },\n  \"annotations\": {\n  \"summary\": \"Test Blackox-Exporter Post\"\n}, \"generatorURL\": \"https://alertmanager.reifen-wolf.de\" }]\n"
+        valid_status_codes:
+        - 200
+      prober: http
+      timeout: 5s
+    pushgw_test_post:
+      http:
+        preferred_ip_protocol: ip4
+        headers:
+          Content-Type: data-binary
+          Auth-User: '{{ traefik_pushgateway_auth_user }}'
+          Auth-Token: '{{ traefik_pushgateway_auth_token }}'
+          Host: pushgateway.reifen-wolf.de
+        method: POST
+        body: "test_metric 1\n  "
+        valid_http_versions:
+        - HTTP/1.0
+        - HTTP/1.1
+        - HTTP/2.0
+        valid_status_codes:
+        - 200
+      prober: http
+      timeout: 5s
+additional_blackbox_exporter_config: {}
+```
+
+## Example Playbook
+
+```yaml
+- name: Apply blackbox_exporter
+  hosts: all
+  become: true
+  roles:
+    - role: lenmail.monitoring.blackbox_exporter
+```
+
+## Testing
+
+The collection CI runs `ansible-lint`, `ansible-test sanity`, repository consistency tests, and per-role syntax checks using `roles/blackbox_exporter/tests/test.yml`.

@@ -1,0 +1,58 @@
+---
+argument_specs:
+  main:
+    short_description: Entry point for the alertmanager role.
+    description:
+    - Validate variables for the `alertmanager` role.
+    options:
+      proxy_env:
+        description:
+        - Controls `proxy_env` for the `alertmanager` role.
+        required: false
+        type: dict
+      alertmanager_version:
+        description:
+        - Controls `alertmanager_version` for the `alertmanager` role.
+        required: false
+        type: str
+      alertmanager_log_level:
+        description:
+        - Controls `alertmanager_log_level` for the `alertmanager` role.
+        required: false
+        type: str
+      alertmanager_webconfig:
+        description:
+        - Controls `alertmanager_webconfig` for the `alertmanager` role.
+        required: false
+        type: dict
+      alertmanager_config_dir:
+        description:
+        - Controls `alertmanager_config_dir` for the `alertmanager` role.
+        required: false
+        type: str
+      alertmanager_web_external_url:
+        description:
+        - Controls `alertmanager_web_external_url` for the `alertmanager` role.
+        required: false
+        type: str
+      alertmanager_template_files:
+        description:
+        - Controls `alertmanager_template_files` for the `alertmanager` role.
+        required: false
+        type: list
+        elements: str
+      alertmanager_config_flags_extra:
+        description:
+        - Controls `alertmanager_config_flags_extra` for the `alertmanager` role.
+        required: false
+        type: dict
+      alertmanager_cluster:
+        description:
+        - Controls `alertmanager_cluster` for the `alertmanager` role.
+        required: false
+        type: dict
+      alertmanager_config:
+        description:
+        - Controls `alertmanager_config` for the `alertmanager` role.
+        required: false
+        type: str

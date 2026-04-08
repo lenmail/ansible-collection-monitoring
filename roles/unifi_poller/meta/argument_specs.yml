@@ -1,0 +1,57 @@
+---
+argument_specs:
+  main:
+    short_description: Entry point for the unifi_poller role.
+    description:
+    - Validate variables for the `unifi_poller` role.
+    options:
+      proxy_env:
+        description:
+        - Controls `proxy_env` for the `unifi_poller` role.
+        required: false
+        type: dict
+      unifi_poller_version:
+        description:
+        - Controls `unifi_poller_version` for the `unifi_poller` role.
+        required: false
+        type: str
+      unifi_poller_system_user:
+        description:
+        - Controls `unifi_poller_system_user` for the `unifi_poller` role.
+        required: false
+        type: str
+      unifi_poller_system_group:
+        description:
+        - Controls `unifi_poller_system_group` for the `unifi_poller` role.
+        required: false
+        type: str
+      unifi_poller_binary_install_dir:
+        description:
+        - Controls `unifi_poller_binary_install_dir` for the `unifi_poller` role.
+        required: false
+        type: str
+      unifi_poller_config_path:
+        description:
+        - Controls `unifi_poller_config_path` for the `unifi_poller` role.
+        required: false
+        type: str
+      unifi_poller_manage_service:
+        description:
+        - Controls `unifi_poller_manage_service` for the `unifi_poller` role.
+        required: false
+        type: bool
+      unifi_poller_service_enabled:
+        description:
+        - Controls `unifi_poller_service_enabled` for the `unifi_poller` role.
+        required: false
+        type: bool
+      unifi_poller_service_state:
+        description:
+        - Controls `unifi_poller_service_state` for the `unifi_poller` role.
+        required: false
+        type: str
+      unifi_poller_config:
+        description:
+        - Controls `unifi_poller_config` for the `unifi_poller` role.
+        required: false
+        type: dict

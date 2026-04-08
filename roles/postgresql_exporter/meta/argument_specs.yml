@@ -1,0 +1,42 @@
+---
+argument_specs:
+  main:
+    short_description: Entry point for the postgresql_exporter role.
+    description:
+    - Validate variables for the `postgresql_exporter` role.
+    options:
+      proxy_env:
+        description:
+        - Controls `proxy_env` for the `postgresql_exporter` role.
+        required: false
+        type: dict
+      postgres_exporter_version:
+        description:
+        - Controls `postgres_exporter_version` for the `postgresql_exporter` role.
+        required: false
+        type: str
+      postgres_exporter_config_flags_extra:
+        description:
+        - Controls `postgres_exporter_config_flags_extra` for the `postgresql_exporter` role.
+        required: false
+        type: dict
+      postgres_exporter_dbname:
+        description:
+        - Controls `postgres_exporter_dbname` for the `postgresql_exporter` role.
+        required: false
+        type: str
+      postgres_exporter_username:
+        description:
+        - Controls `postgres_exporter_username` for the `postgresql_exporter` role.
+        required: false
+        type: str
+      postgres_exporter_query_filename:
+        description:
+        - Controls `postgres_exporter_query_filename` for the `postgresql_exporter` role.
+        required: false
+        type: str
+      postgres_exporter_data_source_name:
+        description:
+        - Controls `postgres_exporter_data_source_name` for the `postgresql_exporter` role.
+        required: false
+        type: str

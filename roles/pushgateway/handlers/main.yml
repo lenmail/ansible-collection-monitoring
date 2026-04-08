@@ -1,0 +1,15 @@
+---
+- name: restart pushgateway
+  systemd:
+    daemon_reload: true
+    name: pushgateway
+    state: restarted
+  become: true
+  tags: pushgateway
+
+- name: reload pushgateway
+  systemd:
+    name: pushgateway
+    state: reloaded
+  become: true
+  tags: pushgateway

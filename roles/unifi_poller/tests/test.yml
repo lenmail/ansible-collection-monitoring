@@ -1,0 +1,7 @@
+---
+- name: Syntax test for unifi_poller
+  hosts: localhost
+  connection: local
+  gather_facts: true
+  roles:
+  - role: ..

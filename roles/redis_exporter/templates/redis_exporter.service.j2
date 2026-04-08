@@ -1,0 +1,21 @@
+{{ ansible_managed | comment }}
+[Unit]
+Description=Prometheus Redis Exporter
+Documentation=https://github.com/oliver006/redis_exporter
+After=network-online.target
+StartLimitInterval=0
+
+[Service]
+Type=simple
+User=prometheus
+Group=prometheus
+ExecStart=/usr/local/bin/redis_exporter \
+  -web.listen-address 0.0.0.0:9121{% for key, value in redis_exporter_config_flags_extra.items() %} \
+  -{{ key }}={{ value }}{% endfor %}
+
+SyslogIdentifier=redis_exporter
+Restart=always
+RestartSec=1
+
+[Install]
+WantedBy=multi-user.target

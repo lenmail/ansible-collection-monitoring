@@ -1,0 +1,33 @@
+{{ ansible_managed | comment }}
+
+[Unit]
+Description=Prometheus Blackbox Exporter
+Documentation=https://github.com/prometheus/blackbox_exporter
+After=network-online.target
+
+[Service]
+Type=simple
+User=prometheus
+Group=prometheus
+PermissionsStartOnly=true
+ExecReload=/bin/kill -HUP $MAINPID
+ExecStart=/usr/local/bin/blackbox_exporter \
+  --config.file=/etc/blackbox_exporter/config.yml \
+  --log.level={{ blackbox_exporter_log_level }} \
+{% if blackbox_exporter_webconfig | length > 0 %}
+  --web.config=/etc/blackbox_exporter/web-config.yml \
+{% endif %}
+  {% for flag, flag_value in blackbox_exporter_config_flags_extra.items() -%}
+  --{{ flag }}={{ flag_value }} \
+  {% endfor -%}
+  --web.listen-address=0.0.0.0:9115
+
+SyslogIdentifier=blackbox_exporter
+KillMode=process
+Restart=always
+RestartSec=5
+LimitNOFILE=32768
+LimitMEMLOCK=infinity
+
+[Install]
+WantedBy=multi-user.target

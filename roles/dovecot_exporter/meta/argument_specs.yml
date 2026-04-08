@@ -1,0 +1,7 @@
+---
+argument_specs:
+  main:
+    short_description: Entry point for the dovecot_exporter role.
+    description:
+    - Validate variables for the `dovecot_exporter` role.
+    options: {}

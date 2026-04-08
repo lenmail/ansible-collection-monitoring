@@ -1,0 +1,35 @@
+{{ ansible_managed | comment }}
+[Unit]
+Description=Prometheus
+Documentation=https://github.com/prometheus
+After=network-online.target
+
+[Service]
+Type=simple
+Environment="GOMAXPROCS={{ ansible_processor_vcpus|default(ansible_processor_count) }}"
+User=prometheus
+Group=prometheus
+ExecReload=/bin/kill -HUP $MAINPID
+ExecStart=/usr/local/bin/prometheus \
+  --config.file=/etc/prometheus/config.yml \
+  --storage.tsdb.path=/var/lib/prometheus \
+  --storage.tsdb.retention.time={{ prometheus_storage_retention_time }} \
+  --web.console.libraries=/etc/prometheus/console_libraries \
+  --web.console.templates=/etc/prometheus/consoles \
+  --web.listen-address=0.0.0.0:9090 \
+  --web.external-url={{ prometheus_web_external_url }} \
+{% if prometheus_remote_write_reveicer %}
+  --web.enable-remote-write-receiver \
+{% endif %}
+{% if prometheus_webconfig | length > 0 %}
+  --web.config.file=/etc/prometheus/web-config.yml \
+{% endif %}
+  --log.level={{ prometheus_log_level }}{% for flag, flag_value in prometheus_config_flags_extra.items() %} \
+  --{{ flag }}={{ flag_value }}{% endfor %}
+
+LimitNOFILE=65000
+SyslogIdentifier=prometheus
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

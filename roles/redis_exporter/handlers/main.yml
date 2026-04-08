@@ -1,0 +1,8 @@
+---
+- name: restart redis_exporter
+  ansible.builtin.systemd:
+    daemon_reload: true
+    name: redis_exporter
+    state: restarted
+  become: true
+  tags: redis_exporter

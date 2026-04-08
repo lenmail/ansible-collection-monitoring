@@ -1,0 +1,72 @@
+---
+argument_specs:
+  main:
+    short_description: Entry point for the snmp_exporter role.
+    description:
+    - Validate variables for the `snmp_exporter` role.
+    options:
+      proxy_env:
+        description:
+        - Controls `proxy_env` for the `snmp_exporter` role.
+        required: false
+        type: dict
+      snmp_exporter_version:
+        description:
+        - Controls `snmp_exporter_version` for the `snmp_exporter` role.
+        required: false
+        type: str
+      snmp_exporter_web_listen_address:
+        description:
+        - Controls `snmp_exporter_web_listen_address` for the `snmp_exporter` role.
+        required: false
+        type: str
+      snmp_exporter_web_listen_port:
+        description:
+        - Controls `snmp_exporter_web_listen_port` for the `snmp_exporter` role.
+        required: false
+        type: str
+      snmp_exporter_log_level:
+        description:
+        - Controls `snmp_exporter_log_level` for the `snmp_exporter` role.
+        required: false
+        type: str
+      snmp_exporter_log_format:
+        description:
+        - Controls `snmp_exporter_log_format` for the `snmp_exporter` role.
+        required: false
+        type: str
+      snmp_exporter_binary_local_dir:
+        description:
+        - Controls `snmp_exporter_binary_local_dir` for the `snmp_exporter` role.
+        required: false
+        type: str
+      snmp_exporter_config_dir:
+        description:
+        - Controls `snmp_exporter_config_dir` for the `snmp_exporter` role.
+        required: false
+        type: str
+      snmp_exporter_create_consul_agent_service:
+        description:
+        - Controls `snmp_exporter_create_consul_agent_service` for the `snmp_exporter` role.
+        required: false
+        type: bool
+      snmp_exporter_config_file:
+        description:
+        - Controls `snmp_exporter_config_file` for the `snmp_exporter` role.
+        required: false
+        type: str
+      snmp_exporter_system_user:
+        description:
+        - Controls `snmp_exporter_system_user` for the `snmp_exporter` role.
+        required: false
+        type: str
+      snmp_exporter_system_group:
+        description:
+        - Controls `snmp_exporter_system_group` for the `snmp_exporter` role.
+        required: false
+        type: str
+      snmp_exporter_limit_nofile:
+        description:
+        - Controls `snmp_exporter_limit_nofile` for the `snmp_exporter` role.
+        required: false
+        type: int

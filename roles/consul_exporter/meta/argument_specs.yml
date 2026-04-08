@@ -1,0 +1,63 @@
+---
+argument_specs:
+  main:
+    short_description: Entry point for the consul_exporter role.
+    description:
+    - Validate variables for the `consul_exporter` role.
+    options:
+      proxy_env:
+        description:
+        - Controls `proxy_env` for the `consul_exporter` role.
+        required: false
+        type: dict
+      consul_exporter_version:
+        description:
+        - Controls `consul_exporter_version` for the `consul_exporter` role.
+        required: false
+        type: str
+      consul_exporter_web_listen_address:
+        description:
+        - Controls `consul_exporter_web_listen_address` for the `consul_exporter` role.
+        required: false
+        type: str
+      consul_exporter_web_listen_port:
+        description:
+        - Controls `consul_exporter_web_listen_port` for the `consul_exporter` role.
+        required: false
+        type: int
+      consul_exporter_log_level:
+        description:
+        - Controls `consul_exporter_log_level` for the `consul_exporter` role.
+        required: false
+        type: str
+      consul_exporter_log_format:
+        description:
+        - Controls `consul_exporter_log_format` for the `consul_exporter` role.
+        required: false
+        type: str
+      consul_exporter_binary_install_dir:
+        description:
+        - Controls `consul_exporter_binary_install_dir` for the `consul_exporter` role.
+        required: false
+        type: str
+      consul_exporter_system_user:
+        description:
+        - Controls `consul_exporter_system_user` for the `consul_exporter` role.
+        required: false
+        type: str
+      consul_exporter_system_group:
+        description:
+        - Controls `consul_exporter_system_group` for the `consul_exporter` role.
+        required: false
+        type: str
+      consul_exporter_consul_token:
+        description:
+        - Controls `consul_exporter_consul_token` for the `consul_exporter` role.
+        required: false
+        type: str
+      consul_exporter_params:
+        description:
+        - Controls `consul_exporter_params` for the `consul_exporter` role.
+        required: false
+        type: list
+        elements: str
