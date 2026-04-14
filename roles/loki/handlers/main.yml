@@ -1,0 +1,12 @@
+---
+- name: restart loki
+  ansible.builtin.systemd:
+    name: loki
+    state: restarted
+  become: true
+
+- name: reload loki
+  ansible.builtin.systemd:
+    name: loki
+    state: reloaded
+  become: true

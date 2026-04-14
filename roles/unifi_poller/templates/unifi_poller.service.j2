@@ -9,8 +9,8 @@ Requires=network.target
 Type=simple
 User={{ unifi_poller_system_user }}
 Group={{ unifi_poller_system_group }}
-ExecStart={{ unifi_poller_binary_install_dir }}/unifi_poller --config={{ unifi_poller_config_path }}/config.yaml
-SyslogIdentifier=unifi_poller
+ExecStart={{ unifi_poller_binary_install_dir }}/{{ unifi_poller_binary_name }} -c {{ unifi_poller_config_path }}/{{ unifi_poller_config_file }}
+SyslogIdentifier={{ unifi_poller_service_name }}
 Restart=always
 RestartSec=10
 NoNewPrivileges=true

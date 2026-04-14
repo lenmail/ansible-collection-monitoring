@@ -1,0 +1,87 @@
+---
+argument_specs:
+  main:
+    short_description: Entry point for the loki role.
+    description:
+    - Validate variables for the `loki` role.
+    options:
+      proxy_env:
+        description:
+        - Controls `proxy_env` for the `loki` role.
+        required: false
+        type: dict
+      loki_version:
+        description:
+        - Controls `loki_version` for the `loki` role.
+        required: false
+        type: str
+      loki_http_listen_port:
+        description:
+        - Controls `loki_http_listen_port` for the `loki` role.
+        required: false
+        type: int
+      loki_http_listen_address:
+        description:
+        - Controls `loki_http_listen_address` for the `loki` role.
+        required: false
+        type: str
+      loki_grpc_listen_port:
+        description:
+        - Controls `loki_grpc_listen_port` for the `loki` role.
+        required: false
+        type: int
+      loki_grpc_listen_address:
+        description:
+        - Controls `loki_grpc_listen_address` for the `loki` role.
+        required: false
+        type: str
+      loki_binary_install_dir:
+        description:
+        - Controls `loki_binary_install_dir` for the `loki` role.
+        required: false
+        type: str
+      loki_config_dir:
+        description:
+        - Controls `loki_config_dir` for the `loki` role.
+        required: false
+        type: str
+      loki_config_file:
+        description:
+        - Controls `loki_config_file` for the `loki` role.
+        required: false
+        type: str
+      loki_data_dir:
+        description:
+        - Controls `loki_data_dir` for the `loki` role.
+        required: false
+        type: str
+      loki_rule_path:
+        description:
+        - Controls `loki_rule_path` for the `loki` role.
+        required: false
+        type: str
+      loki_system_user:
+        description:
+        - Controls `loki_system_user` for the `loki` role.
+        required: false
+        type: str
+      loki_system_group:
+        description:
+        - Controls `loki_system_group` for the `loki` role.
+        required: false
+        type: str
+      loki_auth_enabled:
+        description:
+        - Controls `loki_auth_enabled` for the `loki` role.
+        required: false
+        type: bool
+      loki_log_level:
+        description:
+        - Controls `loki_log_level` for the `loki` role.
+        required: false
+        type: str
+      loki_config:
+        description:
+        - Controls `loki_config` for the `loki` role.
+        required: false
+        type: dict

@@ -1,0 +1,7 @@
+---
+- name: Syntax test for loki
+  hosts: localhost
+  connection: local
+  gather_facts: true
+  roles:
+  - role: ..

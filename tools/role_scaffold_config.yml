@@ -27,6 +27,7 @@ role_descriptions:
   ilo5_exporter: Install and configure the HPE iLO5 Prometheus exporter.
   ipmi_exporter: Install and configure the Prometheus ipmi_exporter.
   keepalived_exporter: Install and configure the Prometheus keepalived_exporter.
+  loki: Install and configure Grafana Loki.
   node_exporter: Install and configure Prometheus node_exporter.
   postfix_exporter: Install and configure a Postfix Prometheus exporter.
   postgresql_exporter: Install and configure the postgres_exporter for PostgreSQL metrics.

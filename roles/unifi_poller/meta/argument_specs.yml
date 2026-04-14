@@ -30,9 +30,24 @@ argument_specs:
         - Controls `unifi_poller_binary_install_dir` for the `unifi_poller` role.
         required: false
         type: str
+      unifi_poller_binary_name:
+        description:
+        - Controls `unifi_poller_binary_name` for the `unifi_poller` role.
+        required: false
+        type: str
       unifi_poller_config_path:
         description:
         - Controls `unifi_poller_config_path` for the `unifi_poller` role.
+        required: false
+        type: str
+      unifi_poller_config_file:
+        description:
+        - Controls `unifi_poller_config_file` for the `unifi_poller` role.
+        required: false
+        type: str
+      unifi_poller_service_name:
+        description:
+        - Controls `unifi_poller_service_name` for the `unifi_poller` role.
         required: false
         type: str
       unifi_poller_manage_service:

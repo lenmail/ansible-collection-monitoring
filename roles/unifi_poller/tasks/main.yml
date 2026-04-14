@@ -31,13 +31,13 @@
 
 - name: Check if unifi_poller is installed
   ansible.builtin.stat:
-    path: "{{ unifi_poller_binary_install_dir }}/unifi_poller"
+    path: "{{ unifi_poller_binary_install_dir }}/{{ unifi_poller_binary_name }}"
   register: __unifi_poller_is_installed
   become: true
   tags: unifi_poller
 
 - name: Gather currently installed unifi_poller version
-  ansible.builtin.command: "{{ unifi_poller_binary_install_dir }}/unifi_poller --version"
+  ansible.builtin.command: "{{ unifi_poller_binary_install_dir }}/{{ unifi_poller_binary_name }} --version"
   changed_when: false
   register: __unifi_poller_current_version_output
   when: __unifi_poller_is_installed.stat.exists
@@ -102,7 +102,7 @@
 - name: Install unifi_poller binary
   ansible.builtin.copy:
     src: "/tmp/unifi_poller-{{ unifi_poller_version }}.linux-{{ go_arch }}"
-    dest: "{{ unifi_poller_binary_install_dir }}/unifi_poller"
+    dest: "{{ unifi_poller_binary_install_dir }}/{{ unifi_poller_binary_name }}"
     mode: "0755"
     owner: "root"
     group: "root"
@@ -115,7 +115,7 @@
   ansible.builtin.template:
     force: true
     src: config.yaml.j2
-    dest: "{{ unifi_poller_config_path }}/config.yaml"
+    dest: "{{ unifi_poller_config_path }}/{{ unifi_poller_config_file }}"
     owner: "{{ unifi_poller_system_user }}"
     group: "{{ unifi_poller_system_group }}"
     mode: "0640"
@@ -128,7 +128,7 @@
 - name: Install systemd service unit
   ansible.builtin.template:
     src: unifi_poller.service.j2
-    dest: /etc/systemd/system/unifi_poller.service
+    dest: "/etc/systemd/system/{{ unifi_poller_service_name }}.service"
     owner: root
     group: root
     mode: "0644"
@@ -139,7 +139,7 @@
 - name: Ensure service is started and enabled
   ansible.builtin.systemd:
     daemon_reload: true
-    name: unifi_poller
+    name: "{{ unifi_poller_service_name }}"
     enabled: "{{ unifi_poller_service_enabled }}"
     state: "{{ unifi_poller_service_state }}"
   become: true
