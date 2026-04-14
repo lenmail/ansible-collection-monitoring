@@ -45,7 +45,7 @@
       return_content: true
       status_code: 200
       body_format: json
-      validate_certs: false
+      validate_certs: "{{ loki_validate_certs | bool }}"
       user: "{{ lookup('env', 'GH_USER') | default(omit) }}"
       password: "{{ lookup('env', 'GH_TOKEN') | default(omit) }}"
     environment: "{{ proxy_env }}"
@@ -56,19 +56,24 @@
 
   - name: set loki version to latest release
     ansible.builtin.set_fact:
-      loki_version: "{{ _latest_release.json.tag_name[1:] }}"
+      loki_resolved_version: "{{ _latest_release.json.tag_name[1:] }}"
+    delegate_facts: true
   when: loki_version == "latest"
   delegate_to: localhost
   run_once: true
   become: true
   tags: loki
 
+- name: set effective loki version
+  ansible.builtin.set_fact:
+    _loki_effective_version: "{{ hostvars['localhost'].loki_resolved_version | default(loki_version) }}"
+  tags: loki
+
 - block:
   - name: get checksum list from github
     ansible.builtin.set_fact:
-      _checksums: "{{ lookup('url', 'https://github.com/grafana/loki/releases/download/v' + loki_version + '/SHA256SUMS', wantlist=True) | list }}"
+      _checksums: "{{ lookup('url', 'https://github.com/grafana/loki/releases/download/v' + _loki_effective_version + '/SHA256SUMS', wantlist=True) | list }}"
     environment: "{{ proxy_env }}"
-    run_once: true
     become: true
     tags: loki
 
@@ -82,8 +87,8 @@
 
   - name: download binary to local folder
     ansible.builtin.get_url:
-      url: "https://github.com/grafana/loki/releases/download/v{{ loki_version }}/loki-linux-{{ go_arch }}.zip"
-      dest: "/tmp/loki-{{ loki_version }}.linux-{{ go_arch }}.zip"
+      url: "https://github.com/grafana/loki/releases/download/v{{ _loki_effective_version }}/loki-linux-{{ go_arch }}.zip"
+      dest: "/tmp/loki-{{ _loki_effective_version }}.linux-{{ go_arch }}.zip"
       checksum: "sha256:{{ loki_checksum }}"
       mode: "0644"
     environment: "{{ proxy_env }}"
@@ -98,7 +103,7 @@
 
   - name: unpack binary
     ansible.builtin.unarchive:
-      src: "/tmp/loki-{{ loki_version }}.linux-{{ go_arch }}.zip"
+      src: "/tmp/loki-{{ _loki_effective_version }}.linux-{{ go_arch }}.zip"
       dest: "/tmp"
       creates: "/tmp/loki-linux-{{ go_arch }}"
     delegate_to: localhost
@@ -117,7 +122,7 @@
     when: not ansible_check_mode
     become: true
     tags: loki
-  when: (not __loki_is_installed.stat.exists) or (loki_version not in (__loki_current_version_output.stdout | default('')))
+  when: (not __loki_is_installed.stat.exists) or (_loki_effective_version not in (__loki_current_version_output.stdout | default('')))
 
 - name: create directories
   ansible.builtin.file:

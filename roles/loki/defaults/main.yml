@@ -9,7 +9,8 @@ loki_binary_install_dir: /usr/local/bin
 loki_config_dir: /etc/loki
 loki_config_file: config.yml
 loki_data_dir: /var/lib/loki
-loki_rule_path: /tmp/loki/rules
+loki_rule_path: "{{ loki_data_dir }}/rules"
+loki_validate_certs: true
 loki_system_user: loki
 loki_system_group: loki
 loki_auth_enabled: false
