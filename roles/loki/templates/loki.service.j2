@@ -1,0 +1,20 @@
+{{ ansible_managed | comment }}
+[Unit]
+Description=Grafana Loki
+Documentation=https://grafana.com/oss/loki/
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User={{ loki_system_user }}
+Group={{ loki_system_group }}
+ExecStart={{ loki_binary_install_dir }}/loki -config.file={{ loki_config_dir }}/{{ loki_config_file }}
+WorkingDirectory={{ loki_data_dir }}
+Restart=always
+RestartSec=30
+LimitNOFILE=1048576
+SyslogIdentifier=loki
+
+[Install]
+WantedBy=multi-user.target

@@ -56,3 +56,33 @@ argument_specs:
         - Controls `alertmanager_config` for the `alertmanager` role.
         required: false
         type: str
+      alertmanager_resolve_timeout:
+        description:
+        - Controls `alertmanager_resolve_timeout` for the `alertmanager` role.
+        required: false
+        type: str
+      alertmanager_smtp:
+        description:
+        - Controls `alertmanager_smtp` for the `alertmanager` role.
+        required: false
+        type: dict
+      alertmanager_time_intervals:
+        description:
+        - Controls `alertmanager_time_intervals` for the `alertmanager` role.
+        required: false
+        type: list
+      alertmanager_inhibit_rules:
+        description:
+        - Controls `alertmanager_inhibit_rules` for the `alertmanager` role.
+        required: false
+        type: list
+      alertmanager_route:
+        description:
+        - Controls `alertmanager_route` for the `alertmanager` role.
+        required: false
+        type: dict
+      alertmanager_routes:
+        description:
+        - Controls `alertmanager_routes` for the `alertmanager` role.
+        required: false
+        type: list

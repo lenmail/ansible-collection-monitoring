@@ -9,6 +9,10 @@ global:
 
 time_intervals:
 {{ alertmanager_time_intervals | to_nice_yaml(indent=2,sort_keys=False) }}
+{% if alertmanager_inhibit_rules | length > 0 %}
+inhibit_rules:
+{{ alertmanager_inhibit_rules | to_nice_yaml(indent=2,sort_keys=False) }}
+{% endif %}
 templates:
 - '{{ alertmanager_config_dir }}/templates/*.tmpl'
 
