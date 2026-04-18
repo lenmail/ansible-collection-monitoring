@@ -1,10 +1,10 @@
 ---
-namespace: lenmail
+namespace: onkeldom
 name: monitoring
 version: 0.1.0
 readme: README.md
 authors:
-- Dominik Lenhardt <dominik.lenhardt@lenmail.de>
+- Dominik Lenhardt <dominik@lenmail.de>
 description: Collection with monitoring roles for exporters, metrics storage, logging, and dashboards.
 license:
 - MIT
