@@ -2,7 +2,7 @@
 - name: restart unifi_poller
   ansible.builtin.systemd:
     daemon_reload: true
-    name: unifi_poller
+    name: "{{ unifi_poller_service_name }}"
     state: restarted
   become: true
   when: unifi_poller_manage_service
