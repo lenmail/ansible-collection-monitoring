@@ -3,76 +3,96 @@
 alloy_service_enabled: true
 alloy_service_state: started
 
-# Konfigurationsdatei-Pfad
-alloy_config_file: /etc/alloy/config.alloy
+# Installation
+alloy_linux_install_package: true
+alloy_windows_install_method: winget
+alloy_windows_installer_url: ""
+alloy_windows_installer_path: C:/Windows/Temp/alloy-installer-windows-amd64.exe
+alloy_windows_product_id: GrafanaLabs.Alloy
+alloy_windows_binary_path: C:/Program Files/GrafanaLabs/Alloy/alloy.exe
 
-# Benutzer und Gruppe (werden normalerweise automatisch beim Paket-Installation erstellt)
+# Konfiguration
+alloy_config_file: ""
+alloy_config_dir: ""
+alloy_data_dir: ""
 alloy_user: alloy
 alloy_group: alloy
-
-# Log-Level
 alloy_log_level: info
+alloy_validate_config: true
 
-# Default Loki-Endpoints (müssen angepasst werden)
-alloy_loki_endpoint: "http://localhost:3100/loki/api/v1/push"
-alloy_normal_logs_tenant: "normal-logs"
-alloy_audit_logs_tenant: "audit-logs"
+# Einheitliche Labels fuer Metriken und Logs.
+alloy_labels:
+  tenant: default
+  environment: prod
+  site: default
+  platform: generic
+  system_role: server
+  component_type: compute
+  managed_by: ansible
 
-# Standard Alloy-Konfiguration
-alloy_config:
-  logging:
-    level: "{{ alloy_log_level }}"
-    format: logfmt
+# Loki-Ausgabe. Leer lassen, wenn der Host keine Logs senden soll.
+alloy_loki_endpoint: ""
+alloy_loki_tenant_id: ""
+alloy_loki_external_labels: {}
 
-  # Loki-Ausgabe für verschiedene Log-Typen
-  loki:
-    write:
-      # Normal logs endpoint
-    - endpoint: "{{ alloy_loki_endpoint }}"
-      tenant_id: "{{ alloy_normal_logs_tenant }}"
-      # Audit logs endpoint  
-    - endpoint: "{{ alloy_loki_endpoint }}"
-      tenant_id: "{{ alloy_audit_logs_tenant }}"
-    source:
-      file:
-        # Normale System-Logs
-      - targets:
-        - __path__: "/var/log/syslog"
-          job: "syslog"
-          log_type: "system"
-          host: "{{ ansible_hostname }}"
-        - __path__: "/var/log/messages"
-          job: "messages"
-          log_type: "system"
-          host: "{{ ansible_hostname }}"
-        - __path__: "/var/log/daemon.log"
-          job: "daemon"
-          log_type: "system"
-          host: "{{ ansible_hostname }}"
-        forward_to: ["loki_0"]    # Normal logs tenant
-        # Audit-Logs
-      - targets:
-        - __path__: "/var/log/audit/audit.log"
-          job: "audit"
-          log_type: "security"
-          host: "{{ ansible_hostname }}"
-        - __path__: "/var/log/auth.log"
-          job: "auth"
-          log_type: "security"
-          host: "{{ ansible_hostname }}"
-        - __path__: "/var/log/secure"
-          job: "secure"
-          log_type: "security"
-          host: "{{ ansible_hostname }}"
-        forward_to: ["loki_1"]    # Audit logs tenant
+# Prometheus Remote Write. Leer lassen, wenn Metriken nur lokal gescraped werden.
+alloy_prometheus_remote_write_url: ""
+alloy_prometheus_remote_write_headers: {}
+alloy_prometheus_external_labels: {}
 
-# Firewall-Konfiguration (falls erforderlich)
+# Linux-Metriken und Logs
+alloy_linux_metrics_enabled: true
+alloy_linux_metrics_collectors_disabled: []
+alloy_linux_metrics_collectors_enabled: []
+alloy_linux_journal_enabled: true
+alloy_linux_journal_max_age: 24h
+alloy_linux_file_logs_enabled: true
+alloy_linux_file_log_targets:
+  - path: /var/log/syslog
+    job: syslog
+    log_type: system
+  - path: /var/log/messages
+    job: messages
+    log_type: system
+  - path: /var/log/auth.log
+    job: auth
+    log_type: security
+  - path: /var/log/secure
+    job: secure
+    log_type: security
+  - path: /var/log/audit/audit.log
+    job: audit
+    log_type: security
+
+# Windows-Metriken und Eventlogs
+alloy_windows_metrics_enabled: true
+alloy_windows_enabled_collectors:
+  - cpu
+  - cs
+  - logical_disk
+  - net
+  - os
+  - service
+  - system
+alloy_windows_eventlog_enabled: true
+alloy_windows_eventlogs:
+  - name: Application
+    job: windows-eventlog-application
+    log_type: application
+  - name: System
+    job: windows-eventlog-system
+    log_type: system
+  - name: Security
+    job: windows-eventlog-security
+    log_type: security
+alloy_windows_bookmark_dir: C:/ProgramData/GrafanaLabs/Alloy/bookmarks
+
+# Freie Alloy-Bloecke fuer Spezialquellen, z. B. Proxmox/Ceph Scrapes.
+alloy_extra_config: ""
+
+# Firewall-Konfiguration
 alloy_firewall_enabled: false
 alloy_firewall_ports: []
 
 # Systemd-Service-Optionen
 alloy_service_override: {}
-  # Environment:
-  #   - "CUSTOM_VAR=value"
-  # ExecStartPre:
-  #   - "/usr/bin/test -f /etc/alloy/config.alloy"

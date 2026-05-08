@@ -1,20 +1,41 @@
 ---
-- name: restart alloy
-  systemd:
+- name: Restart alloy on Linux
+  ansible.builtin.systemd:
     name: "{{ alloy_service_name }}"
     state: restarted
     daemon_reload: true
   become: true
+  when: ansible_os_family != "Windows"
+  listen: restart alloy
 
-- name: reload alloy
-  systemd:
+- name: Restart alloy on Windows
+  ansible.windows.win_service:
+    name: "{{ alloy_service_name }}"
+    state: restarted
+  when: ansible_os_family == "Windows"
+  listen: restart alloy
+
+- name: Reload alloy on Linux
+  ansible.builtin.systemd:
     name: "{{ alloy_service_name }}"
     state: reloaded
   become: true
+  when: ansible_os_family != "Windows"
+  listen: reload alloy
 
-- name: start alloy
-  systemd:
+- name: Start alloy on Linux
+  ansible.builtin.systemd:
     name: "{{ alloy_service_name }}"
     state: started
     enabled: "{{ alloy_service_enabled }}"
   become: true
+  when: ansible_os_family != "Windows"
+  listen: start alloy
+
+- name: Start alloy on Windows
+  ansible.windows.win_service:
+    name: "{{ alloy_service_name }}"
+    state: started
+    start_mode: "{{ 'auto' if alloy_service_enabled else 'manual' }}"
+  when: ansible_os_family == "Windows"
+  listen: start alloy

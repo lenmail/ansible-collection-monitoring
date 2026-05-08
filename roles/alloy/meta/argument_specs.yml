@@ -3,70 +3,144 @@ argument_specs:
   main:
     short_description: Entry point for the alloy role.
     description:
-    - Validate variables for the `alloy` role.
+      - Install and configure Grafana Alloy for Linux and Windows telemetry.
     options:
       alloy_service_enabled:
         description:
-        - Controls `alloy_service_enabled` for the `alloy` role.
+          - Whether the Alloy service is enabled at boot.
         required: false
         type: bool
       alloy_service_state:
         description:
-        - Controls `alloy_service_state` for the `alloy` role.
+          - Desired Alloy service state.
+        required: false
+        type: str
+      alloy_linux_install_package:
+        description:
+          - Install the Alloy package on Linux hosts.
+        required: false
+        type: bool
+      alloy_windows_install_method:
+        choices:
+          - winget
+          - url
+        description:
+          - Windows installation method.
+        required: false
+        type: str
+      alloy_windows_installer_url:
+        description:
+          - Installer URL used when alloy_windows_install_method is url.
+        required: false
+        type: str
+      alloy_windows_binary_path:
+        description:
+          - Path to alloy.exe for validation on Windows.
         required: false
         type: str
       alloy_config_file:
         description:
-        - Controls `alloy_config_file` for the `alloy` role.
+          - Path to the Alloy configuration file.
         required: false
         type: str
       alloy_user:
         description:
-        - Controls `alloy_user` for the `alloy` role.
+          - Linux service user.
         required: false
         type: str
       alloy_group:
         description:
-        - Controls `alloy_group` for the `alloy` role.
+          - Linux service group.
         required: false
         type: str
       alloy_log_level:
         description:
-        - Controls `alloy_log_level` for the `alloy` role.
+          - Alloy log level.
         required: false
         type: str
-      alloy_loki_endpoint:
+      alloy_validate_config:
         description:
-        - Controls `alloy_loki_endpoint` for the `alloy` role.
+          - Run alloy fmt --test after rendering the configuration.
         required: false
-        type: str
-      alloy_normal_logs_tenant:
+        type: bool
+      alloy_labels:
         description:
-        - Controls `alloy_normal_logs_tenant` for the `alloy` role.
-        required: false
-        type: str
-      alloy_audit_logs_tenant:
-        description:
-        - Controls `alloy_audit_logs_tenant` for the `alloy` role.
-        required: false
-        type: str
-      alloy_config:
-        description:
-        - Controls `alloy_config` for the `alloy` role.
+          - Common labels added to metrics and logs.
         required: false
         type: dict
+      alloy_loki_endpoint:
+        description:
+          - Loki push endpoint. Leave empty to disable log shipping.
+        required: false
+        type: str
+      alloy_loki_tenant_id:
+        description:
+          - Optional Loki tenant id.
+        required: false
+        type: str
+      alloy_loki_external_labels:
+        description:
+          - Additional labels for log streams.
+        required: false
+        type: dict
+      alloy_prometheus_remote_write_url:
+        description:
+          - Prometheus remote_write endpoint. Leave empty to disable metric shipping.
+        required: false
+        type: str
+      alloy_prometheus_remote_write_headers:
+        description:
+          - Optional HTTP headers for Prometheus remote_write.
+        required: false
+        type: dict
+      alloy_prometheus_external_labels:
+        description:
+          - Additional external labels for metrics.
+        required: false
+        type: dict
+      alloy_linux_metrics_enabled:
+        description:
+          - Enable embedded Linux host metrics via prometheus.exporter.unix.
+        required: false
+        type: bool
+      alloy_linux_file_logs_enabled:
+        description:
+          - Enable Linux file log collection.
+        required: false
+        type: bool
+      alloy_linux_journal_enabled:
+        description:
+          - Enable Linux journald collection.
+        required: false
+        type: bool
+      alloy_windows_metrics_enabled:
+        description:
+          - Enable embedded Windows metrics via prometheus.exporter.windows.
+        required: false
+        type: bool
+      alloy_windows_eventlog_enabled:
+        description:
+          - Enable Windows Event Log collection.
+        required: false
+        type: bool
+      alloy_extra_config:
+        description:
+          - Raw Alloy configuration appended to the generated profile.
+        required: false
+        type: str
       alloy_firewall_enabled:
         description:
-        - Controls `alloy_firewall_enabled` for the `alloy` role.
+          - Manage local firewall rules for Alloy listener ports.
         required: false
         type: bool
       alloy_firewall_ports:
         description:
-        - Controls `alloy_firewall_ports` for the `alloy` role.
+          - Firewall ports in port/protocol format.
+        elements: str
         required: false
         type: list
       alloy_service_override:
         description:
-        - Controls `alloy_service_override` for the `alloy` role.
+          - Linux systemd override configuration.
         required: false
         type: dict
