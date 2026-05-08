@@ -17,6 +17,7 @@ Die Rolle betreibt Alloy als hostnahen Agenten fuer Logs und Metriken:
 - Windows-Hostmetriken ueber `prometheus.exporter.windows`
 - Linux-Logs aus journald und definierten Logdateien
 - Windows Event Logs aus Application, System und Security
+- stabile Loglabels fuer Dashboard-Filter: `service`, bei journald zusaetzlich `unit`, `syslog_identifier` und `level`
 - Versand von Logs an Loki
 - Versand von Metriken per Prometheus Remote Write
 - erweiterbare Alloy-Rohkonfiguration fuer Sonderquellen

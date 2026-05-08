@@ -69,9 +69,29 @@ prometheus.scrape "windows_host" {
 {% endif %}
 
 {% if ansible_os_family != 'Windows' and alloy_linux_journal_enabled and loki_enabled %}
+loki.relabel "journal" {
+  forward_to = []
+
+  rule {
+    source_labels = ["__journal__systemd_unit"]
+    target_label  = "unit"
+  }
+
+  rule {
+    source_labels = ["__journal_syslog_identifier"]
+    target_label  = "syslog_identifier"
+  }
+
+  rule {
+    source_labels = ["__journal_priority_keyword"]
+    target_label  = "level"
+  }
+}
+
 loki.source.journal "systemd" {
   max_age    = "{{ alloy_linux_journal_max_age }}"
-  labels     = {{ river_map(log_labels | combine({'job': 'systemd-journal', 'log_type': 'system'})) }}
+  labels     = {{ river_map(log_labels | combine({'job': 'systemd-journal', 'log_type': 'system', 'service': 'systemd-journal'})) }}
+  relabel_rules = loki.relabel.journal.rules
   forward_to = [loki.write.default.receiver]
 }
 {% endif %}
@@ -80,7 +100,7 @@ loki.source.journal "systemd" {
 loki.source.file "linux_files" {
   targets = [
 {% for target in alloy_linux_file_log_targets %}
-    {{ river_map(log_labels | combine({'__path__': target.path, 'job': target.job, 'log_type': target.log_type})) }},
+    {{ river_map(log_labels | combine({'__path__': target.path, 'job': target.job, 'log_type': target.log_type, 'service': target.service | default(target.job)})) }},
 {% endfor %}
   ]
   forward_to = [loki.write.default.receiver]
@@ -92,7 +112,7 @@ loki.source.file "linux_files" {
 loki.source.windowsevent "{{ eventlog.name | lower }}" {
   eventlog_name = "{{ eventlog.name }}"
   bookmark_path = "{{ alloy_windows_bookmark_dir }}/{{ eventlog.name }}.xml"
-  labels        = {{ river_map(log_labels | combine({'job': eventlog.job, 'log_type': eventlog.log_type})) }}
+  labels        = {{ river_map(log_labels | combine({'job': eventlog.job, 'log_type': eventlog.log_type, 'service': eventlog.service | default(eventlog.name | lower)})) }}
   forward_to    = [loki.write.default.receiver]
 }
 
